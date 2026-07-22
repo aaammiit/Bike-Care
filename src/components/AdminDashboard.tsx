@@ -465,11 +465,19 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onViewInvoice })
 
             {/* Assign Mechanic Overlay Dialog */}
             {assigningBookingId && (
-              <div className="fixed inset-0 bg-slate-900/30 backdrop-blur-xs z-50 flex items-center justify-center p-4">
-                <div className="bg-white border border-slate-200 rounded-3xl p-6 max-w-sm w-full space-y-4 text-left shadow-2xl">
-                  <div className="flex justify-between items-center border-b border-slate-100 pb-2">
-                    <h4 className="font-bold text-sm text-slate-900">Assign Garage Mechanic</h4>
-                    <button onClick={() => setAssigningBookingId(null)} className="text-slate-400 text-xs">Cancel</button>
+              <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs z-50 flex items-center justify-center p-2 sm:p-4">
+                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl sm:rounded-3xl p-5 sm:p-6 max-w-sm w-full space-y-4 text-left shadow-2xl">
+                  <div className="flex justify-between items-center border-b border-slate-100 dark:border-slate-800 pb-3 gap-2">
+                    <h4 className="font-bold text-sm text-slate-900 dark:text-white truncate">Assign Garage Mechanic</h4>
+                    <button
+                      type="button"
+                      onClick={() => setAssigningBookingId(null)}
+                      aria-label="Close dialog"
+                      title="Close"
+                      className="shrink-0 w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 flex items-center justify-center transition cursor-pointer border border-slate-200 dark:border-slate-700"
+                    >
+                      <X className="h-4 w-4 stroke-[2.5]" />
+                    </button>
                   </div>
 
                   <form onSubmit={handleConfirmAssign} className="space-y-4">

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useApp } from "../AppContext";
 import { MessageSquare, PhoneCall, X, ShieldAlert, Smartphone, ArrowDown, Send } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
@@ -9,6 +9,15 @@ interface CommunicationsDrawerProps {
 }
 
 export const CommunicationsDrawer: React.FC<CommunicationsDrawerProps> = ({ isOpen, onClose }) => {
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && isOpen) {
+        onClose();
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isOpen, onClose]);
   const { sentMessagesLog, triggerSmsWhatsApp, currentCustomer } = useApp();
   const [activeTab, setActiveTab] = useState<"All" | "WhatsApp" | "SMS">("All");
   const [testMsg, setTestMsg] = useState("");
@@ -44,26 +53,28 @@ export const CommunicationsDrawer: React.FC<CommunicationsDrawerProps> = ({ isOp
             className="fixed inset-y-0 right-0 max-w-md w-full bg-slate-950 text-slate-100 shadow-2xl z-50 flex flex-col border-l border-slate-800"
           >
             {/* Header */}
-            <div className="p-4 border-b border-slate-800 flex items-center justify-between bg-slate-900">
-              <div className="flex items-center space-x-2.5">
-                <div className="bg-green-500/20 text-green-400 p-2 rounded-xl">
+            <div className="p-3.5 sm:p-4 border-b border-slate-800 flex items-center justify-between bg-slate-900 gap-2 shrink-0">
+              <div className="flex items-center space-x-2.5 min-w-0 flex-1 pr-1">
+                <div className="bg-green-500/20 text-green-400 p-2 rounded-xl shrink-0">
                   <Smartphone className="h-5 w-5" />
                 </div>
-                <div>
-                  <h3 className="font-display font-bold text-sm tracking-tight text-white flex items-center">
-                    Messaging Simulator
-                    <span className="ml-2 px-1.5 py-0.5 bg-green-500/20 text-green-400 text-[10px] font-mono rounded">
+                <div className="min-w-0 flex-1">
+                  <h3 className="font-display font-bold text-sm tracking-tight text-white flex items-center truncate">
+                    <span className="truncate">Messaging Simulator</span>
+                    <span className="ml-2 px-1.5 py-0.5 bg-green-500/20 text-green-400 text-[10px] font-mono rounded shrink-0">
                       ACTIVE
                     </span>
                   </h3>
-                  <p className="text-[10px] text-slate-400 font-mono">Real-time WhatsApp & SMS Gateway Log</p>
+                  <p className="text-[10px] text-slate-400 font-mono truncate">Real-time WhatsApp & SMS Gateway Log</p>
                 </div>
               </div>
               <button
                 onClick={onClose}
-                className="p-1.5 hover:bg-slate-800 rounded-lg text-slate-400 hover:text-white transition"
+                aria-label="Close messaging simulator drawer"
+                title="Close (Esc)"
+                className="shrink-0 w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition flex items-center justify-center cursor-pointer border border-slate-700 shadow-2xs z-20"
               >
-                <X className="h-4 w-4" />
+                <X className="h-4 w-4 stroke-[2.5]" />
               </button>
             </div>
 

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useApp } from "../AppContext";
 import { Bike, ServiceType, Booking, BIKE_SERVICES_LIST } from "../types";
 import {
@@ -44,6 +44,17 @@ export const BookingWizard: React.FC<BookingWizardProps> = ({ isOpen, onClose, p
   const [locationError, setLocationError] = useState<string | null>(null);
   const [useGps, setUseGps] = useState(false);
   const [receiveSmsUpdates, setReceiveSmsUpdates] = useState(true);
+
+  // Add escape key handler
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && isOpen) {
+        onClose();
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isOpen, onClose]);
 
   const handleAcquireLocation = () => {
     setIsLocating(true);
@@ -224,31 +235,36 @@ export const BookingWizard: React.FC<BookingWizardProps> = ({ isOpen, onClose, p
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-50 overflow-y-auto">
+        <div className="fixed inset-0 z-[120] overflow-y-auto">
           {/* Backdrop */}
-          <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs transition-opacity" onClick={onClose} />
+          <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-md transition-opacity" onClick={onClose} />
 
           {/* Dialog Container */}
-          <div className="flex min-h-full items-center justify-center p-4 text-center">
+          <div className="flex min-h-full items-start sm:items-center justify-center p-2 sm:p-4 text-center">
             <motion.div
               initial={{ scale: 0.95, y: 15, opacity: 0 }}
               animate={{ scale: 1, y: 0, opacity: 1 }}
               exit={{ scale: 0.95, y: 15, opacity: 0 }}
               transition={{ type: "spring", damping: 25, stiffness: 220 }}
-              className="w-full max-w-2xl transform overflow-hidden rounded-3xl bg-white text-left align-middle shadow-2xl transition-all border border-slate-100 flex flex-col"
+              className="w-full max-w-2xl my-auto transform overflow-hidden rounded-2xl sm:rounded-3xl bg-white dark:bg-slate-900 text-left align-middle shadow-2xl transition-all border border-slate-200 dark:border-slate-800 flex flex-col max-h-[90vh] sm:max-h-[88vh] relative z-10"
             >
               
               {/* Header */}
-              <div className="px-6 py-5 border-b border-slate-100 flex items-center justify-between bg-slate-50 rounded-t-3xl">
-                <div>
-                  <h3 className="font-display font-bold text-lg text-slate-900 flex items-center">
-                    <BikeIcon className="h-5 w-5 mr-2 text-blue-600 shrink-0" />
-                    Book Service Appointment
+              <div className="sticky top-0 z-30 px-4 py-3.5 sm:px-6 sm:py-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-slate-50 dark:bg-slate-900 rounded-t-2xl sm:rounded-t-3xl shrink-0 gap-2 shadow-xs">
+                <div className="min-w-0 flex-1 pr-1">
+                  <h3 className="font-display font-bold text-base sm:text-lg text-slate-900 dark:text-white flex items-center truncate">
+                    <BikeIcon className="h-5 w-5 mr-2 text-blue-600 dark:text-blue-400 shrink-0" />
+                    <span className="truncate">Book Service Appointment</span>
                   </h3>
-                  <p className="text-xs text-slate-500 font-sans mt-0.5">Specialized Bike Mechanical Workshop</p>
+                  <p className="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 font-sans mt-0.5 truncate">Specialized Bike Mechanical Workshop</p>
                 </div>
-                <button onClick={onClose} className="p-1.5 hover:bg-slate-200 rounded-lg text-slate-400 hover:text-slate-600 transition">
-                  <X className="h-5 w-5" />
+                <button
+                  onClick={onClose}
+                  aria-label="Close booking wizard"
+                  title="Close (Esc)"
+                  className="shrink-0 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-slate-200/90 hover:bg-rose-500 hover:text-white dark:bg-slate-800 dark:hover:bg-rose-600 text-slate-700 dark:text-slate-200 transition-all flex items-center justify-center cursor-pointer shadow-2xs border border-slate-300/60 dark:border-slate-700/60 z-30 active:scale-95"
+                >
+                  <X className="h-5 w-5 stroke-[2.5]" />
                 </button>
               </div>
 

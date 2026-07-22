@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Invoice } from "../types";
 import { Printer, Download, X, Check, ShieldCheck, QrCode } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
@@ -10,6 +10,16 @@ interface InvoicePrintModalProps {
 }
 
 export const InvoicePrintModal: React.FC<InvoicePrintModalProps> = ({ isOpen, onClose, invoice }) => {
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && isOpen) {
+        onClose();
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isOpen, onClose]);
+
   if (!invoice) return null;
 
   const handlePrintSimulate = () => {
@@ -24,42 +34,46 @@ export const InvoicePrintModal: React.FC<InvoicePrintModalProps> = ({ isOpen, on
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-50 overflow-y-auto">
+        <div className="fixed inset-0 z-[120] overflow-y-auto">
           {/* Backdrop */}
-          <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-xs transition-opacity" onClick={onClose} />
+          <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-md transition-opacity" onClick={onClose} />
 
           {/* Dialog Wrapper */}
-          <div className="flex min-h-full items-center justify-center p-4 text-center">
+          <div className="flex min-h-full items-start sm:items-center justify-center p-2 sm:p-4 text-center">
             <motion.div
               initial={{ scale: 0.95, opacity: 0, y: 10 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.95, opacity: 0, y: 10 }}
-              className="w-full max-w-2xl transform overflow-hidden rounded-3xl bg-white p-6 text-left align-middle shadow-2xl transition-all border border-slate-200/80"
+              className="w-full max-w-2xl my-auto transform overflow-hidden rounded-2xl sm:rounded-3xl bg-white p-4 sm:p-6 text-left align-middle shadow-2xl transition-all border border-slate-200/80 max-h-[90vh] sm:max-h-[88vh] flex flex-col relative z-10"
             >
               
               {/* Header Action Controls */}
-              <div className="flex justify-between items-center pb-4 mb-6 border-b border-slate-100 no-print">
+              <div className="sticky top-0 z-30 bg-white flex justify-between items-center pb-3 mb-4 border-b border-slate-100 no-print gap-2 shrink-0">
                 <div className="flex space-x-2">
                   <button
                     onClick={handlePrintSimulate}
-                    className="flex items-center space-x-1.5 text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 px-3.5 py-2 rounded-xl transition"
+                    className="flex items-center space-x-1.5 text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-xl transition cursor-pointer"
                   >
                     <Printer className="h-4 w-4" />
-                    <span>Print Invoice</span>
+                    <span className="hidden sm:inline">Print Invoice</span>
+                    <span className="sm:hidden">Print</span>
                   </button>
                   <button
                     onClick={handleDownloadSimulate}
-                    className="flex items-center space-x-1.5 text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 px-3.5 py-2 rounded-xl transition shadow-sm"
+                    className="flex items-center space-x-1.5 text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-xl transition shadow-xs cursor-pointer"
                   >
                     <Download className="h-4 w-4" />
-                    <span>Download PDF</span>
+                    <span className="hidden sm:inline">Download PDF</span>
+                    <span className="sm:hidden">PDF</span>
                   </button>
                 </div>
                 <button
                   onClick={onClose}
-                  className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-400 hover:text-slate-600 transition"
+                  aria-label="Close invoice modal"
+                  title="Close (Esc)"
+                  className="shrink-0 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-slate-100 hover:bg-rose-500 hover:text-white text-slate-700 transition-all flex items-center justify-center cursor-pointer border border-slate-200 shadow-2xs z-30 active:scale-95"
                 >
-                  <X className="h-5 w-5" />
+                  <X className="h-5 w-5 stroke-[2.5]" />
                 </button>
               </div>
 

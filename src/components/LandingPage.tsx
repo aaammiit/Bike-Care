@@ -274,6 +274,19 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenBooking, onNavig
     return () => clearInterval(timer);
   }, []);
 
+  // Monitor Scroll position & Keyboard escape key to close active modals
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setIsBookingModalOpen(false);
+        setLightboxImg(null);
+        setShowSuccessModal(false);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
   // Monitor Scroll position to highlight menu items
   useEffect(() => {
     const handleScroll = () => {
@@ -1031,14 +1044,14 @@ _Please confirm my ${isEmergency ? "emergency SOS dispatch" : "slot"} on your da
       {/* MODAL APPOINTMENT FORM OVERLAY */}
       <AnimatePresence>
         {isBookingModalOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="fixed inset-0 z-[120] overflow-y-auto p-2 sm:p-4 flex items-start sm:items-center justify-center min-h-full">
             {/* Backdrop */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setIsBookingModalOpen(false)}
-              className="fixed inset-0 bg-slate-950/70 backdrop-blur-sm"
+              className="fixed inset-0 bg-slate-950/80 backdrop-blur-md"
             />
 
             {/* Modal Dialog Content Container */}
@@ -1047,23 +1060,23 @@ _Please confirm my ${isEmergency ? "emergency SOS dispatch" : "slot"} on your da
               animate={{ scale: 1, y: 0, opacity: 1 }}
               exit={{ scale: 0.95, y: 15, opacity: 0 }}
               transition={{ type: "spring", damping: 25, stiffness: 220 }}
-              className={`w-full ${isEmergency ? "max-w-xl" : "max-w-3xl"} transition-all duration-300 transform overflow-hidden rounded-3xl bg-white text-left align-middle shadow-xl border-2 border-slate-200 flex flex-col relative z-10 max-h-[90vh]`}
+              className={`w-full ${isEmergency ? "max-w-xl" : "max-w-3xl"} my-auto transition-all duration-300 transform overflow-hidden rounded-2xl sm:rounded-3xl bg-white dark:bg-slate-900 text-left align-middle shadow-2xl border-2 border-slate-200 dark:border-slate-800 flex flex-col relative z-10 max-h-[90vh] sm:max-h-[88vh]`}
             >
               <form 
                 onSubmit={handleBookingSubmit} 
                 className="flex flex-col flex-1 min-h-0 overflow-hidden"
               >
-                {/* Modal Header - Fixed at Top */}
-                <div className="px-6 py-5 border-b-2 border-slate-100 flex items-center justify-between bg-slate-50 rounded-t-3xl shrink-0">
-                  <div className="flex items-center space-x-2.5">
-                    <div className="bg-eager-green text-white p-2.5 rounded-xl border-b-4 border-emerald-600">
-                      <Wrench className="h-4.5 w-4.5 stroke-[2.5]" />
+                {/* Modal Header - Sticky at Top with single clean close button */}
+                <div className="sticky top-0 z-30 px-4 py-3.5 sm:px-6 sm:py-4 border-b-2 border-slate-100 dark:border-slate-800/80 flex items-center justify-between bg-slate-50 dark:bg-slate-900 rounded-t-2xl sm:rounded-t-3xl shrink-0 gap-2 shadow-xs">
+                  <div className="flex items-center space-x-2 sm:space-x-3 min-w-0 flex-1 pr-1">
+                    <div className="bg-eager-green text-white p-2 sm:p-2.5 rounded-xl border-b-3 border-emerald-600 shrink-0">
+                      <Wrench className="h-4 w-4 sm:h-5 sm:w-5 stroke-[2.5]" />
                     </div>
-                    <div>
-                      <h3 className="font-display font-black text-lg text-charcoal uppercase tracking-tight">
+                    <div className="min-w-0 flex-1">
+                      <h3 className="font-display font-black text-sm sm:text-base md:text-lg text-slate-900 dark:text-white uppercase tracking-tight truncate sm:whitespace-normal">
                         WhatsApp Dispatch Portal
                       </h3>
-                      <p className="text-[10px] font-mono text-eager-green font-bold uppercase tracking-widest">
+                      <p className="text-[10px] sm:text-[11px] font-mono text-eager-green font-bold uppercase tracking-wider truncate">
                         Fast-Track Diagnostic Ticket Generator
                       </p>
                     </div>
@@ -1071,9 +1084,11 @@ _Please confirm my ${isEmergency ? "emergency SOS dispatch" : "slot"} on your da
                   <button
                     type="button"
                     onClick={() => setIsBookingModalOpen(false)}
-                    className="p-1.5 hover:bg-slate-200 rounded-lg text-slate-400 hover:text-slate-600 transition cursor-pointer"
+                    aria-label="Close booking form"
+                    title="Close form (Esc)"
+                    className="shrink-0 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-slate-200/90 hover:bg-rose-500 hover:text-white dark:bg-slate-800 dark:hover:bg-rose-600 text-slate-700 dark:text-slate-200 transition-all flex items-center justify-center cursor-pointer shadow-2xs border border-slate-300/60 dark:border-slate-700/60 z-30 active:scale-95"
                   >
-                    <X className="h-5 w-5" />
+                    <X className="h-5 w-5 stroke-[2.5]" />
                   </button>
                 </div>
 
@@ -1554,37 +1569,47 @@ _Please confirm my ${isEmergency ? "emergency SOS dispatch" : "slot"} on your da
                 </div>
 
                 {/* Submit Trigger / Tail / Footer - Fixed at Bottom */}
-                <div className="p-6 border-t border-slate-200 dark:border-slate-800/60 bg-slate-50 dark:bg-slate-900/35 rounded-b-3xl shrink-0 text-left">
-                  <button
-                    type="submit"
-                    disabled={isSubmitting}
-                    className={`w-full py-4 rounded-2xl text-xs font-black tracking-widest uppercase transition-all duration-300 flex items-center justify-center space-x-2 cursor-pointer ${
-                      isEmergency
-                        ? "bg-rose-600 hover:bg-rose-700 text-white border-b-4 border-rose-800"
-                        : "bg-[#F97316] hover:bg-[#ea580c] text-white border-b-4 border-orange-700"
-                    }`}
-                  >
-                    {isSubmitting ? (
-                      <>
-                        <div className="w-5 h-5 rounded-full border-2 border-white border-t-transparent animate-spin" />
-                        <span>{isEmergency ? "Dispatching SOS Signal..." : "Forming WhatsApp Dispatch..."}</span>
-                      </>
-                    ) : (
-                      <>
-                        {isEmergency ? (
-                          <>
-                            <AlertTriangle className="h-4.5 w-4.5 animate-pulse" />
-                            <span>🚨 Dispatch Emergency SOS Now via WhatsApp 🚨</span>
-                          </>
-                        ) : (
-                          <>
-                            <MessageSquare className="h-4.5 w-4.5" />
-                            <span>Book Appointment via WhatsApp</span>
-                          </>
-                        )}
-                      </>
-                    )}
-                  </button>
+                <div className="p-4 sm:p-6 border-t border-slate-200 dark:border-slate-800/60 bg-slate-50 dark:bg-slate-900/35 rounded-b-3xl shrink-0 text-left">
+                  <div className="flex flex-col sm:flex-row gap-2.5 sm:gap-3">
+                    <button
+                      type="submit"
+                      disabled={isSubmitting}
+                      className={`flex-1 py-3.5 sm:py-4 rounded-2xl text-xs font-black tracking-widest uppercase transition-all duration-300 flex items-center justify-center space-x-2 cursor-pointer ${
+                        isEmergency
+                          ? "bg-rose-600 hover:bg-rose-700 text-white border-b-4 border-rose-800"
+                          : "bg-[#F97316] hover:bg-[#ea580c] text-white border-b-4 border-orange-700"
+                      }`}
+                    >
+                      {isSubmitting ? (
+                        <>
+                          <div className="w-5 h-5 rounded-full border-2 border-white border-t-transparent animate-spin" />
+                          <span>{isEmergency ? "Dispatching SOS Signal..." : "Forming WhatsApp Dispatch..."}</span>
+                        </>
+                      ) : (
+                        <>
+                          {isEmergency ? (
+                            <>
+                              <AlertTriangle className="h-4.5 w-4.5 animate-pulse" />
+                              <span>🚨 Dispatch Emergency SOS 🚨</span>
+                            </>
+                          ) : (
+                            <>
+                              <MessageSquare className="h-4.5 w-4.5" />
+                              <span>Book Appointment via WhatsApp</span>
+                            </>
+                          )}
+                        </>
+                      )}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setIsBookingModalOpen(false)}
+                      className="px-5 py-3.5 sm:py-4 rounded-2xl text-xs font-black tracking-wider uppercase transition-all bg-slate-200 hover:bg-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-300/80 dark:border-slate-700 cursor-pointer flex items-center justify-center shrink-0 gap-1.5"
+                    >
+                      <X className="h-4 w-4 stroke-[2.5]" />
+                      <span>Close</span>
+                    </button>
+                  </div>
                   <p className="text-[10px] text-slate-500 font-mono text-center mt-3 font-bold">
                     {isEmergency 
                       ? "🚨 DIRECT PRIORITY LINE • NO WAITING QUEUE" 

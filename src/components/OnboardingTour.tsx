@@ -107,7 +107,7 @@ export const OnboardingTour: React.FC<OnboardingTourProps> = ({ isOpen, onClose 
 
   return (
     <AnimatePresence>
-      <div id="onboarding-tour-overlay" className="fixed inset-0 z-[300] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md">
+      <div id="onboarding-tour-overlay" className="fixed inset-0 z-[300] flex items-center justify-center p-2 sm:p-4 bg-slate-950/80 backdrop-blur-md">
         {/* Background Click Shield */}
         <div className="absolute inset-0" onClick={onClose} />
 
@@ -116,20 +116,21 @@ export const OnboardingTour: React.FC<OnboardingTourProps> = ({ isOpen, onClose 
           animate={{ scale: 1, opacity: 1, y: 0 }}
           exit={{ scale: 0.9, opacity: 0, y: 20 }}
           transition={{ type: "spring", damping: 25, stiffness: 220 }}
-          className="relative bg-white w-full max-w-lg rounded-3xl border-2 border-b-8 border-slate-200 text-slate-800 shadow-2xl p-6 md:p-8 overflow-hidden z-10 text-left"
+          className="relative bg-white dark:bg-slate-900 w-full max-w-lg rounded-2xl sm:rounded-3xl border-2 border-b-6 sm:border-b-8 border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-100 shadow-2xl p-5 sm:p-8 overflow-hidden z-10 text-left"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Top Row with step indicator and close */}
-          <div className="flex items-center justify-between pb-4 border-b-2 border-slate-100">
-            <span className="px-3.5 py-1.5 bg-slate-150 text-slate-700 font-extrabold text-[10px] tracking-wider uppercase rounded-full border border-slate-200">
+          <div className="flex items-center justify-between pb-3 sm:pb-4 border-b-2 border-slate-100 dark:border-slate-800/80 gap-2">
+            <span className="px-3.5 py-1.5 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-extrabold text-[10px] tracking-wider uppercase rounded-full border border-slate-200 dark:border-slate-700">
               {step.badge}
             </span>
             <button
               onClick={onClose}
-              className="p-1.5 rounded-xl text-slate-400 hover:text-slate-800 hover:bg-slate-100 transition-colors cursor-pointer"
-              title="Skip Tour"
+              aria-label="Close tour"
+              className="shrink-0 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition flex items-center justify-center cursor-pointer border border-slate-200 dark:border-slate-700 shadow-2xs z-20"
+              title="Skip Tour (Esc)"
             >
-              <X className="h-5 w-5" />
+              <X className="h-5 w-5 stroke-[2.5]" />
             </button>
           </div>
 

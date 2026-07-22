@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useApp } from "../AppContext";
 import { motion, AnimatePresence } from "motion/react";
 import { X, AlertTriangle, MapPin, Phone, Truck, CheckCircle2, ShieldAlert, Navigation, Compass } from "lucide-react";
@@ -76,34 +76,46 @@ export const SOSModal: React.FC<SOSModalProps> = ({ isOpen, onClose }) => {
     setTimeout(() => setLiveStep(2), 7000);
   };
 
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && isOpen) {
+        onClose();
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isOpen, onClose]);
+
   if (!isOpen) return null;
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 overflow-y-auto bg-slate-950/85 backdrop-blur-md">
+      <div className="fixed inset-0 z-[120] flex items-start sm:items-center justify-center p-2 sm:p-4 overflow-y-auto bg-slate-950/85 backdrop-blur-md min-h-full">
         <motion.div
           initial={{ scale: 0.9, opacity: 0, y: 30 }}
           animate={{ scale: 1, opacity: 1, y: 0 }}
           exit={{ scale: 0.9, opacity: 0, y: 30 }}
           transition={{ type: "spring", duration: 0.45 }}
-          className="relative w-full max-w-lg bg-white dark:bg-slate-900 rounded-3xl overflow-hidden shadow-2xl border-2 border-rose-500/20 max-h-[90vh] flex flex-col text-slate-800 dark:text-slate-100"
+          className="relative w-full max-w-lg my-auto bg-white dark:bg-slate-900 rounded-2xl sm:rounded-3xl overflow-hidden shadow-2xl border-2 border-rose-500/30 max-h-[90vh] sm:max-h-[88vh] flex flex-col text-slate-800 dark:text-slate-100 z-10"
         >
           {/* Top SOS Warning Strip */}
-          <div className="bg-rose-600 dark:bg-rose-700 text-white px-6 py-3.5 flex items-center justify-between shadow-lg">
-            <div className="flex items-center space-x-2.5">
-              <span className="p-1 bg-white/20 rounded-lg animate-pulse">
-                <ShieldAlert className="h-5.5 w-5.5 text-white" />
+          <div className="sticky top-0 z-30 bg-rose-600 dark:bg-rose-700 text-white px-4 py-3 sm:px-6 sm:py-3.5 flex items-center justify-between shadow-lg shrink-0 gap-2">
+            <div className="flex items-center space-x-2 sm:space-x-2.5 min-w-0 flex-1 pr-1">
+              <span className="p-1 sm:p-1.5 bg-white/20 rounded-lg animate-pulse shrink-0">
+                <ShieldAlert className="h-5 w-5 sm:h-5.5 sm:w-5.5 text-white" />
               </span>
-              <div className="text-left">
-                <h3 className="font-display font-black text-sm tracking-widest uppercase">🚨 EMERGENCY ROAD ASSIST</h3>
-                <p className="text-[10px] font-mono text-rose-100 uppercase tracking-widest">Instant Rescue Dispatch Panel</p>
+              <div className="text-left min-w-0 flex-1">
+                <h3 className="font-display font-black text-xs sm:text-sm tracking-wider uppercase truncate">🚨 EMERGENCY ROAD ASSIST</h3>
+                <p className="text-[10px] sm:text-[11px] font-mono text-rose-100 uppercase tracking-wider truncate">Instant Rescue Dispatch Panel</p>
               </div>
             </div>
             <button
               onClick={onClose}
-              className="p-1 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-colors cursor-pointer"
+              aria-label="Close emergency SOS modal"
+              title="Close (Esc)"
+              className="shrink-0 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white/20 hover:bg-rose-800 text-white flex items-center justify-center transition-all cursor-pointer border border-white/30 shadow-2xs z-30 active:scale-95"
             >
-              <X className="h-5 w-5" />
+              <X className="h-5 w-5 stroke-[2.5]" />
             </button>
           </div>
 
