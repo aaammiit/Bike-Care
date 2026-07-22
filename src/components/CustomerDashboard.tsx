@@ -20,6 +20,7 @@ import {
   Sparkles,
   MapPin,
   Check,
+  CheckCircle,
   ShieldCheck,
   ArrowRight
 } from "lucide-react";
@@ -741,60 +742,183 @@ export const CustomerDashboard: React.FC<CustomerDashboardProps> = ({ onOpenBook
               </motion.div>
             )}
 
-            {/* PANEL 3: PAST REPAIR SERVICE HISTORY */}
+            {/* PANEL 3: PAST REPAIR SERVICE HISTORY & REQUEST LOGS */}
             {activeTab === "history" && (
-              <motion.div className="space-y-6" variants={containerVariants}>
-                <h3 className="font-display font-bold text-base text-slate-900 text-left">My Historical Service Book</h3>
+              <motion.div className="space-y-8" variants={containerVariants}>
                 
-                {pastRepairs.length === 0 ? (
-                  <motion.div variants={itemVariants} className="text-center py-16 bg-white border border-slate-200 rounded-3xl p-6">
-                    <FileText className="h-12 w-12 text-slate-300 mx-auto stroke-1 mb-2" />
-                    <p className="text-xs text-slate-500">No completed services found on record.</p>
-                  </motion.div>
-                ) : (
-                  <div className="space-y-4">
-                    {pastRepairs.map(rep => {
-                      const invoice = invoices.find(inv => inv.repairId === rep.id);
-                      return (
-                        <motion.div
-                          key={rep.id}
-                          variants={itemVariants}
-                          className="bg-white border-2 border-b-4 border-slate-200 rounded-2xl p-5 text-left flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4"
-                        >
-                      <div className="space-y-1">
-                        <div className="flex items-center space-x-2">
-                          <h4 className="font-bold text-sm text-slate-900">{rep.serviceType}</h4>
-                          <span className="px-2 py-0.5 bg-emerald-50 text-emerald-700 border border-emerald-100 text-[9px] font-mono rounded">
-                            COMPLETED & DELIVERED
-                          </span>
-                        </div>
-                        <p className="text-xs text-slate-500 font-sans">
-                          Vehicle: {rep.bikeDetails.brand} {rep.bikeDetails.model} ({rep.bikeDetails.registrationNumber})
-                        </p>
-                        <p className="text-[10px] text-slate-400 font-mono">
-                          Completed: {rep.completionDate ? new Date(rep.completionDate).toLocaleDateString() : "N/A"} • Mechanic: {rep.assignedMechanicName}
-                        </p>
-                      </div>
-
-                      <div className="shrink-0 flex items-center space-x-4">
-                        <div className="text-left sm:text-right">
-                          <span className="text-[9px] text-slate-400 font-mono block">Offline Bill</span>
-                          <span className="text-sm font-bold text-slate-900 font-mono">Rs. {invoice?.finalAmount || rep.estimatedCost.total}</span>
-                        </div>
-                        {invoice && (
-                          <button
-                            onClick={() => onViewInvoice(invoice)}
-                            className="bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold px-3 py-2 rounded-xl transition"
-                          >
-                            Receipt
-                          </button>
-                        )}
-                      </div>
-                        </motion.div>
-                      );
-                    })}
+                {/* Section A: All Service Requests & Bookings */}
+                <div className="space-y-4">
+                  <div className="flex justify-between items-center text-left">
+                    <div>
+                      <h3 className="font-display font-bold text-base text-slate-900">Service Requests & Emergency Log</h3>
+                      <p className="text-xs text-slate-500">Track all submitted booking and SOS requests, accepted appointment dates, and status updates.</p>
+                    </div>
                   </div>
-                )}
+
+                  {bookings.length === 0 ? (
+                    <motion.div variants={itemVariants} className="text-center py-10 bg-white border border-slate-200 rounded-3xl p-6">
+                      <Clock className="h-10 w-10 text-slate-300 mx-auto stroke-1 mb-2" />
+                      <p className="text-xs text-slate-500">No active or historical booking requests submitted yet.</p>
+                    </motion.div>
+                  ) : (
+                    <div className="grid grid-cols-1 gap-4 text-left">
+                      {bookings.map(book => (
+                        <motion.div
+                          key={book.id}
+                          variants={itemVariants}
+                          className="bg-white border-2 border-slate-200/80 hover:border-slate-300 rounded-2xl p-5 space-y-3 shadow-xs transition"
+                        >
+                          <div className="flex flex-wrap items-start justify-between gap-2 border-b border-slate-100 pb-3">
+                            <div>
+                              <div className="flex items-center gap-2">
+                                <h4 className="font-bold text-sm text-slate-900">{book.serviceType}</h4>
+                                {book.status === "Confirmed" && (
+                                  <span className="px-2 py-0.5 bg-emerald-100 text-emerald-800 border border-emerald-200 text-[10px] font-mono font-bold rounded-md flex items-center gap-1">
+                                    <CheckCircle className="h-3 w-3 text-emerald-600" />
+                                    <span>ACCEPTED</span>
+                                  </span>
+                                )}
+                                {book.status === "Pending" && (
+                                  <span className="px-2 py-0.5 bg-amber-100 text-amber-800 border border-amber-200 text-[10px] font-mono font-bold rounded-md flex items-center gap-1">
+                                    <Clock className="h-3 w-3 text-amber-600 animate-spin" />
+                                    <span>AWAITING APPROVAL</span>
+                                  </span>
+                                )}
+                                {book.status === "Rejected" && (
+                                  <span className="px-2 py-0.5 bg-rose-100 text-rose-800 border border-rose-200 text-[10px] font-mono font-bold rounded-md flex items-center gap-1">
+                                    <AlertOctagon className="h-3 w-3 text-rose-600" />
+                                    <span>REJECTED BY GARAGE</span>
+                                  </span>
+                                )}
+                                {book.status === "Cancelled" && (
+                                  <span className="px-2 py-0.5 bg-slate-100 text-slate-600 border border-slate-200 text-[10px] font-mono font-bold rounded-md">
+                                    CANCELLED
+                                  </span>
+                                )}
+                              </div>
+                              <p className="text-xs text-slate-600 mt-1">
+                                Vehicle: <span className="font-semibold text-slate-800">{book.bikeDetails}</span>
+                              </p>
+                            </div>
+
+                            <div className="text-right text-xs font-mono">
+                              <span className="text-slate-400 block text-[10px]">REQUESTED FOR:</span>
+                              <span className="text-slate-800 font-bold">{book.date}</span>
+                              <span className="text-slate-500 block text-[10px]">{book.timeSlot}</span>
+                            </div>
+                          </div>
+
+                          {/* Status Details / Acceptance Message / Rejection Message */}
+                          {book.status === "Confirmed" && (
+                            <div className="bg-emerald-50 border border-emerald-200/80 rounded-xl p-3 text-xs space-y-1 text-emerald-950">
+                              <div className="font-bold flex items-center gap-1.5 text-emerald-800">
+                                <CheckCircle className="h-4 w-4 text-emerald-600" />
+                                <span>ACCEPTED APPOINTMENT CONFIRMED</span>
+                              </div>
+                              <p className="text-xs text-emerald-900">
+                                Scheduled Date: <span className="font-bold">{book.acceptedDate || book.date}</span> ({book.acceptedTimeSlot || book.timeSlot})
+                              </p>
+                              <p className="text-[11px] text-emerald-700">
+                                Garage Contact: <span className="font-mono font-bold">+91 97678 24216</span> (Rana Singh)
+                              </p>
+                            </div>
+                          )}
+
+                          {book.status === "Rejected" && (
+                            <div className="bg-rose-50 border border-rose-200/80 rounded-xl p-3 text-xs space-y-1 text-rose-950">
+                              <div className="font-bold flex items-center gap-1.5 text-rose-800">
+                                <AlertOctagon className="h-4 w-4 text-rose-600" />
+                                <span>REJECTED BY GARAGE MANAGER</span>
+                              </div>
+                              <p className="text-xs text-rose-900 font-medium italic">
+                                "{book.rejectionReason || "Workshop schedule full for requested slot."}"
+                              </p>
+                              <p className="text-[11px] text-rose-700">
+                                Please call us at <span className="font-mono font-bold">+91 97678 24216</span> to select an alternate slot.
+                              </p>
+                            </div>
+                          )}
+
+                          {book.status === "Pending" && (
+                            <div className="bg-slate-50 border border-slate-200/80 rounded-xl p-3 text-xs flex justify-between items-center gap-3">
+                              <p className="text-slate-600">
+                                Your request is being reviewed by Rana Garage admin team. You will receive a WhatsApp message once accepted or rejected.
+                              </p>
+                              <button
+                                onClick={() => cancelBooking(book.id)}
+                                className="text-xs font-bold text-red-600 hover:underline shrink-0"
+                              >
+                                Cancel Request
+                              </button>
+                            </div>
+                          )}
+
+                          {book.notes && (
+                            <p className="text-xs text-slate-500 italic bg-slate-50/60 p-2 rounded-lg border border-slate-100">
+                              Notes: "{book.notes}"
+                            </p>
+                          )}
+                        </motion.div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* Section B: Completed Services & Receipts */}
+                <div className="space-y-4 pt-4 border-t border-slate-200">
+                  <h3 className="font-display font-bold text-base text-slate-900 text-left">Completed Service Book & Invoices</h3>
+                  
+                  {pastRepairs.length === 0 ? (
+                    <motion.div variants={itemVariants} className="text-center py-10 bg-white border border-slate-200 rounded-3xl p-6">
+                      <FileText className="h-10 w-10 text-slate-300 mx-auto stroke-1 mb-2" />
+                      <p className="text-xs text-slate-500">No completed services found on record.</p>
+                    </motion.div>
+                  ) : (
+                    <div className="space-y-4">
+                      {pastRepairs.map(rep => {
+                        const invoice = invoices.find(inv => inv.repairId === rep.id);
+                        return (
+                          <motion.div
+                            key={rep.id}
+                            variants={itemVariants}
+                            className="bg-white border-2 border-b-4 border-slate-200 rounded-2xl p-5 text-left flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4"
+                          >
+                            <div className="space-y-1">
+                              <div className="flex items-center space-x-2">
+                                <h4 className="font-bold text-sm text-slate-900">{rep.serviceType}</h4>
+                                <span className="px-2 py-0.5 bg-emerald-50 text-emerald-700 border border-emerald-100 text-[9px] font-mono rounded">
+                                  COMPLETED & DELIVERED
+                                </span>
+                              </div>
+                              <p className="text-xs text-slate-500 font-sans">
+                                Vehicle: {rep.bikeDetails.brand} {rep.bikeDetails.model} ({rep.bikeDetails.registrationNumber})
+                              </p>
+                              <p className="text-[10px] text-slate-400 font-mono">
+                                Completed: {rep.completionDate ? new Date(rep.completionDate).toLocaleDateString() : "N/A"} • Mechanic: {rep.assignedMechanicName}
+                              </p>
+                            </div>
+
+                            <div className="shrink-0 flex items-center space-x-4">
+                              <div className="text-left sm:text-right">
+                                <span className="text-[9px] text-slate-400 font-mono block">Offline Bill</span>
+                                <span className="text-sm font-bold text-slate-900 font-mono">Rs. {invoice?.finalAmount || rep.estimatedCost.total}</span>
+                              </div>
+                              {invoice && (
+                                <button
+                                  onClick={() => onViewInvoice(invoice)}
+                                  className="bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold px-3 py-2 rounded-xl transition cursor-pointer"
+                                >
+                                  Receipt
+                                </button>
+                              )}
+                            </div>
+                          </motion.div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+
               </motion.div>
             )}
 

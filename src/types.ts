@@ -48,7 +48,7 @@ export interface Bike {
   odometer: number;
 }
 
-export type BookingStatus = "Pending" | "Confirmed" | "Cancelled";
+export type BookingStatus = "Pending" | "Confirmed" | "Cancelled" | "Rejected";
 
 export interface Booking {
   id: string;
@@ -64,6 +64,9 @@ export interface Booking {
   notes?: string;
   receiveSmsUpdates?: boolean;
   status: BookingStatus;
+  rejectionReason?: string;
+  acceptedDate?: string;
+  acceptedTimeSlot?: string;
   createdAt: string;
 }
 

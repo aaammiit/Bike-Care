@@ -50,7 +50,8 @@ interface AppContextType {
   addBike: (bike: Omit<Bike, "id">) => Bike;
   createBooking: (bookingData: Omit<Booking, "id" | "customerId" | "customerName" | "customerMobile" | "status" | "createdAt">) => Booking;
   cancelBooking: (bookingId: string) => void;
-  confirmBooking: (bookingId: string, assignedMechanicId?: string) => void;
+  confirmBooking: (bookingId: string, assignedMechanicId?: string, acceptedDate?: string, acceptedTimeSlot?: string) => void;
+  rejectBooking: (bookingId: string, rejectionReason: string) => void;
   
   // Repair Methods
   startRepair: (repairId: string) => void;
@@ -674,10 +675,21 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   };
 
-  const confirmBooking = (bookingId: string, assignedMechanicId?: string) => {
-    setBookings(prev => prev.map(b => b.id === bookingId ? { ...b, status: "Confirmed" as BookingStatus } : b));
+  const confirmBooking = (bookingId: string, assignedMechanicId?: string, acceptedDate?: string, acceptedTimeSlot?: string) => {
     const booking = bookings.find(b => b.id === bookingId);
     if (!booking) return;
+
+    const finalDate = acceptedDate || booking.date;
+    const finalTimeSlot = acceptedTimeSlot || booking.timeSlot;
+
+    setBookings(prev => prev.map(b => b.id === bookingId ? {
+      ...b,
+      status: "Confirmed" as BookingStatus,
+      date: finalDate,
+      timeSlot: finalTimeSlot,
+      acceptedDate: finalDate,
+      acceptedTimeSlot: finalTimeSlot
+    } : b));
 
     // Create corresponding repair job
     const bike = bikes.find(bk => bk.id === booking.bikeId);
@@ -696,8 +708,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       customerMobile: booking.customerMobile,
       bikeId: booking.bikeId,
       bikeDetails: {
-        brand: bike ? bike.brand : "Unknown",
-        model: bike ? bike.model : "Bike",
+        brand: bike ? bike.brand : (booking.bikeDetails.split(" ")[0] || "Unknown"),
+        model: bike ? bike.model : (booking.bikeDetails.split(" ").slice(1).join(" ") || "Bike"),
         registrationNumber: bike ? bike.registrationNumber : "Pending",
         odometer: bike ? bike.odometer : 1000
       },
@@ -710,7 +722,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           status: "Vehicle Received",
           timestamp: new Date().toISOString(),
           updatedBy: "Rajesh Shinde",
-          notes: "Booking confirmed. Vehicle check-in approved."
+          notes: `Booking ACCEPTED for ${finalDate} (${finalTimeSlot}). Vehicle check-in approved.`
         }
       ],
       estimatedCost: {
@@ -726,16 +738,16 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
     setRepairs(prev => [newRepair, ...prev]);
 
-    // Notify Customer on WhatsApp and SMS
+    // Notify Customer on WhatsApp and SMS with ACCEPTED Date and Time!
     triggerSmsWhatsApp(
       booking.customerMobile,
-      `*Rana Garage*\nHello ${booking.customerName}, your service booking for your ${newRepair.bikeDetails.brand} ${newRepair.bikeDetails.model} is CONFIRMED.\n\n📅 Date: ${booking.date}\n⏰ Slot: ${booking.timeSlot}\n📍 Tracking: https://rana.garage/track/${newRepair.id}`,
+      `*✅ RANA GARAGE - BOOKING ACCEPTED*\nHello ${booking.customerName}, your service booking for ${booking.bikeDetails} has been ACCEPTED!\n\n📅 Accepted Date: ${finalDate}\n⏰ Accepted Time Slot: ${finalTimeSlot}\n👨‍🔧 Assigned Mechanic: ${mech ? mech.name : "Karan Singh"}\n📞 Contact Garage: +91 97678 24216\n📍 Live Tracking ID: ${newRepair.id}`,
       "WhatsApp"
     );
 
     addNotification(
-      "Service Scheduled",
-      `Your service has been confirmed for ${booking.date}. Mechanic assigned: ${mech ? mech.name : "To be decided"}.`,
+      "Service Request Accepted",
+      `Your booking for ${booking.bikeDetails} was ACCEPTED for ${finalDate} at ${finalTimeSlot}!`,
       "success",
       "Customer"
     );
@@ -743,11 +755,38 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     if (assignedMechanicId) {
       addNotification(
         "New Job Assigned",
-        `You have been assigned a new job: ${booking.serviceType} for ${newRepair.bikeDetails.brand} ${newRepair.bikeDetails.model}.`,
+        `You have been assigned a new job: ${booking.serviceType} for ${booking.bikeDetails} on ${finalDate}.`,
         "info",
         "Mechanic"
       );
     }
+  };
+
+  const rejectBooking = (bookingId: string, rejectionReason: string) => {
+    const booking = bookings.find(b => b.id === bookingId);
+    if (!booking) return;
+
+    const reasonMsg = rejectionReason || "Garage schedule full for requested time slot.";
+
+    setBookings(prev => prev.map(b => b.id === bookingId ? {
+      ...b,
+      status: "Rejected" as BookingStatus,
+      rejectionReason: reasonMsg
+    } : b));
+
+    // Notify customer via SMS / WhatsApp with rejection reason
+    triggerSmsWhatsApp(
+      booking.customerMobile,
+      `*❌ RANA GARAGE - BOOKING UPDATE*\nHello ${booking.customerName}, your service request for ${booking.bikeDetails} could not be accepted at this time.\n\n⚠️ Reason: "${reasonMsg}"\n\n📞 Please call Rana Singh at +91 97678 24216 to discuss an alternate date.`,
+      "WhatsApp"
+    );
+
+    addNotification(
+      "Booking Request Declined",
+      `Your booking request for ${booking.bikeDetails} was declined: "${reasonMsg}". Please contact us to reschedule.`,
+      "alert",
+      "Customer"
+    );
   };
 
   const startRepair = (repairId: string) => {
@@ -1162,6 +1201,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         createBooking,
         cancelBooking,
         confirmBooking,
+        rejectBooking,
         startRepair,
         updateRepairStatus,
         approveEstimate,

@@ -74,6 +74,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onViewInvoice })
     employees,
     confirmBooking,
     cancelBooking,
+    rejectBooking,
     updateRepairStatus,
     assignMechanic,
     addPartsToRepair,
@@ -112,6 +113,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onViewInvoice })
   // Assign Mechanic overlay modal state
   const [assigningBookingId, setAssigningBookingId] = useState<string | null>(null);
   const [selectedMechId, setSelectedMechId] = useState("");
+  const [acceptedDate, setAcceptedDate] = useState("");
+  const [acceptedTimeSlot, setAcceptedTimeSlot] = useState("");
+
+  // Reject Booking overlay modal state
+  const [rejectingBookingId, setRejectingBookingId] = useState<string | null>(null);
+  const [rejectionReason, setRejectionReason] = useState("");
 
   // Financial aggregation
   const paidInvoices = invoices.filter(i => i.paymentStatus === "Paid");
@@ -136,9 +143,24 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onViewInvoice })
   const handleConfirmAssign = (e: React.FormEvent) => {
     e.preventDefault();
     if (!assigningBookingId) return;
-    confirmBooking(assigningBookingId, selectedMechId || undefined);
+    confirmBooking(
+      assigningBookingId,
+      selectedMechId || undefined,
+      acceptedDate || undefined,
+      acceptedTimeSlot || undefined
+    );
     setAssigningBookingId(null);
     setSelectedMechId("");
+    setAcceptedDate("");
+    setAcceptedTimeSlot("");
+  };
+
+  const handleConfirmReject = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!rejectingBookingId) return;
+    rejectBooking(rejectingBookingId, rejectionReason || "Workshop schedule full for requested time slot.");
+    setRejectingBookingId(null);
+    setRejectionReason("");
   };
 
   const handleAddPartsSubmit = (e: React.FormEvent) => {
@@ -441,8 +463,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onViewInvoice })
 
                     <div className="flex justify-between items-center pt-2">
                       <button
-                        onClick={() => cancelBooking(booking.id)}
-                        className="text-xs font-semibold text-red-600 hover:bg-red-50 px-3.5 py-2 rounded-xl transition"
+                        onClick={() => {
+                          setRejectingBookingId(booking.id);
+                          setRejectionReason("Workshop schedule full for requested time slot. Please contact us to pick an alternate date.");
+                        }}
+                        className="text-xs font-semibold text-red-600 hover:bg-red-50 px-3.5 py-2 rounded-xl transition cursor-pointer"
                       >
                         Decline Booking
                       </button>
@@ -450,12 +475,13 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onViewInvoice })
                       <button
                         onClick={() => {
                           setAssigningBookingId(booking.id);
-                          // default to first mechanic
+                          setAcceptedDate(booking.date);
+                          setAcceptedTimeSlot(booking.timeSlot);
                           setSelectedMechId(employees.find(e => e.role === "Mechanic")?.id || "");
                         }}
-                        className="bg-blue-600 text-white text-xs font-bold px-4 py-2 rounded-xl hover:bg-blue-700 transition shadow-sm"
+                        className="bg-blue-600 text-white text-xs font-bold px-4 py-2 rounded-xl hover:bg-blue-700 transition shadow-sm cursor-pointer"
                       >
-                        Confirm & Assign Mechanic
+                        Accept Request & Assign
                       </button>
                     </div>
                   </div>
@@ -463,12 +489,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onViewInvoice })
               </div>
             )}
 
-            {/* Assign Mechanic Overlay Dialog */}
+            {/* Accept Request & Assign Mechanic Overlay Dialog */}
             {assigningBookingId && (
               <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs z-50 flex items-center justify-center p-2 sm:p-4">
-                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl sm:rounded-3xl p-5 sm:p-6 max-w-sm w-full space-y-4 text-left shadow-2xl">
+                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl sm:rounded-3xl p-5 sm:p-6 max-w-md w-full space-y-4 text-left shadow-2xl">
                   <div className="flex justify-between items-center border-b border-slate-100 dark:border-slate-800 pb-3 gap-2">
-                    <h4 className="font-bold text-sm text-slate-900 dark:text-white truncate">Assign Garage Mechanic</h4>
+                    <h4 className="font-bold text-sm text-slate-900 dark:text-white truncate">Accept Service Request</h4>
                     <button
                       type="button"
                       onClick={() => setAssigningBookingId(null)}
@@ -481,12 +507,43 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onViewInvoice })
                   </div>
 
                   <form onSubmit={handleConfirmAssign} className="space-y-4">
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">
+                          Accepted Date
+                        </label>
+                        <input
+                          type="text"
+                          required
+                          value={acceptedDate}
+                          onChange={e => setAcceptedDate(e.target.value)}
+                          placeholder="2026-07-25"
+                          className="w-full bg-slate-50 dark:bg-slate-950/50 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2 text-xs"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">
+                          Accepted Time Slot
+                        </label>
+                        <input
+                          type="text"
+                          required
+                          value={acceptedTimeSlot}
+                          onChange={e => setAcceptedTimeSlot(e.target.value)}
+                          placeholder="10:00 AM - 12:00 PM"
+                          className="w-full bg-slate-50 dark:bg-slate-950/50 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2 text-xs"
+                        />
+                      </div>
+                    </div>
+
                     <div>
-                      <label className="block text-xs font-semibold text-slate-600 mb-1">Select Mechanic on Duty</label>
+                      <label className="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">
+                        Select Mechanic on Duty
+                      </label>
                       <select
                         value={selectedMechId}
                         onChange={e => setSelectedMechId(e.target.value)}
-                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs"
+                        className="w-full bg-slate-50 dark:bg-slate-950/50 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2 text-xs"
                       >
                         <option value="">Decide Later / Dispatch Pool</option>
                         {employees.filter(e => e.role === "Mechanic" && e.status === "Active").map(m => (
@@ -499,9 +556,52 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onViewInvoice })
 
                     <button
                       type="submit"
-                      className="w-full bg-emerald-600 text-white font-bold py-2 rounded-xl text-xs hover:bg-emerald-700 transition"
+                      className="w-full bg-emerald-600 text-white font-bold py-2.5 rounded-xl text-xs hover:bg-emerald-700 transition cursor-pointer"
                     >
-                      Authorize Admission & Send WhatsApp Alert
+                      Accept Request & Send WhatsApp Alert
+                    </button>
+                  </form>
+                </div>
+              </div>
+            )}
+
+            {/* Reject Request Overlay Dialog */}
+            {rejectingBookingId && (
+              <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs z-50 flex items-center justify-center p-2 sm:p-4">
+                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl sm:rounded-3xl p-5 sm:p-6 max-w-md w-full space-y-4 text-left shadow-2xl">
+                  <div className="flex justify-between items-center border-b border-slate-100 dark:border-slate-800 pb-3 gap-2">
+                    <h4 className="font-bold text-sm text-red-600 dark:text-red-400 truncate">Decline Service Request</h4>
+                    <button
+                      type="button"
+                      onClick={() => setRejectingBookingId(null)}
+                      aria-label="Close dialog"
+                      title="Close"
+                      className="shrink-0 w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 flex items-center justify-center transition cursor-pointer border border-slate-200 dark:border-slate-700"
+                    >
+                      <X className="h-4 w-4 stroke-[2.5]" />
+                    </button>
+                  </div>
+
+                  <form onSubmit={handleConfirmReject} className="space-y-4">
+                    <div>
+                      <label className="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">
+                        Reason for Rejection / Customer Message
+                      </label>
+                      <textarea
+                        required
+                        rows={3}
+                        value={rejectionReason}
+                        onChange={e => setRejectionReason(e.target.value)}
+                        placeholder="e.g. Workshop schedule full for requested time slot. Please contact us at +91 97678 24216."
+                        className="w-full bg-slate-50 dark:bg-slate-950/50 border border-slate-200 dark:border-slate-800 rounded-xl p-3 text-xs focus:ring-1 focus:ring-red-500 outline-none"
+                      />
+                    </div>
+
+                    <button
+                      type="submit"
+                      className="w-full bg-red-600 text-white font-bold py-2.5 rounded-xl text-xs hover:bg-red-700 transition cursor-pointer"
+                    >
+                      Confirm Rejection & Send Message
                     </button>
                   </form>
                 </div>
