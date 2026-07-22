@@ -1,0 +1,311 @@
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Nunito", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Nunito", sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+
+  --color-eager-green: #58cc02;
+  --color-storybook-green: #d7ffb8;
+  --color-spark-blue: #1cb0f6;
+  --color-fresh-leaf: #a5ed6e;
+  --color-night-ink: #000437;
+  --color-paper-white: #ffffff;
+  --color-charcoal: #4b4b4b;
+  --color-pencil-gray: #777777;
+  --color-faded-gray: #afafaf;
+  
+  --color-brand-50: #f7ffea;
+  --color-brand-100: #e2ffd0;
+  --color-brand-500: #58cc02;
+  --color-brand-600: #46a302;
+  --color-brand-900: #000437;
+  
+  --color-dark-800: #000437;
+  --color-dark-900: #00021c;
+}
+
+@layer base {
+  body {
+    @apply font-sans bg-white text-charcoal antialiased selection:bg-storybook-green selection:text-night-ink;
+  }
+}
+
+/* Custom Duolingo Tactile buttons & elements */
+.duo-btn, .duo-btn-green, .duo-btn-blue, .duo-btn-outline, .duo-btn-gray {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  transition: all 100ms ease-out;
+  font-size: 0.75rem;
+  cursor: pointer;
+  user-select: none;
+  border-radius: 14px;
+  padding: 0.85rem 1.35rem;
+  border-style: solid;
+  border-width: 2px;
+  outline: none;
+}
+.duo-btn:active, .duo-btn-green:active, .duo-btn-blue:active, .duo-btn-outline:active, .duo-btn-gray:active {
+  transform: translateY(2px);
+}
+
+.duo-btn-green {
+  color: #ffffff;
+  background-color: #58cc02;
+  border-color: #58cc02;
+  box-shadow: 0 4px 0 0 #46a302;
+}
+.duo-btn-green:active {
+  box-shadow: 0 2px 0 0 #46a302;
+}
+
+.duo-btn-green-sm {
+  font-size: 11px;
+  padding: 0.5rem 1rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: #ffffff;
+  background-color: #58cc02;
+  border: 2px solid #58cc02;
+  border-radius: 12px;
+  box-shadow: 0 3px 0 0 #46a302;
+  transition: all 100ms ease-out;
+}
+.duo-btn-green-sm:active {
+  transform: translateY(1.5px);
+  box-shadow: 0 1.5px 0 0 #46a302;
+}
+
+.duo-btn-blue {
+  color: #ffffff;
+  background-color: #1cb0f6;
+  border-color: #1cb0f6;
+  box-shadow: 0 4px 0 0 #1899d6;
+}
+.duo-btn-blue:active {
+  box-shadow: 0 2px 0 0 #1899d6;
+}
+
+.duo-btn-blue-sm {
+  font-size: 11px;
+  padding: 0.5rem 1rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: #ffffff;
+  background-color: #1cb0f6;
+  border: 2px solid #1cb0f6;
+  border-radius: 12px;
+  box-shadow: 0 3px 0 0 #1899d6;
+  transition: all 100ms ease-out;
+}
+.duo-btn-blue-sm:active {
+  transform: translateY(1.5px);
+  box-shadow: 0 1.5px 0 0 #1899d6;
+}
+
+.duo-btn-outline {
+  color: #1cb0f6;
+  background-color: #ffffff;
+  border-color: #afafaf;
+  box-shadow: 0 4px 0 0 #afafaf;
+}
+.duo-btn-outline:active {
+  box-shadow: 0 2px 0 0 #afafaf;
+}
+
+.duo-btn-outline-sm {
+  font-size: 11px;
+  padding: 0.5rem 1rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: #1cb0f6;
+  background-color: #ffffff;
+  border: 2px solid #afafaf;
+  border-radius: 12px;
+  box-shadow: 0 3px 0 0 #afafaf;
+  transition: all 100ms ease-out;
+}
+.duo-btn-outline-sm:active {
+  transform: translateY(1.5px);
+  box-shadow: 0 1.5px 0 0 #afafaf;
+}
+
+.duo-btn-gray {
+  color: #777777;
+  background-color: #ffffff;
+  border-color: #cbd5e1;
+  box-shadow: 0 4px 0 0 #e2e8f0;
+}
+.duo-btn-gray:active {
+  box-shadow: 0 2px 0 0 #e2e8f0;
+}
+
+.duo-btn-gray-sm {
+  font-size: 11px;
+  padding: 0.5rem 1rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: #777777;
+  background-color: #ffffff;
+  border: 2px solid #cbd5e1;
+  border-radius: 12px;
+  box-shadow: 0 3px 0 0 #e2e8f0;
+  transition: all 100ms ease-out;
+}
+.duo-btn-gray-sm:active {
+  transform: translateY(1.5px);
+  box-shadow: 0 1.5px 0 0 #e2e8f0;
+}
+
+.duo-card {
+  background-color: #ffffff;
+  border: 2px solid #cbd5e1;
+  border-bottom-width: 4px;
+  border-radius: 16px;
+  padding: 1.25rem;
+  transition: all 150ms ease-out;
+}
+
+.duo-card-active {
+  border: 2px solid #58cc02;
+  border-bottom-width: 4px;
+  background-color: #f7ffea;
+  border-radius: 16px;
+  padding: 1.25rem;
+}
+
+.duo-card-blue {
+  border: 2px solid #1cb0f6;
+  border-bottom-width: 4px;
+  background-color: #f0f9ff;
+  border-radius: 16px;
+  padding: 1.25rem;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 9999px;
+  border: 2px solid white;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Glassmorphism overrides for Duolingo flat paper style */
+.glass-panel {
+  @apply bg-white border border-b-2 border-slate-200;
+}
+
+.dark-glass-panel {
+  @apply bg-night-ink border border-b-2 border-slate-900;
+}
+
+/* --- CUSTOM IMMERSIVE WORKSHOP ANIMATIONS --- */
+
+/* Paused ground lines when docked */
+.scrolling-ground.paused {
+  animation-play-state: paused !important;
+}
+
+/* Shudder damper/shock test animation */
+.shudder-effect {
+  animation: shockShudder 0.3s ease-in-out infinite alternate;
+}
+
+@keyframes shockShudder {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(4.5px);
+  }
+}
+
+/* Snow Foam Dripping Bubble Particles */
+.foam-drip-bubble {
+  position: absolute;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 50%;
+  box-shadow: 0 0 6px rgba(255, 255, 255, 0.7);
+  animation: dripFall 1.2s cubic-bezier(0.4, 0, 1, 1) infinite;
+  pointer-events: none;
+}
+
+@keyframes dripFall {
+  0% {
+    transform: translateY(-10px) scale(0.6);
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  90% {
+    opacity: 0.95;
+    transform: translateY(35px) scale(1.05);
+  }
+  100% {
+    transform: translateY(45px) scale(0.4);
+    opacity: 0;
+  }
+}
+
+/* Spark Blast Particles for Engine/Valves calibration */
+.engine-spark-particle {
+  position: absolute;
+  background: #f97316;
+  box-shadow: 0 0 8px #f97316, 0 0 12px #ef4444;
+  border-radius: 50%;
+  animation: sparkBlast 0.7s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+  opacity: 0;
+}
+
+@keyframes sparkBlast {
+  0% {
+    transform: translate(0, 0) scale(1.2);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(var(--tx), var(--ty)) scale(0.1);
+    opacity: 0;
+  }
+}
+
+/* Brake Hydraulic Expansion Wave Rings */
+.brake-ring-wave {
+  border: 2px solid #ec4899;
+  border-radius: 50%;
+  box-shadow: 0 0 12px #ec4899;
+  animation: rippleExpand 0.9s cubic-bezier(0.1, 0.8, 0.3, 1) infinite;
+  opacity: 0;
+}
+
+@keyframes rippleExpand {
+  0% {
+    transform: scale(0.2);
+    opacity: 0.9;
+  }
+  100% {
+    transform: scale(3.5);
+    opacity: 0;
+  }
+}
+
+
