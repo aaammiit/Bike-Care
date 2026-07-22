@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
+import { generateGoogleMapsUrl } from "./utils/locationUtils";
 import {
   Bike,
   Booking,
@@ -644,9 +645,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     );
 
     // Simulated SMS & WhatsApp
+    const mapsUrl = generateGoogleMapsUrl(sosData.location);
     triggerSmsWhatsApp(
       currentCustomer.mobile,
-      `🚨 RANA BIKE CARE SOS: Hello ${currentCustomer.name}, our rescue vehicle has been dispatched! Mechanic Karan Singh (+91 90001 22222) is on his way to ${sosData.location}. We are on it!`,
+      `🚨 RANA BIKE CARE SOS: Hello ${currentCustomer.name}, our rescue vehicle has been dispatched! Mechanic Karan Singh (+91 90001 22222) is on his way to ${sosData.location}.\n📍 Live Google Maps: ${mapsUrl}`,
       "WhatsApp"
     );
 

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import { generateGoogleMapsUrl } from "../utils/locationUtils";
 import { 
   mechanicData, 
   reviewsData, 
@@ -368,6 +369,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenBooking, onNavig
       // Create prefilled WhatsApp text block
       const emergencyBadge = isEmergency ? "🚨 URGENT EMERGENCY DISPATCH REQUEST 🚨" : "🏍️ RANA GARAGE APPOINTMENT REQUEST";
       const urgencyNote = isEmergency ? "\n*URGENCY: IMMEDIATE ROAD ASSISTANCE / WORKSHOP SOS*\n" : "";
+      const mapsUrl = generateGoogleMapsUrl(formLoc, gpsCoords);
       const whatsappMessage = `*${emergencyBadge}*${urgencyNote}
 *Customer Details:*
 • Name: ${formName}
@@ -381,7 +383,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenBooking, onNavig
 *Service Requested:*
 • Category: ${formCategory}
 • Description: "${formDesc || (isEmergency ? "Immediate roadside / fast workshop emergency care needed." : "General checkup and tuning request.")}"
-• Location: ${formLoc}
+• Location: ${formLoc || "Koregaon Park, Pune"}
+📍 *Google Maps Location:* ${mapsUrl}
 
 *Preferred Schedule:*
 • Preferred Date: ${isEmergency ? "IMMEDIATE (ASAP BREAKDOWN SOS)" : formDate}
@@ -391,7 +394,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenBooking, onNavig
 _Please confirm my ${isEmergency ? "emergency SOS dispatch" : "slot"} on your dashboard, Rana Singh. Thank you!_`;
 
       const encodedMessage = encodeURIComponent(whatsappMessage);
-      const waUrl = `https://wa.me/919876543210?text=${encodedMessage}`;
+      const waUrl = `https://wa.me/919767824216?text=${encodedMessage}`;
 
       // Open WhatsApp after a brief delay so the user sees the success modal first!
       setTimeout(() => {
@@ -1260,8 +1263,17 @@ _Please confirm my ${isEmergency ? "emergency SOS dispatch" : "slot"} on your da
                           <div className="mt-1.5 flex items-center justify-between px-1">
                             <p className="text-[10px] font-mono font-bold text-emerald-500 flex items-center">
                               <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full mr-1.5 animate-ping" />
-                              SATELLITE ACCURACY LOCKED ({gpsCoords.latitude.toFixed(5)}, {gpsCoords.longitude.toFixed(5)})
+                              SATELLITE ACCURACY LOCKED ({gpsCoords.lat.toFixed(4)}°, {gpsCoords.lon.toFixed(4)}°)
                             </p>
+                            <a
+                              href={generateGoogleMapsUrl(formLoc, gpsCoords)}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="text-[10px] font-mono font-black text-rose-500 hover:text-rose-600 underline flex items-center gap-0.5"
+                            >
+                              <span>Open in Maps</span>
+                              <ExternalLink className="h-3 w-3" />
+                            </a>
                           </div>
                         )}
                         
@@ -1378,6 +1390,15 @@ _Please confirm my ${isEmergency ? "emergency SOS dispatch" : "slot"} on your da
                                         <p className="text-xs text-slate-700 dark:text-slate-300 font-bold font-mono mt-1.5 leading-relaxed">
                                           {formLoc}
                                         </p>
+                                        <a
+                                          href={generateGoogleMapsUrl(formLoc, gpsCoords)}
+                                          target="_blank"
+                                          rel="noreferrer"
+                                          className="inline-flex items-center gap-1 mt-1 text-[10px] font-mono font-black text-emerald-600 dark:text-emerald-400 hover:underline"
+                                        >
+                                          <MapPin className="h-3 w-3" />
+                                          <span>Open in Google Maps ↗</span>
+                                        </a>
                                       </div>
                                     </div>
                                     <div className="flex items-center justify-between pt-2 border-t border-emerald-500/20">
@@ -2293,7 +2314,7 @@ _Please confirm my ${isEmergency ? "emergency SOS dispatch" : "slot"} on your da
               {/* Instant Call CTA buttons */}
               <div className="flex gap-3 pt-3">
                 <a
-                  href="tel:+919876543210"
+                  href="tel:+919767824216"
                   className="flex-1 bg-slate-100 hover:bg-slate-200 dark:bg-slate-900 dark:hover:bg-slate-850 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-800 py-3 rounded-xl text-xs font-bold text-center transition flex items-center justify-center space-x-2"
                 >
                   <Phone className="h-4 w-4 text-[#F97316]" />

@@ -65,7 +65,7 @@ export const mechanicData: MechanicInfo = {
   name: "Rana Singh",
   age: 38,
   experience: "12+ Years",
-  phone: "+91 98765 43210",
+  phone: "+91 97678 24216",
   skills: [
     "Complete Engine Overhauling",
     "ECU Remapping & Spark Calibration",

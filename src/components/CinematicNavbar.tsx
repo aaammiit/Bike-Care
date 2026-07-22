@@ -523,7 +523,7 @@ export const CinematicNavbar: React.FC<CinematicNavbarProps> = ({
                 whileHover={{ y: -2, scale: 1.03 }}
                 whileTap={{ y: 1, scale: 0.97 }}
                 transition={{ type: "spring", stiffness: 450, damping: 14 }}
-                href="tel:+919876543210"
+                href="tel:+919767824216"
                 className="hidden md:inline-flex items-center space-x-2 px-4 py-2 rounded-full border-2 border-[#38bdf8] bg-sky-50/80 hover:bg-sky-100 text-[#0284c7] dark:bg-sky-950/40 dark:text-sky-300 font-black text-xs tracking-wider cursor-pointer shadow-2xs"
               >
                 <Phone className="h-4 w-4 text-[#0284c7] dark:text-sky-300" />
@@ -638,7 +638,7 @@ export const CinematicNavbar: React.FC<CinematicNavbarProps> = ({
               {/* Mobile Drawer Bottom with large high-contrast CTAs */}
               <div className="space-y-3.5 pt-6 border-t border-orange-500/10">
                 <a
-                  href="tel:+919876543210"
+                  href="tel:+919767824216"
                   className={`w-full flex items-center justify-center space-x-2 py-3.5 rounded-xl text-xs font-black uppercase tracking-widest border transition-all ${
                     isDarkMode 
                       ? "bg-slate-900 border-slate-800 text-white" 

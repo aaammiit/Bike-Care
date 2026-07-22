@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useApp } from "../AppContext";
+import { generateGoogleMapsUrl } from "../utils/locationUtils";
 import { motion, AnimatePresence } from "motion/react";
-import { X, AlertTriangle, MapPin, Phone, Truck, CheckCircle2, ShieldAlert, Navigation, Compass } from "lucide-react";
+import { X, AlertTriangle, MapPin, Phone, Truck, CheckCircle2, ShieldAlert, Navigation, Compass, ExternalLink, MessageSquare } from "lucide-react";
 
 interface SOSModalProps {
   isOpen: boolean;
@@ -59,17 +60,31 @@ export const SOSModal: React.FC<SOSModalProps> = ({ isOpen, onClose }) => {
       finalBikeDetails = b ? `${b.brand} ${b.model} (${b.registrationNumber})` : "Motorcycle";
     }
 
-    const finalLocation = location || "Pune Main Road (GPS Est.)";
+    const finalLocation = location || "Koregaon Park, Pune Main Road (GPS Est.)";
+    const mapsUrl = generateGoogleMapsUrl(finalLocation);
 
     triggerSOS({
       bikeId: selectedBikeId,
       bikeDetails: finalBikeDetails,
       issueType,
       description: description || "Stranded on road, need towing/on-site repair.",
-      location: finalLocation
+      location: `${finalLocation}\n📍 Google Maps: ${mapsUrl}`
     });
 
     setIsSubmitted(true);
+
+    // Open WhatsApp directly with prefilled Google Maps location link
+    const waMsg = `🚨 *EMERGENCY SOS ROAD BREAKDOWN DISPATCH* 🚨
+• Customer: ${currentCustomer.name} (${phone})
+• Bike: ${finalBikeDetails}
+• Issue: ${issueType}
+• Details: "${description || "Stranded on road, urgent breakdown assistance required"}"
+• Location: ${finalLocation}
+📍 *Google Maps Location:* ${mapsUrl}`;
+
+    setTimeout(() => {
+      window.open(`https://wa.me/919767824216?text=${encodeURIComponent(waMsg)}`, "_blank");
+    }, 1200);
 
     // Auto progress live tracking simulation steps
     setTimeout(() => setLiveStep(1), 3000);
@@ -228,6 +243,20 @@ export const SOSModal: React.FC<SOSModalProps> = ({ isOpen, onClose }) => {
                     />
                     <MapPin className="absolute left-3.5 top-3.5 h-4.5 w-4.5 text-slate-400" />
                   </div>
+                  {location && (
+                    <div className="flex items-center justify-between px-1 text-[10px] font-mono">
+                      <span className="text-slate-400">Maps Link Generated:</span>
+                      <a
+                        href={generateGoogleMapsUrl(location)}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-rose-500 font-bold hover:underline flex items-center gap-0.5"
+                      >
+                        <span>Test Google Maps ↗</span>
+                        <ExternalLink className="h-3 w-3" />
+                      </a>
+                    </div>
+                  )}
                 </div>
 
                 {/* Phone number */}

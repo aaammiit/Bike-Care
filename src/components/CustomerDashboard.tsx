@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useApp } from "../AppContext";
+import { generateGoogleMapsUrl } from "../utils/locationUtils";
 import { Bike, Booking, RepairJob, Invoice, BIKE_SERVICES_LIST } from "../types";
 import { DuoSkeleton } from "./DuoSkeleton";
 import {
@@ -818,7 +819,7 @@ export const CustomerDashboard: React.FC<CustomerDashboardProps> = ({ onOpenBook
                     <span className="text-[10px] text-red-600">Available Monday - Saturday (9 AM - 8 PM)</span>
                   </div>
                   <a
-                    href="tel:+919876543210"
+                    href="tel:+919767824216"
                     className="bg-red-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold"
                   >
                     Call Now
@@ -831,8 +832,19 @@ export const CustomerDashboard: React.FC<CustomerDashboardProps> = ({ onOpenBook
                     <span className="text-[10px] text-slate-500">Send live location for recovery towing</span>
                   </div>
                   <button
-                    onClick={() => setToastMessage("Launching live Pune WhatsApp recovery channel! Connecting you with driver...")}
-                    className="bg-emerald-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold flex items-center cursor-pointer"
+                    onClick={() => {
+                      const userLoc = "Lane 5, Koregaon Park, Pune";
+                      const mapsUrl = generateGoogleMapsUrl(userLoc, { lat: 18.5362, lon: 73.8940 });
+                      const bikeName = bikes[0] ? `${bikes[0].brand} ${bikes[0].model}` : "Motorcycle";
+                      const msg = `🚨 *TOWING & RECOVERY HELP REQUEST*
+Hello Rana Garage, I need emergency towing assistance for my ${bikeName}.
+• Customer: ${currentCustomer.name} (${currentCustomer.mobile})
+• Location: ${userLoc}
+📍 *Google Maps Location:* ${mapsUrl}`;
+                      window.open(`https://wa.me/919767824216?text=${encodeURIComponent(msg)}`, "_blank");
+                      setToastMessage("Opening WhatsApp with live Google Maps towing location!");
+                    }}
+                    className="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold flex items-center cursor-pointer transition"
                   >
                     <MessageSquare className="h-3.5 w-3.5 mr-1" />
                     Towing Help
