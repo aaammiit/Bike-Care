@@ -47,7 +47,7 @@ export const CinematicNavbar: React.FC<CinematicNavbarProps> = ({
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 20);
     };
-    window.addEventListener("scroll", handleScroll);
+    window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
@@ -552,14 +552,6 @@ export const CinematicNavbar: React.FC<CinematicNavbarProps> = ({
                 <span>SOS</span>
               </button>
 
-              {/* Day / Night Mode Toggle Button */}
-              <button
-                onClick={() => setIsDarkMode(!isDarkMode)}
-                className="p-2.5 rounded-full border-2 border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-700 dark:text-amber-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all cursor-pointer shadow-2xs flex items-center justify-center"
-                title={isDarkMode ? "Switch to Day Light Mode" : "Switch to Night Dark Mode"}
-              >
-                {isDarkMode ? <Sun className="h-4 w-4 text-amber-400" /> : <Moon className="h-4 w-4 text-slate-700" />}
-              </button>
 
               {/* Mobile menu hamburger */}
               <button

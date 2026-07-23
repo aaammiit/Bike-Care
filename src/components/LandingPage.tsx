@@ -84,7 +84,7 @@ const AnimatedCounter: React.FC<{ target: number; suffix?: string; label: string
   const [count, setCount] = useState(0);
 
   useEffect(() => {
-    let start = 0;
+    let animationFrameId: number;
     const duration = 2000; // premium slow count-up
     const startTime = performance.now();
 
@@ -99,13 +99,19 @@ const AnimatedCounter: React.FC<{ target: number; suffix?: string; label: string
       setCount(currentCount);
 
       if (progress < 1) {
-        requestAnimationFrame(animate);
+        animationFrameId = requestAnimationFrame(animate);
       } else {
         setCount(target);
       }
     };
 
-    requestAnimationFrame(animate);
+    animationFrameId = requestAnimationFrame(animate);
+
+    return () => {
+      if (animationFrameId) {
+        cancelAnimationFrame(animationFrameId);
+      }
+    };
   }, [target]);
 
   const isDecimal = target % 1 !== 0;
@@ -290,24 +296,32 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenBooking, onNavig
 
   // Monitor Scroll position to highlight menu items
   useEffect(() => {
-    const handleScroll = () => {
-      const sections = ["home", "services", "about", "gallery", "repairs", "reviews", "faq", "contact"];
-      const scrollPos = window.scrollY + 200;
+    let ticking = false;
 
-      for (const section of sections) {
-        const el = document.getElementById(section);
-        if (el) {
-          const top = el.offsetTop;
-          const height = el.offsetHeight;
-          if (scrollPos >= top && scrollPos < top + height) {
-            setActiveSection(section);
-            break;
+    const handleScroll = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          const sections = ["home", "services", "about", "gallery", "repairs", "reviews", "faq", "contact"];
+          const scrollPos = window.scrollY + 200;
+
+          for (const section of sections) {
+            const el = document.getElementById(section);
+            if (el) {
+              const top = el.offsetTop;
+              const height = el.offsetHeight;
+              if (scrollPos >= top && scrollPos < top + height) {
+                setActiveSection(section);
+                break;
+              }
+            }
           }
-        }
+          ticking = false;
+        });
+        ticking = true;
       }
     };
 
-    window.addEventListener("scroll", handleScroll);
+    window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
