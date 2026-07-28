@@ -1,8 +1,9 @@
-import workshopLiftImg from "../assets/images/workshop_lift_bay_1785236179122.jpg";
-import clutchEngineImg from "../assets/images/clutch_engine_repair_1785236194121.jpg";
-import suspensionImg from "../assets/images/suspension_tuning_service_1785236209600.jpg";
-import foamWashImg from "../assets/images/foam_wash_polishing_1785236222167.jpg";
-import engineOilImg from "../assets/images/engine_oil_inspection_1785236244156.jpg";
+// Direct image URLs for high performance and reliable builds
+const workshopLiftImg = "https://images.unsplash.com/photo-1558981806-ec527fa84c39?auto=format&fit=crop&q=80&w=1200";
+const clutchEngineImg = "https://images.unsplash.com/photo-1568772585407-9361f9bf3a87?auto=format&fit=crop&q=80&w=1200";
+const suspensionImg = "https://images.unsplash.com/photo-1486006920555-c77dce18193b?auto=format&fit=crop&q=80&w=1200";
+const foamWashImg = "https://images.unsplash.com/photo-1607860108855-64acf2078ed9?auto=format&fit=crop&q=80&w=1200";
+const engineOilImg = "https://images.unsplash.com/photo-1617814076367-b759c7d7e738?auto=format&fit=crop&q=80&w=1200";
 
 export interface MechanicInfo {
   photo: string;

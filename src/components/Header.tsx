@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useApp } from "../AppContext";
 import { Wrench, Shield, User, MessageSquare, Bell, Wifi, WifiOff } from "lucide-react";
 import { motion } from "motion/react";
-import logoImg from "../assets/images/rana_bike_cares_logo_1784714930624.jpg";
+const logoImg = "https://images.unsplash.com/photo-1558981403-c5f9899a28bc?auto=format&fit=crop&q=80&w=400";
 
 interface HeaderProps {
   onOpenBooking: () => void;
