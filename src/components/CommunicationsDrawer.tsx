@@ -53,7 +53,7 @@ export const CommunicationsDrawer: React.FC<CommunicationsDrawerProps> = ({ isOp
             className="fixed inset-y-0 right-0 max-w-md w-full bg-slate-950 text-slate-100 shadow-2xl z-50 flex flex-col border-l border-slate-800"
           >
             {/* Header */}
-            <div className="p-3.5 sm:p-4 border-b border-slate-800 flex items-center justify-between bg-slate-900 gap-2 shrink-0">
+            <div className="sticky top-0 z-30 p-3.5 sm:p-4 border-b border-slate-800 flex items-center justify-between bg-slate-900 gap-2 shrink-0 shadow-md">
               <div className="flex items-center space-x-2.5 min-w-0 flex-1 pr-1">
                 <div className="bg-green-500/20 text-green-400 p-2 rounded-xl shrink-0">
                   <Smartphone className="h-5 w-5" />
@@ -72,9 +72,10 @@ export const CommunicationsDrawer: React.FC<CommunicationsDrawerProps> = ({ isOp
                 onClick={onClose}
                 aria-label="Close messaging simulator drawer"
                 title="Close (Esc)"
-                className="shrink-0 w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition flex items-center justify-center cursor-pointer border border-slate-700 shadow-2xs z-20"
+                className="shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/40 font-bold text-xs transition cursor-pointer z-30 shadow-2xs"
               >
                 <X className="h-4 w-4 stroke-[2.5]" />
+                <span className="font-mono text-[10px] uppercase">Close</span>
               </button>
             </div>
 

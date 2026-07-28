@@ -975,21 +975,7 @@ Hello Rana Garage, I need emergency towing assistance for my ${bikeName}.
                   </button>
                 </div>
 
-                <div className="p-3 bg-blue-50 border border-blue-150 rounded-xl flex items-center justify-between">
-                  <div>
-                    <span className="font-bold text-blue-950 block">Interactive Guided Tour</span>
-                    <span className="text-[10px] text-blue-600">Replay step-by-step walk-throughs any time</span>
-                  </div>
-                  <button
-                    onClick={() => {
-                      window.dispatchEvent(new Event("start-rana-tour"));
-                      setToastMessage("Launching the onboarding guided tour! Enjoy the walk-through.");
-                    }}
-                    className="bg-blue-600 hover:bg-blue-700 text-white px-3.5 py-1.5 rounded-lg text-xs font-bold cursor-pointer"
-                  >
-                    Start Tour
-                  </button>
-                </div>
+
               </div>
             </motion.div>
 

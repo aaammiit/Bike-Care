@@ -1,14 +1,19 @@
 import React, { useState, useEffect, useRef } from "react";
 import { generateGoogleMapsUrl } from "../utils/locationUtils";
+import { useApp } from "../AppContext";
+import { ReviewFormModal } from "./ReviewFormModal";
 import { 
   mechanicData, 
   reviewsData, 
   galleryData, 
-  beforeAfterData, 
   pricingPackages, 
   faqItems, 
   majorBrands,
-  BeforeAfterItem
+  workshopLiftImg,
+  clutchEngineImg,
+  suspensionImg,
+  foamWashImg,
+  engineOilImg
 } from "./garageData";
 import { AnimatedMotorcycle } from "./AnimatedMotorcycle";
 import { CinematicNavbar } from "./CinematicNavbar";
@@ -51,7 +56,7 @@ import { ServiceType } from "../types";
 interface LandingPageProps {
   onOpenBooking: (preselectedService?: ServiceType) => void;
   onNavigateToRole: (role: "Customer" | "Admin" | "Mechanic") => void;
-  onOpenSOS: () => void;
+  onOpenUsers?: () => void;
 }
 
 // Native synthesized workshop sound effect generator
@@ -132,31 +137,31 @@ const AnimatedCounter: React.FC<{ target: number; suffix?: string; label: string
 const serviceJourneySteps = [
   {
     phase: "PHASE 01",
-    title: "Digital Dispatch Gateway",
-    img: "https://images.unsplash.com/photo-1558981806-ec527fa84c39?auto=format&fit=crop&w=600&q=80",
-    boldIntro: "Instant WhatsApp Ticket Preparation",
-    mainBody: "Prepare your booking request instantly using our automated diagnostic modal. Connect your active WhatsApp phone number, specify your motorcycle details, and establish a live GPS lock with a single tap. Your details are packaged securely for Rana Singh's instant workshop review."
+    title: "Digital Dispatch & Hydraulic Bay Entry",
+    img: workshopLiftImg,
+    boldIntro: "Instant WhatsApp Dispatch & Hydraulic Lift Setup",
+    mainBody: "Prepare your booking request instantly using our automated diagnostic portal. Connect your active WhatsApp phone number, specify your motorcycle details, and enter our hydraulic lift bay. Your details are packaged securely for Rana Singh's instant workshop review."
   },
   {
     phase: "PHASE 02",
-    title: "Honest Bay Diagnostics",
-    img: "https://images.unsplash.com/photo-1485965120184-e220f721d03e?auto=format&fit=crop&w=600&q=80",
-    boldIntro: "Advanced Sensor & Frame Scans",
-    mainBody: "Roll your machine into our premium Koregaon Park service bay. Rana personally performs computer-guided electronic diagnostics, cylinder compression analysis, carburetor air-fuel sensor profiling, and laser-guided frame alignment checks to discover the precise mechanical health of your bike."
+    title: "Suspension & Damping Diagnostics",
+    img: suspensionImg,
+    boldIntro: "Shock Absorber & Damping Calibration",
+    mainBody: "Roll your machine into our premium Koregaon Park service bay. Rana personally performs hands-on rear shock absorber adjustments, USD fork oil seal checks, and laser-guided wheel alignment to guarantee ultimate road grip and riding comfort."
   },
   {
     phase: "PHASE 03",
-    title: "Precision Engine & Fuel Tuning",
-    img: "https://images.unsplash.com/photo-1568772585407-9361f9bf3a87?auto=format&fit=crop&w=600&q=80",
-    boldIntro: "100% Genuine OEM Spares & Assembly",
-    mainBody: "Rana Singh initiates target-focused physical restoration, carburetor sonic cleaning, high-performance spark plugs fitting, and custom ECU remapping. Every single spare part used is direct-from-brand certified OEM hardware backed by our premium local guarantee."
+    title: "Precision Engine & Clutch Assembly",
+    img: clutchEngineImg,
+    boldIntro: "100% Genuine OEM Spares & Engine Overhaul",
+    mainBody: "Rana Singh initiates target-focused clutch plate replacement, flywheel gear torquing, carburetor sonic cleaning, and custom ECU remapping. Every single spare part used is direct-from-brand certified OEM hardware backed by our guarantee."
   },
   {
     phase: "PHASE 04",
-    title: "Road Test & Delivery",
-    img: "https://images.unsplash.com/photo-1558981403-c5f9899a28bc?auto=format&fit=crop&w=600&q=80",
-    boldIntro: "Rigorous 5km Quality Check & Foam Wash",
-    mainBody: "Every single bike undergoes a rigorous 5km road-testing checklist by Rana Singh to validate brake response, clutch feel, suspension stability, and smooth power delivery. Afterward, your bike receives a full premium thick snow foam wash, polish, and is ready for safe UPI/Cash offline settle!"
+    title: "Polishing, Detailing & Offline Delivery",
+    img: foamWashImg,
+    boldIntro: "Hand-Wiping Buffing, Teflon Wax & Road Test",
+    mainBody: "Every single bike undergoes a microfiber hand-wiping polish, Teflon wax application, and a rigorous 5km road-testing checklist by Rana Singh to validate brake response, clutch feel, and smooth power delivery before safe UPI/Cash offline settle!"
   }
 ];
 
@@ -189,18 +194,20 @@ const AnimatedSectionHeader: React.FC<AnimatedSectionHeaderProps> = ({ badge, ti
   );
 };
 
-export const LandingPage: React.FC<LandingPageProps> = ({ onOpenBooking, onNavigateToRole, onOpenSOS }) => {
+export const LandingPage: React.FC<LandingPageProps> = ({ onOpenBooking, onNavigateToRole, onOpenUsers }) => {
+  const { addUserRequest, customerReviews, mechanicProfile } = useApp();
+  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+
+  const activeMechanic = mechanicProfile || mechanicData;
+
+  const displayReviews = customerReviews || [];
+
   // Theme Toggle: Defaults to false (to match user requested Black + Orange + White combo as standard preset)
   const [isDarkMode, setIsDarkMode] = useState(false);
 
   // Active section highlighters for scrolling
   const [activeSection, setActiveSection] = useState("home");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-
-  // Before & After comparison slider state
-  const [selectedCaseIdx, setSelectedCaseIdx] = useState(0);
-  const [sliderVal, setSliderVal] = useState(50);
-  const sliderContainerRef = useRef<HTMLDivElement>(null);
 
   // Lightbox State
   const [lightboxImg, setLightboxImg] = useState<{ url: string; title: string; desc: string } | null>(null);
@@ -215,15 +222,20 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenBooking, onNavig
   // Form State
   const [formName, setFormName] = useState("");
   const [formPhone, setFormPhone] = useState("");
+  const [isWhatsApp, setIsWhatsApp] = useState<boolean>(true);
   const [formBrand, setFormBrand] = useState("Royal Enfield");
   const [formModel, setFormModel] = useState("");
   const [formReg, setFormReg] = useState("");
   const [formCategory, setFormCategory] = useState("General Maintenance");
   const [formDesc, setFormDesc] = useState("");
-  const [formDate, setFormDate] = useState("");
+  const [formDate, setFormDate] = useState(() => {
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    return tomorrow.toISOString().split("T")[0];
+  });
   const [formTime, setFormTime] = useState("10:00 AM - 12:00 PM");
+  const [formPinCode, setFormPinCode] = useState("271201");
   const [formLoc, setFormLoc] = useState("");
-  const [isEmergency, setIsEmergency] = useState(false);
 
   // Booking Feedback States
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -275,11 +287,12 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenBooking, onNavig
 
   // Auto-scroll reviews carousel effect
   useEffect(() => {
+    if (!displayReviews || displayReviews.length === 0) return;
     const timer = setInterval(() => {
-      setActiveReviewIdx((prev) => (prev + 1) % reviewsData.length);
+      setActiveReviewIdx((prev) => (prev + 1) % displayReviews.length);
     }, 6000);
     return () => clearInterval(timer);
-  }, []);
+  }, [displayReviews]);
 
   // Monitor Scroll position & Keyboard escape key to close active modals
   useEffect(() => {
@@ -301,7 +314,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenBooking, onNavig
     const handleScroll = () => {
       if (!ticking) {
         window.requestAnimationFrame(() => {
-          const sections = ["home", "services", "about", "gallery", "repairs", "reviews", "faq", "contact"];
+          const sections = ["home", "services", "about", "gallery", "reviews", "faq", "contact"];
           const scrollPos = window.scrollY + 200;
 
           for (const section of sections) {
@@ -325,27 +338,6 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenBooking, onNavig
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Before & After mouse/touch scrubbers
-  const handleSliderMove = (clientX: number) => {
-    if (!sliderContainerRef.current) return;
-    const rect = sliderContainerRef.current.getBoundingClientRect();
-    const x = clientX - rect.left;
-    const percentage = Math.max(0, Math.min(100, (x / rect.width) * 100));
-    setSliderVal(percentage);
-  };
-
-  const handleTouchMove = (e: React.TouchEvent) => {
-    if (e.touches[0]) {
-      handleSliderMove(e.touches[0].clientX);
-    }
-  };
-
-  const handleMouseMove = (e: React.MouseEvent) => {
-    if (e.buttons === 1) { // Left click held and dragged
-      handleSliderMove(e.clientX);
-    }
-  };
-
   // Process Booking Form Submission
   const handleBookingSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -353,19 +345,16 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenBooking, onNavig
 
     if (!formName.trim()) errors.push("Please provide your full name.");
     if (!formPhone.trim()) errors.push("Active phone number is required.");
-    if (!isEmergency && !formModel.trim()) errors.push("Please enter your motorcycle model.");
-    if (!isEmergency && !formDate) errors.push("Please select a preferred service date.");
-    if (isEmergency && !formDesc.trim()) errors.push("Please enter a short description of the emergency issue.");
-    if (!formLoc.trim()) errors.push("Please enter or capture your breakdown location.");
+    if (!formModel.trim()) errors.push("Please enter your motorcycle model.");
+    if (!formDate) errors.push("Please select a preferred service date.");
+    if (!formLoc.trim()) errors.push("Please enter or capture your location.");
 
     if (errors.length > 0) {
       setValidationErrors(errors);
-      // Scroll to error banner if visible, otherwise scroll modal content
       const errorEl = document.getElementById("appointment-card");
       if (errorEl) {
         errorEl.scrollIntoView({ behavior: "smooth" });
       } else {
-        // Modal is scrollable, scroll to top
         window.scrollTo({ top: 0, behavior: "smooth" });
       }
       return;
@@ -374,20 +363,36 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenBooking, onNavig
     setValidationErrors([]);
     setIsSubmitting(true);
 
-    // Simulate luxury animation lag
+    // Save to user requests store for owner CSV access
+    const finalLocation = `${formLoc || "Koregaon Park, Pune"} [PIN: ${formPinCode || "271201"}]`;
+    if (addUserRequest) {
+      addUserRequest({
+        name: formName,
+        phone: formPhone,
+        isWhatsApp: isWhatsApp,
+        bikeModel: `${formBrand} ${formModel}`.trim() || "Motorcycle",
+        serviceCategory: formCategory,
+        description: formDesc || "Service & Maintenance Booking",
+        preferredDate: formDate,
+        preferredSlot: formTime,
+        pickupOption: "None",
+        location: finalLocation
+      });
+    }
+
+    // Processing animation lag
     setTimeout(() => {
       setIsSubmitting(false);
       setShowSuccessModal(true);
       setIsBookingModalOpen(false); // Hide form modal when showing success modal!
 
-      // Create prefilled WhatsApp text block
-      const emergencyBadge = isEmergency ? "🚨 URGENT EMERGENCY DISPATCH REQUEST 🚨" : "🏍️ RANA GARAGE APPOINTMENT REQUEST";
-      const urgencyNote = isEmergency ? "\n*URGENCY: IMMEDIATE ROAD ASSISTANCE / WORKSHOP SOS*\n" : "";
-      const mapsUrl = generateGoogleMapsUrl(formLoc, gpsCoords);
-      const whatsappMessage = `*${emergencyBadge}*${urgencyNote}
+      if (isWhatsApp) {
+        // Create prefilled WhatsApp text block
+        const mapsUrl = generateGoogleMapsUrl(formLoc, gpsCoords);
+        const whatsappMessage = `*🏍️ RANA GARAGE APPOINTMENT REQUEST*
 *Customer Details:*
 • Name: ${formName}
-• Phone: ${formPhone}
+• Phone: ${formPhone} (WhatsApp Active)
 
 *Motorcycle Details:*
 • Brand: ${formBrand}
@@ -396,26 +401,28 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenBooking, onNavig
 
 *Service Requested:*
 • Category: ${formCategory}
-• Description: "${formDesc || (isEmergency ? "Immediate roadside / fast workshop emergency care needed." : "General checkup and tuning request.")}"
-• Location: ${formLoc || "Koregaon Park, Pune"}
+• Description: "${formDesc || "General checkup and tuning request."}"
+• Location & PIN: ${finalLocation}
 📍 *Google Maps Location:* ${mapsUrl}
 
 *Preferred Schedule:*
-• Preferred Date: ${isEmergency ? "IMMEDIATE (ASAP BREAKDOWN SOS)" : formDate}
-• Preferred Slot: ${isEmergency ? "URGENT DISPATCH REQUIRED (15-30 mins)" : formTime}
+• Preferred Date: ${formDate}
+• Preferred Slot: ${formTime}
+• Area PIN Code: ${formPinCode || "271201"}
 
 ---
-_Please confirm my ${isEmergency ? "emergency SOS dispatch" : "slot"} on your dashboard, Rana Singh. Thank you!_`;
+_Please confirm my slot on your dashboard, Master Rana. Thank you!_`;
 
-      const encodedMessage = encodeURIComponent(whatsappMessage);
-      const waUrl = `https://wa.me/919767824216?text=${encodedMessage}`;
+        const encodedMessage = encodeURIComponent(whatsappMessage);
+        const waUrl = `https://wa.me/919767824216?text=${encodedMessage}`;
 
-      // Open WhatsApp after a brief delay so the user sees the success modal first!
-      setTimeout(() => {
-        window.open(waUrl, "_blank");
-      }, 1500);
+        // Open WhatsApp after a brief delay so the user sees the success modal first!
+        setTimeout(() => {
+          window.open(waUrl, "_blank");
+        }, 1200);
+      }
 
-    }, 1200);
+    }, 800);
   };
 
   // Quick Estimator Calculation Logic
@@ -496,8 +503,6 @@ _Please confirm my ${isEmergency ? "emergency SOS dispatch" : "slot"} on your da
     setIsBookingModalOpen(true);
   };
 
-  const currentCase: BeforeAfterItem = beforeAfterData[selectedCaseIdx];
-
   // Helper theme classes mapping aligned with Duolingo White Paper Theme
   const bgClass = "bg-white text-charcoal";
   const cardClass = "duo-card text-charcoal";
@@ -551,7 +556,7 @@ _Please confirm my ${isEmergency ? "emergency SOS dispatch" : "slot"} on your da
         activeSection={activeSection}
         onNavigateToRole={onNavigateToRole}
         onOpenBooking={() => setIsBookingModalOpen(true)}
-        onOpenSOS={onOpenSOS}
+        onOpenUsers={onOpenUsers}
       />
 
       {/* 2. HERO SECTION */}
@@ -616,17 +621,6 @@ _Please confirm my ${isEmergency ? "emergency SOS dispatch" : "slot"} on your da
               <ChevronRight className="h-5 w-5 ml-1" />
             </motion.button>
             
-            <motion.button
-              onClick={() => window.dispatchEvent(new Event("start-rana-tour"))}
-              className="flex-1 bg-amber-500 hover:bg-amber-600 text-white border-b-4 border-amber-700 active:translate-y-[2px] active:border-b-2 font-black uppercase tracking-widest py-4 px-6 rounded-[16px] text-sm sm:text-base flex items-center justify-center space-x-2 cursor-pointer"
-              whileHover={{ y: -3, scale: 1.02 }}
-              whileTap={{ y: 2, scale: 0.98 }}
-              transition={{ type: "spring", stiffness: 450, damping: 14 }}
-              style={{ transition: "background-color 100ms, border-color 100ms, color 100ms, box-shadow 100ms" }}
-            >
-              <Sparkles className="h-4.5 w-4.5 text-white mr-1 animate-pulse" />
-              <span>Interactive Tour</span>
-            </motion.button>
 
             <motion.a
               href="#services"
@@ -700,43 +694,112 @@ _Please confirm my ${isEmergency ? "emergency SOS dispatch" : "slot"} on your da
           <AnimatedSectionHeader
             badge="GARAGE SERVICES DECK"
             title="Tuned and Treated to Perfection."
-            description="We diagnose and repair all motorcycle categories with 100% genuine spares. Hover on each card to review estimated completion times, diagnostic guidelines, and offline settle procedures."
+            description="We diagnose and repair all motorcycle categories with 100% genuine spares across every bike model."
           />
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
-              { title: "General Maintenance", desc: "42-point safety checkup, chain tension adjust, filter cleaning, engine tightings, clean spark plugs.", time: "2-3 Hours", status: "Package Standard", icon: Wrench },
-              { title: "Engine Overhauling", desc: "Valve lapping, piston rings replacement, block boring, engine compression restoration, synthetic oil flushing.", time: "1-2 Days", status: "Diagnostic Required", icon: Gauge },
-              { title: "Brakes & Suspension", desc: "Caliper cleaning, premium carbon brake pads fitting, WP fork oil and dual lip pressure seals replacement.", time: "2 Hours", status: "Add-on Diagnostic", icon: Activity },
-              { title: "Battery & Electricals", desc: "Exide battery load testing, wiring loom short diagnostics, solid-state starter relay fitting, bulb wraps.", time: "1 Hour", status: "Diagnostic Settle", icon: Sparkles },
-              { title: "Chain & Drive Repair", desc: "Gold O-ring heavy-duty drive chain installation, laser alignment, wheel tension checking.", time: "45 Mins", status: "Package Option", icon: Sliders },
-              { title: "Carburetor & ECU Tune", desc: "Mikuni carb dismantling, sonic cleaning, float setups, fuel-map OBD flashing for maximum throttle response.", time: "1.5 Hours", status: "Included in Pro", icon: Cpu },
-              { title: "Foam Snow Wash & Teflon", desc: "High-pressure active thick snow foaming, tire gloss shine, buffer wax orbital Teflon paint polishing.", time: "1 Hour", status: "Standard Benefit", icon: Sparkles },
-              { title: "Accident & Frame Fix", desc: "Chassis laser geometry checks, bent handle restoration, OEM outer fairings procurement and painting.", time: "Varies", status: "Diagnostic Settle", icon: AlertTriangle }
+              { 
+                title: "General Maintenance", 
+                bikeModel: "Hero Splendor / Honda Shine",
+                img: engineOilImg,
+                desc: "42-point safety checkup, oil dipstick level test, chain tension adjust, filter cleaning, clean spark plugs.", 
+                status: "Included Work", 
+                icon: Wrench 
+              },
+              { 
+                title: "Engine & Clutch Repair", 
+                bikeModel: "Royal Enfield Bullet 350",
+                img: clutchEngineImg,
+                desc: "Clutch basket friction plate assembly, valve lapping, piston rings replacement, synthetic oil flushing.", 
+                status: "Expert Engine Bay", 
+                icon: Gauge 
+              },
+              { 
+                title: "Brakes & Shock Suspension", 
+                bikeModel: "KTM Duke 200 / 390",
+                img: suspensionImg,
+                desc: "Rear shock absorber tuning, caliper cleaning, ceramic brake pads fitting, WP fork oil seal replacement.", 
+                status: "Safety Checked", 
+                icon: Activity 
+              },
+              { 
+                title: "Scooter Hydraulic Lift Bay", 
+                bikeModel: "Honda Activa / Jupiter / Vespa",
+                img: workshopLiftImg,
+                desc: "Elevated hydraulic lift servicing for scooters, variator belt checks, brake drum cleaning & oil change.", 
+                status: "Lift Bay Active", 
+                icon: Bike 
+              },
+              { 
+                title: "Foam Snow Wash & Teflon", 
+                bikeModel: "Vintage Cruiser / Street Bikes",
+                img: foamWashImg,
+                desc: "High-pressure active foam wash, microfiber wiping, tire gloss shine, buffer wax orbital Teflon polishing.", 
+                status: "Gloss Finished", 
+                icon: Sparkles 
+              },
+              { 
+                title: "Battery & Electricals", 
+                bikeModel: "TVS Apache / Pulsar",
+                img: "https://images.unsplash.com/photo-1558981403-c5f9899a28bc?auto=format&fit=crop&w=600&q=80",
+                desc: "Exide battery load testing, wiring loom short diagnostics, solid-state starter relay fitting, bulb wraps.", 
+                status: "Diagnostic Check", 
+                icon: Sparkles 
+              },
+              { 
+                title: "Chain & Drive Repair", 
+                bikeModel: "Yamaha R15 V4 / MT-15",
+                img: "https://images.unsplash.com/photo-1508962914676-134849a727f0?auto=format&fit=crop&w=600&q=80",
+                desc: "Gold O-ring heavy-duty drive chain installation, laser alignment, wheel tension checking.", 
+                status: "Precision Setup", 
+                icon: Sliders 
+              },
+              { 
+                title: "Carburetor & ECU Tune", 
+                bikeModel: "Kawasaki Ninja / Sports",
+                img: "https://images.unsplash.com/photo-1609630875171-b1321377ee65?auto=format&fit=crop&w=600&q=80",
+                desc: "Mikuni carb dismantling, sonic cleaning, float setups, fuel-map OBD flashing for maximum throttle response.", 
+                status: "Tuning Bench", 
+                icon: Cpu 
+              }
             ].map((service, idx) => {
               const IconComp = service.icon;
               return (
                 <div
                   key={idx}
-                  className="duo-card p-6 hover:border-spark-blue hover:-translate-y-1 hover:shadow-[0_4px_0_0_#1899d6] transition-all duration-200 group relative overflow-hidden flex flex-col justify-between bg-white text-charcoal"
+                  className="duo-card hover:border-spark-blue hover:-translate-y-1 hover:shadow-[0_4px_0_0_#1899d6] transition-all duration-200 group relative overflow-hidden flex flex-col justify-between bg-white text-charcoal rounded-2xl border-2 border-slate-200"
                 >
-                  <div className="space-y-4">
-                    <div className="p-3 bg-sky-50 text-spark-blue border-2 border-sky-100 rounded-xl w-fit shrink-0 transition-transform group-hover:scale-110">
-                      <IconComp className="h-6 w-6" />
+                  <div className="relative h-44 w-full overflow-hidden bg-slate-100">
+                    <img 
+                      src={service.img} 
+                      alt={service.title} 
+                      referrerPolicy="no-referrer"
+                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent" />
+                    <span className="absolute top-3 left-3 bg-slate-900/90 text-white font-mono text-[9px] font-bold px-2.5 py-1 rounded-md backdrop-blur-md border border-slate-700">
+                      🏍️ {service.bikeModel}
+                    </span>
+                    <div className="absolute bottom-2.5 left-3 p-2 bg-sky-50 text-spark-blue border-2 border-sky-100 rounded-xl shrink-0">
+                      <IconComp className="h-5 w-5" />
                     </div>
+                  </div>
+
+                  <div className="p-5 flex-1 flex flex-col justify-between space-y-3">
                     <div className="text-left space-y-1.5">
-                      <h3 className="font-display font-black text-lg text-charcoal group-hover:text-spark-blue transition-colors">
+                      <h3 className="font-display font-black text-base text-charcoal group-hover:text-spark-blue transition-colors">
                         {service.title}
                       </h3>
                       <p className="text-xs text-pencil-gray font-medium leading-relaxed">
                         {service.desc}
                       </p>
                     </div>
-                  </div>
 
-                  <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between text-xs">
-                    <span className="text-pencil-gray font-semibold">Time: <span className="text-charcoal font-bold">{service.time}</span></span>
-                    <span className="text-spark-blue font-extrabold text-[11px] uppercase tracking-wide">{service.status}</span>
+                    <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
+                      <span className="text-pencil-gray font-bold text-[11px]">Work Category</span>
+                      <span className="text-spark-blue font-extrabold text-[11px] uppercase tracking-wide">{service.status}</span>
+                    </div>
                   </div>
                 </div>
               );
@@ -754,10 +817,10 @@ _Please confirm my ${isEmergency ? "emergency SOS dispatch" : "slot"} on your da
           
           <div className="max-w-2xl mx-auto mb-8 space-y-1.5">
             <h2 className="font-display font-black text-2xl sm:text-3xl md:text-4xl text-slate-900 dark:text-white tracking-tight">
-              Pre-Fixed Budgets. Zero Extra Fees.
+              Work Inclusions & Service Packages
             </h2>
             <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 font-semibold max-w-xl mx-auto leading-normal">
-              Fixed inclusion packages with transparent flat rates and zero hidden charges.
+              Comprehensive motorcycle repair and maintenance packages with complete itemized work checklists.
             </p>
           </div>
 
@@ -773,7 +836,7 @@ _Please confirm my ${isEmergency ? "emergency SOS dispatch" : "slot"} on your da
               >
                 {pkg.popular && (
                   <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-[#58cc02] text-white font-black text-[10px] uppercase tracking-wider px-3.5 py-1 rounded-full border border-emerald-600 shadow-2xs z-10 whitespace-nowrap">
-                    MOST POPULAR
+                    RECOMMENDED PACKAGE
                   </span>
                 )}
 
@@ -781,11 +844,12 @@ _Please confirm my ${isEmergency ? "emergency SOS dispatch" : "slot"} on your da
                   <div className="text-left flex items-center justify-between">
                     <div>
                       <h3 className="font-display font-black text-xl text-slate-900 dark:text-white">{pkg.name}</h3>
-                      <p className="text-[11px] text-slate-500 dark:text-slate-400 font-semibold mt-0.5">Time: {pkg.time}</p>
+                      <p className="text-[11px] text-[#58cc02] font-mono font-bold mt-0.5">Full Maintenance Scope</p>
                     </div>
                     <div className="text-right">
-                      <div className="text-2xl font-display font-black text-[#58cc02]">Rs. {pkg.price}</div>
-                      <span className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider">Flat Fee</span>
+                      <span className="inline-block p-2 bg-emerald-50 text-[#58cc02] rounded-xl font-bold text-xs border border-emerald-100">
+                        100% Genuine
+                      </span>
                     </div>
                   </div>
 
@@ -805,19 +869,18 @@ _Please confirm my ${isEmergency ? "emergency SOS dispatch" : "slot"} on your da
                   <motion.button
                     onClick={() => {
                       setFormCategory(pkg.name);
-                      setFormDesc(`Requesting service package: "${pkg.name}" (Rs. ${pkg.price})`);
+                      setFormDesc(`Requesting service package: "${pkg.name}"`);
                       setIsBookingModalOpen(true);
                     }}
                     className={`w-full text-center py-2.5 px-4 rounded-full text-xs font-black tracking-wider uppercase transition-all cursor-pointer ${
                       pkg.popular
-                        ? "bg-[#58cc02] hover:bg-[#46a302] text-white shadow-xs border border-emerald-600/30"
-                        : "border-2 border-slate-200 dark:border-slate-700 hover:border-[#38bdf8] text-[#0284c7] dark:text-sky-400 bg-white dark:bg-slate-800/80 hover:bg-sky-50/50 dark:hover:bg-slate-800 shadow-2xs"
+                        ? "bg-[#58cc02] text-white hover:bg-emerald-600 shadow-sm"
+                        : "bg-slate-900 text-white hover:bg-slate-800 dark:bg-slate-100 dark:text-slate-900"
                     }`}
                     whileHover={{ y: -2, scale: 1.01 }}
                     whileTap={{ y: 1, scale: 0.99 }}
-                    transition={{ type: "spring", stiffness: 450, damping: 14 }}
                   >
-                    SELECT {pkg.name.toUpperCase()}
+                    BOOK {pkg.name.toUpperCase()}
                   </motion.button>
                 </div>
               </div>
@@ -852,135 +915,6 @@ _Please confirm my ${isEmergency ? "emergency SOS dispatch" : "slot"} on your da
         </div>
       </section>
 
-      {/* 7. BEFORE & AFTER REPAIR REVEAL SLIDER (Interactive Comparison) */}
-      <section id="repairs" className="py-10 md:py-12 border-t-2 border-b-2 bg-white border-slate-100">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-            
-            {/* Left Column: Selector tabs and explanations */}
-            <div className="lg:col-span-5 space-y-6 text-left">
-              <div className="inline-flex items-center space-x-1.5 px-2.5 py-1.5 bg-sky-50 text-spark-blue border-2 border-sky-100 rounded-xl text-[10px] font-bold uppercase tracking-widest">
-                <Sliders className="h-3.5 w-3.5" />
-                <span>INTERACTIVE COMPARISON BENCH</span>
-              </div>
-              <h2 className="font-display font-black text-3xl sm:text-5xl text-charcoal tracking-tight leading-none">
-                Before & After Gallery.
-              </h2>
-              <p className="text-pencil-gray text-sm font-semibold leading-relaxed">
-                Select an engineering case-study card below. Hold and drag the vertical slider handle on the right image to scrub between the dirty/carbon-clogged state and the pristine, polished completed machine.
-              </p>
- 
-              {/* Case studies list selectors */}
-              <div className="space-y-3 pt-2">
-                {beforeAfterData.map((ba, idx) => (
-                  <button
-                    key={ba.id}
-                    onClick={() => {
-                      setSelectedCaseIdx(idx);
-                      setSliderVal(50);
-                    }}
-                    className={`w-full p-4 rounded-[16px] border text-left transition-all flex items-start space-x-3.5 cursor-pointer ${
-                      selectedCaseIdx === idx
-                        ? "bg-brand-50 border-eager-green shadow-[0_4px_0_0_#46a302] text-eager-green"
-                        : "duo-card hover:border-slate-300"
-                    }`}
-                  >
-                    <div className="p-2 rounded-xl bg-slate-50 text-pencil-gray shrink-0 border-2 border-slate-200">
-                      <Bike className="h-4.5 w-4.5" />
-                    </div>
-                    <div className="space-y-0.5">
-                      <h4 className="text-xs font-bold text-pencil-gray">{ba.bike}</h4>
-                      <h3 className="text-sm font-black text-charcoal">{ba.title}</h3>
-                    </div>
-                  </button>
-                ))}
-              </div>
-            </div>
- 
-            {/* Right Column: Sliding Canvas controller */}
-            <div className="lg:col-span-7 flex flex-col justify-center items-center">
-              <p className="text-[10px] text-pencil-gray font-bold tracking-widest uppercase mb-3">
-                ⚠️ DRAG THE SLIDER TO REVEAL TRANSFORMATION
-              </p>
- 
-              <div 
-                ref={sliderContainerRef}
-                onMouseMove={handleMouseMove}
-                onMouseDown={(e) => handleSliderMove(e.clientX)}
-                onTouchMove={handleTouchMove}
-                onTouchStart={(e) => {
-                  if (e.touches[0]) handleSliderMove(e.touches[0].clientX);
-                }}
-                className="relative h-80 sm:h-[400px] w-full max-w-xl rounded-3xl overflow-hidden border-2 border-slate-200 shadow-md cursor-ew-resize select-none"
-              >
-                {/* AFTER IMAGE (Background) */}
-                <div className="absolute inset-0 bg-slate-900">
-                  <img 
-                    src={currentCase.afterImg} 
-                    alt="Rana Garage after service" 
-                    referrerPolicy="no-referrer"
-                    className="absolute inset-0 h-full w-full object-cover pointer-events-none select-none"
-                  />
-                  <div className="absolute bottom-4 right-4 bg-emerald-600/90 backdrop-blur-md text-white text-[9px] font-mono font-bold px-2.5 py-1 rounded-md uppercase tracking-wider z-10 shadow-sm">
-                    After: Rana Complete
-                  </div>
-                </div>
- 
-                {/* BEFORE IMAGE (Clip-Path Foreground overlay) */}
-                <div 
-                  className="absolute inset-0 pointer-events-none"
-                  style={{ clipPath: `polygon(0 0, ${sliderVal}% 0, ${sliderVal}% 100%, 0 100%)` }}
-                >
-                  <img 
-                    src={currentCase.beforeImg} 
-                    alt="Dirty bike before service" 
-                    referrerPolicy="no-referrer"
-                    className="absolute inset-0 h-full w-full object-cover filter grayscale sepia brightness-90 contrast-125 select-none"
-                  />
-                  <div className="absolute bottom-4 left-4 bg-rose-900/90 backdrop-blur-md text-white text-[9px] font-mono font-bold px-2.5 py-1 rounded-md uppercase tracking-wider z-10 shadow-sm">
-                    Before: Dirty / Worn
-                  </div>
-                </div>
- 
-                {/* Slicer division bar indicator */}
-                <div 
-                  className="absolute inset-y-0 w-1 bg-spark-blue cursor-ew-resize z-20 pointer-events-none"
-                  style={{ left: `${sliderVal}%` }}
-                >
-                  <div className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-8 h-8 rounded-full bg-spark-blue border-2 border-white flex items-center justify-center shadow-lg pointer-events-none text-white">
-                    <Sliders className="h-4.5 w-4.5" />
-                  </div>
-                </div>
-              </div>
- 
-              {/* Case summary stats ribbon */}
-              <div className="duo-card p-4 mt-6 max-w-xl w-full grid grid-cols-3 gap-3 text-center text-xs divide-x divide-slate-100 bg-white">
-                <div>
-                  <span className="text-pencil-gray block text-[9px] font-bold uppercase tracking-wide">LAB HOURS</span>
-                  <span className="text-charcoal font-black block mt-0.5">{currentCase.duration}</span>
-                </div>
-                <div>
-                  <span className="text-pencil-gray block text-[9px] font-bold uppercase tracking-wide">QUALITY LEVEL</span>
-                  <span className="text-spark-blue font-black block mt-0.5">OEM Standards</span>
-                </div>
-                <div>
-                  <span className="text-pencil-gray block text-[9px] font-bold uppercase tracking-wide">SATISFACTION</span>
-                  <span className="text-eager-green font-black block mt-0.5">★ {currentCase.satisfaction}</span>
-                </div>
-              </div>
- 
-              <div className="mt-3 text-center max-w-xl text-xs text-pencil-gray font-bold italic">
-                "{currentCase.desc}"
-              </div>
-
-            </div>
-
-          </div>
-
-        </div>
-      </section>
-
       {/* 8. APPOINTMENT / ISSUE FORM TRIGGER BANNER (WhatsApp Redirect Gateway) */}
       <section id="appointment-portal" className="py-8 md:py-10 border-t-2 border-b-2 bg-brand-50/15 border-slate-100">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 text-center">
@@ -992,16 +926,16 @@ _Please confirm my ${isEmergency ? "emergency SOS dispatch" : "slot"} on your da
                 DIGITAL QUEUE DISPATCH
               </span>
               <h2 className="font-display font-black text-2xl sm:text-4xl text-charcoal tracking-tight leading-tight">
-                Choose Your Service Priority Mode
+                Schedule Your Service Appointment
               </h2>
               <p className="text-pencil-gray text-xs sm:text-sm font-semibold leading-relaxed max-w-2xl mx-auto">
-                Open Pune's premier diagnostics and repair gateway. Complete our rapid ticket setup and auto-generate your WhatsApp priority dispatch. Choose standard booking for scheduled tuneups, or SOS emergency for immediate help.
+                Open Pune's premier diagnostics and repair gateway. Complete our rapid ticket setup and auto-generate your WhatsApp priority dispatch.
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full mt-4">
-              {/* Card 1: Standard Service Booking */}
-              <div className="duo-card p-5 flex flex-col justify-between items-center text-center space-y-4 border-2 border-slate-100 bg-slate-50/40 hover:border-slate-200 transition">
+            <div className="max-w-md w-full mt-2">
+              {/* Standard Service Booking Button */}
+              <div className="duo-card p-6 flex flex-col justify-between items-center text-center space-y-4 border-2 border-slate-100 bg-slate-50/40 hover:border-slate-200 transition">
                 <div className="p-3 bg-brand-100 text-eager-green rounded-2xl w-fit">
                   <Calendar className="h-6 w-6 stroke-[2]" />
                 </div>
@@ -1013,7 +947,6 @@ _Please confirm my ${isEmergency ? "emergency SOS dispatch" : "slot"} on your da
                 </div>
                 <motion.button
                   onClick={() => {
-                    setIsEmergency(false);
                     playDiagnosticBeep(600, 100);
                     setIsBookingModalOpen(true);
                   }}
@@ -1023,32 +956,6 @@ _Please confirm my ${isEmergency ? "emergency SOS dispatch" : "slot"} on your da
                 >
                   <Calendar className="h-4 w-4" />
                   <span>Book Scheduled Slot</span>
-                </motion.button>
-              </div>
-
-              {/* Card 2: Emergency Immediate SOS */}
-              <div className="duo-card p-5 flex flex-col justify-between items-center text-center space-y-4 border-2 border-rose-100 bg-rose-50/20 hover:border-rose-200 transition">
-                <div className="p-3 bg-rose-100 text-rose-600 rounded-2xl w-fit">
-                  <AlertTriangle className="h-6 w-6 stroke-[2] animate-pulse" />
-                </div>
-                <div className="space-y-1">
-                  <h3 className="font-display font-black text-base text-rose-700">Immediate Emergency SOS</h3>
-                  <p className="text-[11px] text-rose-600/90 font-medium leading-relaxed">
-                    Locked wheel? Flat tyre? Engine won't spark? Request fast emergency support or towing. Understood by Rana as a top priority dispatch.
-                  </p>
-                </div>
-                <motion.button
-                  onClick={() => {
-                    setIsEmergency(true);
-                    playDiagnosticBeep(900, 120);
-                    setIsBookingModalOpen(true);
-                  }}
-                  className="w-full bg-rose-600 hover:bg-rose-700 text-white border-b-4 border-rose-800 hover:border-rose-900 py-3 rounded-2xl text-xs uppercase tracking-wider flex items-center justify-center space-x-2 cursor-pointer shadow-md shadow-rose-600/5"
-                  whileHover={{ y: -2, scale: 1.01 }}
-                  whileTap={{ y: 1, scale: 0.99 }}
-                >
-                  <AlertTriangle className="h-4 w-4" />
-                  <span>Request Immediate Service</span>
                 </motion.button>
               </div>
             </div>
@@ -1077,7 +984,7 @@ _Please confirm my ${isEmergency ? "emergency SOS dispatch" : "slot"} on your da
               animate={{ scale: 1, y: 0, opacity: 1 }}
               exit={{ scale: 0.95, y: 15, opacity: 0 }}
               transition={{ type: "spring", damping: 25, stiffness: 220 }}
-              className={`w-full ${isEmergency ? "max-w-xl" : "max-w-3xl"} my-auto transition-all duration-300 transform overflow-hidden rounded-2xl sm:rounded-3xl bg-white dark:bg-slate-900 text-left align-middle shadow-2xl border-2 border-slate-200 dark:border-slate-800 flex flex-col relative z-10 max-h-[90vh] sm:max-h-[88vh]`}
+              className="w-full max-w-3xl my-auto transition-all duration-300 transform overflow-hidden rounded-2xl sm:rounded-3xl bg-white dark:bg-slate-900 text-left align-middle shadow-2xl border-2 border-slate-200 dark:border-slate-800 flex flex-col relative z-10 max-h-[90vh] sm:max-h-[88vh]"
             >
               <form 
                 onSubmit={handleBookingSubmit} 
@@ -1110,7 +1017,7 @@ _Please confirm my ${isEmergency ? "emergency SOS dispatch" : "slot"} on your da
                 </div>
 
                 {/* Aesthetic priority stripe - Fixed */}
-                <div className={`h-1.5 w-full shrink-0 ${isEmergency ? "bg-rose-500" : "bg-eager-green"}`} />
+                <div className="h-1.5 w-full shrink-0 bg-eager-green" />
 
                 {/* Modal scrollable body with only the Form Fields inside */}
                 <div className="overflow-y-auto p-6 sm:p-8 space-y-6 flex-1 min-h-0">
@@ -1127,228 +1034,18 @@ _Please confirm my ${isEmergency ? "emergency SOS dispatch" : "slot"} on your da
                     </div>
                   )}
 
-                  {/* High-fidelity Segmented Toggle: Standard vs Emergency SOS */}
-                  <div className="space-y-2">
-                    <label className="block text-[10px] font-mono text-slate-500 dark:text-slate-400 uppercase font-black tracking-wider text-center">
-                      Select Your Service Type
-                    </label>
-                    <div className="grid grid-cols-2 p-1.5 bg-slate-100 dark:bg-slate-900 rounded-2xl border-2 border-slate-200 dark:border-slate-800">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setIsEmergency(false);
-                          playDiagnosticBeep(600, 100);
-                        }}
-                        className={`py-3 text-xs sm:text-sm font-black uppercase tracking-wider rounded-xl transition-all duration-200 flex items-center justify-center gap-1.5 cursor-pointer ${
-                          !isEmergency 
-                            ? "bg-white dark:bg-slate-805 text-eager-green shadow-sm border border-slate-200/50" 
-                            : "text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 hover:bg-slate-50/50 dark:hover:bg-slate-800/30"
-                        }`}
-                      >
-                        <Calendar className="w-4 h-4 shrink-0" />
-                        <span>📅 Standard Slot Booking</span>
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setIsEmergency(true);
-                          playDiagnosticBeep(950, 120);
-                        }}
-                        className={`py-3 text-xs sm:text-sm font-black uppercase tracking-wider rounded-xl transition-all duration-200 flex items-center justify-center gap-1.5 cursor-pointer ${
-                          isEmergency 
-                            ? "bg-rose-600 text-white shadow-sm border border-rose-500" 
-                            : "text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 hover:bg-slate-50/50 dark:hover:bg-slate-800/30"
-                        }`}
-                      >
-                        <AlertTriangle className="w-4 h-4 shrink-0 animate-pulse text-white" />
-                        <span>🚨 Emergency SOS</span>
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* Immediate Emergency SOS Info Block */}
-                  {isEmergency && (
-                    <motion.div 
-                      initial={{ opacity: 0, y: -10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      className="p-4 bg-rose-500/10 border border-rose-500/30 rounded-2xl text-left space-y-1.5"
-                    >
-                      <div className="flex items-center space-x-2 text-rose-500">
-                        <AlertTriangle className="h-5 w-5 animate-bounce shrink-0" />
-                        <h4 className="text-xs font-mono font-black uppercase tracking-wider">IMMEDIATE BREAKDOWN SOS IN SERVICE</h4>
-                      </div>
-                      <p className="text-[11px] text-slate-700 dark:text-slate-300 font-semibold leading-relaxed">
-                        This dispatcher flags your ticket as an **immediate priority breakdown**. Mechanic Rana Singh will prepare the roadside toolkit or dispatch the towing flatbed immediately to your live GPS location within Koregaon Park (5km).
-                      </p>
-                      <div className="text-[9.5px] text-rose-500 font-mono font-bold uppercase tracking-wider">
-                        ⚡ ETA: 15-30 MINUTES • WORKSHOP PRIORITY CLEARANCE
-                      </div>
-                    </motion.div>
-                  )}
-
-                  {isEmergency ? (
-                    // 30-Year Expert UI/UX Premium Minimal SOS Form
-                    <div className="space-y-5 animate-fadeIn text-left">
-                      {/* Name & Phone Number in a grid */}
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div className="relative group text-left">
-                          <label className="block text-[10px] font-mono text-slate-500 dark:text-slate-400 uppercase mb-1.5 font-black tracking-wider">
-                            Full Name <span className="text-rose-500">*</span>
-                          </label>
-                          <div className="relative">
-                            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 group-focus-within:text-rose-500 transition-colors">
-                              <User className="h-4 w-4" />
-                            </span>
-                            <input
-                              type="text"
-                              required
-                              placeholder="e.g. Rajkumar Shinde"
-                              value={formName}
-                              onChange={(e) => setFormName(e.target.value)}
-                              className="w-full rounded-2xl pl-11 pr-4 py-3.5 text-xs outline-none transition border bg-slate-50/50 dark:bg-slate-900/30 border-slate-200 dark:border-slate-800 focus:border-rose-500 focus:ring-4 focus:ring-rose-500/10 font-sans font-semibold text-slate-900 dark:text-white"
-                            />
-                          </div>
-                        </div>
-
-                        <div className="relative group text-left">
-                          <label className="block text-[10px] font-mono text-slate-500 dark:text-slate-400 uppercase mb-1.5 font-black tracking-wider">
-                            Active WhatsApp Number <span className="text-rose-500">*</span>
-                          </label>
-                          <div className="relative">
-                            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 group-focus-within:text-rose-500 transition-colors">
-                              <Smartphone className="h-4 w-4" />
-                            </span>
-                            <input
-                              type="tel"
-                              required
-                              placeholder="e.g. +91 98230 45678"
-                              value={formPhone}
-                              onChange={(e) => setFormPhone(e.target.value)}
-                              className="w-full rounded-2xl pl-11 pr-4 py-3.5 text-xs outline-none transition border bg-slate-50/50 dark:bg-slate-900/30 border-slate-200 dark:border-slate-800 focus:border-rose-500 focus:ring-4 focus:ring-rose-500/10 font-sans font-semibold text-slate-900 dark:text-white"
-                            />
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Premium Geolocation and Manual Location entry with 10 km limit warning */}
-                      <div className="relative group text-left">
-                        <div className="flex justify-between items-center mb-1.5">
-                          <label className="text-[10px] font-mono text-slate-500 dark:text-slate-400 uppercase font-black tracking-wider">
-                            Breakdown Location (10 KM Coverage Limit) <span className="text-rose-500">*</span>
-                          </label>
-                          <span className="text-[9px] font-mono font-black text-rose-500 uppercase tracking-widest bg-rose-500/10 px-2 py-0.5 rounded-full border border-rose-500/20">
-                            PUNE AREA ONLY
-                          </span>
-                        </div>
+                  {/* Standard Form - 2 Balanced Columns */}
+                  <div className="space-y-6 text-left">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
                         
-                        <div className="relative">
-                          <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 group-focus-within:text-rose-500 transition-colors">
-                            <MapPin className="h-4 w-4" />
-                          </span>
-                          <input
-                            type="text"
-                            required
-                            placeholder="Street, landmark, or area (e.g., Lane 6 Koregaon Park)"
-                            value={formLoc}
-                            onChange={(e) => setFormLoc(e.target.value)}
-                            className="w-full rounded-2xl pl-11 pr-32 py-3.5 text-xs outline-none transition border bg-slate-50/50 dark:bg-slate-900/30 border-slate-200 dark:border-slate-800 focus:border-rose-500 focus:ring-4 focus:ring-rose-500/10 font-sans font-semibold text-slate-900 dark:text-white"
-                          />
-                          <button
-                            type="button"
-                            onClick={handleAcquireLocation}
-                            disabled={gpsLoading}
-                            className="absolute right-2.5 top-1/2 -translate-y-1/2 bg-rose-600 hover:bg-rose-700 disabled:bg-rose-800 text-white font-black px-3.5 py-1.5 rounded-xl transition duration-300 shadow-sm text-[10px] uppercase tracking-widest flex items-center space-x-1 cursor-pointer"
-                          >
-                            {gpsLoading ? (
-                              <>
-                                <div className="w-3 h-3 rounded-full border border-white border-t-transparent animate-spin" />
-                                <span>LOCKING...</span>
-                              </>
-                            ) : (
-                              <>
-                                <MapPin className="h-3.5 w-3.5 animate-pulse" />
-                                <span>AUTO GPS</span>
-                              </>
-                            )}
-                          </button>
-                        </div>
-                        
-                        {gpsCoords && (
-                          <div className="mt-1.5 flex items-center justify-between px-1">
-                            <p className="text-[10px] font-mono font-bold text-emerald-500 flex items-center">
-                              <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full mr-1.5 animate-ping" />
-                              SATELLITE ACCURACY LOCKED ({gpsCoords.lat.toFixed(4)}°, {gpsCoords.lon.toFixed(4)}°)
-                            </p>
-                            <a
-                              href={generateGoogleMapsUrl(formLoc, gpsCoords)}
-                              target="_blank"
-                              rel="noreferrer"
-                              className="text-[10px] font-mono font-black text-rose-500 hover:text-rose-600 underline flex items-center gap-0.5"
-                            >
-                              <span>Open in Maps</span>
-                              <ExternalLink className="h-3 w-3" />
-                            </a>
-                          </div>
-                        )}
-                        
-                        {gpsError && (
-                          <p className="text-[10px] text-rose-500 font-mono mt-1.5 font-bold flex items-center px-1">
-                            <AlertTriangle className="h-3 w-3 mr-1" />
-                            {gpsError}
-                          </p>
-                        )}
-
-                        {/* Coverage hint banner */}
-                        <div className="mt-2.5 p-3 rounded-2xl bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 flex items-center justify-between text-left">
-                          <div className="flex items-center space-x-2">
-                            <div className="w-2 h-2 rounded-full bg-rose-600 animate-ping shrink-0" />
-                            <p className="text-[11px] font-sans font-semibold text-slate-600 dark:text-slate-300">
-                              Serving Koregaon Park, Kalyani Nagar, Viman Nagar, Camp & near 10 km.
-                            </p>
-                          </div>
-                          <span className="text-[10px] font-mono font-black text-rose-600 uppercase tracking-wider shrink-0">
-                            15 MIN ETA
-                          </span>
-                        </div>
-                      </div>
-
-                      {/* Issue Description (Short) */}
-                      <div className="relative group text-left">
-                        <label className="block text-[10px] font-mono text-slate-500 dark:text-slate-400 uppercase mb-1.5 font-black tracking-wider">
-                          What is the emergency issue? (Keep it short) <span className="text-rose-500">*</span>
-                        </label>
-                        <div className="relative">
-                          <span className="absolute left-4 top-4 text-slate-400 dark:text-slate-500 group-focus-within:text-rose-500 transition-colors">
-                            <Wrench className="h-4 w-4" />
-                          </span>
-                          <textarea
-                            required
-                            placeholder="e.g. Rear tire flat puncture, bike won't crank / start near lane 5 petrol pump."
-                            value={formDesc}
-                            onChange={(e) => setFormDesc(e.target.value)}
-                            rows={3}
-                            className="w-full rounded-2xl pl-11 pr-4 py-3.5 text-xs outline-none transition border resize-none bg-slate-50/50 dark:bg-slate-900/30 border-slate-200 dark:border-slate-800 focus:border-rose-500 focus:ring-4 focus:ring-rose-500/10 font-sans font-semibold text-slate-900 dark:text-white"
-                          />
-                        </div>
-                        <div className="flex items-center justify-between mt-1 px-1">
-                          <span className="text-[10px] text-slate-400 dark:text-slate-500 font-medium">Please include bike model if possible (e.g. Pulsar 220)</span>
-                          <span className="text-[9.5px] font-mono text-rose-500/80 font-bold uppercase tracking-wider">⚡ Direct SOS Line</span>
-                        </div>
-                      </div>
-                    </div>
-                  ) : (
-                    // Standard Form - 2 Columns (Contact and Specs, then troubleshoot)
-                    <div className="space-y-6 text-left">
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        
-                        {/* Column 1: Client details */}
+                        {/* Column 1: Contact Profile & Bike Details */}
                         <div className="space-y-4 text-left">
                           <h3 className="text-xs font-bold text-slate-900 dark:text-slate-200 uppercase tracking-widest font-mono border-b border-slate-200 dark:border-slate-800/80 pb-2 flex items-center">
                             <User className="h-4 w-4 text-[#F97316] mr-1.5" />
-                            1. Contact Profile
+                            1. Contact & Bike Details
                           </h3>
 
-                          <div className="space-y-3">
+                          <div className="space-y-3.5">
                             <div>
                               <label className="block text-[10px] font-mono text-slate-900 dark:text-slate-200 uppercase mb-1.5 font-black tracking-wider">
                                 Your Full Name <span className="text-[#F97316]">*</span>
@@ -1359,24 +1056,122 @@ _Please confirm my ${isEmergency ? "emergency SOS dispatch" : "slot"} on your da
                                 placeholder="e.g. Rajkumar Shinde"
                                 value={formName}
                                 onChange={(e) => setFormName(e.target.value)}
-                                className={`w-full rounded-xl px-3.5 py-3 text-xs outline-none transition border ${inputClass}`}
+                                className={`w-full rounded-xl px-3.5 py-2.5 text-xs outline-none transition border ${inputClass}`}
                               />
                             </div>
 
                             <div>
                               <label className="block text-[10px] font-mono text-slate-900 dark:text-slate-200 uppercase mb-1.5 font-black tracking-wider">
-                                Phone Number (WhatsApp Active) <span className="text-[#F97316]">*</span>
+                                Phone Number <span className="text-[#F97316]">*</span>
                               </label>
                               <input
                                 type="tel"
                                 required
-                                placeholder="e.g. +91 98230 45678"
+                                placeholder="e.g. 9823045678"
                                 value={formPhone}
                                 onChange={(e) => setFormPhone(e.target.value)}
-                                className={`w-full rounded-xl px-3.5 py-3 text-xs outline-none transition border ${inputClass}`}
+                                className={`w-full rounded-xl px-3.5 py-2.5 text-xs outline-none transition border font-mono ${inputClass}`}
                               />
+                              <div className="flex items-center justify-between mt-1 text-[11px] font-mono">
+                                {formPhone.replace(/\D/g, "").length === 0 ? (
+                                  <span className="text-slate-400">Enter 10 digits</span>
+                                ) : formPhone.replace(/\D/g, "").length === 10 ? (
+                                  <span className="text-emerald-500 font-bold">✓ Valid 10-digit phone number</span>
+                                ) : (
+                                  <span className="text-amber-500 font-bold">⚠️ {formPhone.replace(/\D/g, "").length}/10 digits</span>
+                                )}
+                              </div>
                             </div>
 
+                            {/* IS THIS WHATSAPP NUMBER QUESTION */}
+                            <div className="pt-2 border-t border-slate-200 dark:border-slate-800">
+                              <label className="block text-[10px] font-mono text-slate-900 dark:text-slate-200 uppercase mb-1.5 font-black tracking-wider">
+                                Is this your WhatsApp Number? <span className="text-[#F97316]">*</span>
+                              </label>
+                              <div className="grid grid-cols-2 gap-2">
+                                <button
+                                  type="button"
+                                  onClick={() => setIsWhatsApp(true)}
+                                  className={`py-2 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 border cursor-pointer ${
+                                    isWhatsApp
+                                      ? "bg-emerald-600 border-emerald-400 text-white shadow-md shadow-emerald-950/30"
+                                      : "bg-slate-100 dark:bg-slate-800 border-slate-300 dark:border-slate-700 text-slate-600 dark:text-slate-400"
+                                  }`}
+                                >
+                                  <span className="w-2 h-2 rounded-full bg-emerald-300" />
+                                  <span>Yes (WhatsApp)</span>
+                                </button>
+
+                                <button
+                                  type="button"
+                                  onClick={() => setIsWhatsApp(false)}
+                                  className={`py-2 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 border cursor-pointer ${
+                                    !isWhatsApp
+                                      ? "bg-amber-600 border-amber-400 text-white shadow-md shadow-amber-950/30"
+                                      : "bg-slate-100 dark:bg-slate-800 border-slate-300 dark:border-slate-700 text-slate-600 dark:text-slate-400"
+                                  }`}
+                                >
+                                  <Phone className="h-3 w-3" />
+                                  <span>No (Call Only)</span>
+                                </button>
+                              </div>
+                            </div>
+
+                            {/* Bike Brand & Model */}
+                            <div className="pt-2 border-t border-slate-200 dark:border-slate-800 space-y-3">
+                              <div className="grid grid-cols-2 gap-3">
+                                <div>
+                                  <label className="block text-[10px] font-mono text-slate-900 dark:text-slate-200 uppercase mb-1.5 font-black tracking-wider">
+                                    Bike Brand <span className="text-[#F97316]">*</span>
+                                  </label>
+                                  <select
+                                    value={formBrand}
+                                    onChange={(e) => setFormBrand(e.target.value)}
+                                    className={`w-full rounded-xl px-3 py-2.5 text-xs outline-none transition border ${inputClass}`}
+                                  >
+                                    {majorBrands.map((b, i) => <option key={i} value={b.name}>{b.name}</option>)}
+                                  </select>
+                                </div>
+
+                                <div>
+                                  <label className="block text-[10px] font-mono text-slate-900 dark:text-slate-200 uppercase mb-1.5 font-black tracking-wider">
+                                    Bike Model <span className="text-[#F97316]">*</span>
+                                  </label>
+                                  <input
+                                    type="text"
+                                    required
+                                    placeholder="e.g. Classic 350"
+                                    value={formModel}
+                                    onChange={(e) => setFormModel(e.target.value)}
+                                    className={`w-full rounded-xl px-3 py-2.5 text-xs outline-none transition border ${inputClass}`}
+                                  />
+                                </div>
+                              </div>
+
+                              <div>
+                                <label className="block text-[10px] font-mono text-slate-900 dark:text-slate-200 uppercase mb-1.5 font-black tracking-wider">
+                                  Vehicle Plate Number (Optional)
+                                </label>
+                                <input
+                                  type="text"
+                                  placeholder="e.g. MH-12-QE-4567"
+                                  value={formReg}
+                                  onChange={(e) => setFormReg(e.target.value)}
+                                  className={`w-full rounded-xl px-3.5 py-2.5 text-xs outline-none transition border ${inputClass}`}
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Column 2: Location, Date & Issue */}
+                        <div className="space-y-4 text-left">
+                          <h3 className="text-xs font-bold text-slate-900 dark:text-slate-200 uppercase tracking-widest font-mono border-b border-slate-200 dark:border-slate-800/80 pb-2 flex items-center">
+                            <MapPin className="h-4 w-4 text-[#F97316] mr-1.5" />
+                            2. Location & Preferred Date
+                          </h3>
+
+                          <div className="space-y-3.5">
                             <div>
                               <label className="block text-[10px] font-mono text-slate-500 dark:text-slate-400 uppercase mb-1.5 font-bold flex justify-between items-center">
                                 <span>📍 Precise Phone Geolocation <span className="text-[#F97316]">*</span></span>
@@ -1388,20 +1183,20 @@ _Please confirm my ${isEmergency ? "emergency SOS dispatch" : "slot"} on your da
                                 )}
                               </label>
                               
-                              <div className={`rounded-2xl p-4 border transition-all duration-300 ${
+                              <div className={`rounded-2xl p-3.5 border transition-all duration-300 ${
                                 formLoc 
                                   ? "bg-emerald-500/10 border-emerald-500/30" 
                                   : "bg-slate-50 dark:bg-slate-950/40 border-slate-200 dark:border-slate-800"
                               }`}>
                                 {formLoc ? (
-                                  <div className="space-y-3">
+                                  <div className="space-y-2">
                                     <div className="flex items-start space-x-2.5">
                                       <div className="p-1.5 rounded-lg bg-emerald-500/20 text-emerald-500 mt-0.5 shrink-0">
                                         <MapPin className="h-4 w-4" />
                                       </div>
                                       <div className="text-left">
                                         <p className="text-[11px] font-mono font-black text-slate-900 dark:text-slate-100 leading-none">GPS LOCK ESTABLISHED</p>
-                                        <p className="text-xs text-slate-700 dark:text-slate-300 font-bold font-mono mt-1.5 leading-relaxed">
+                                        <p className="text-xs text-slate-700 dark:text-slate-300 font-bold font-mono mt-1 leading-relaxed">
                                           {formLoc}
                                         </p>
                                         <a
@@ -1428,14 +1223,14 @@ _Please confirm my ${isEmergency ? "emergency SOS dispatch" : "slot"} on your da
                                     </div>
                                   </div>
                                 ) : (
-                                  <div className="flex flex-col items-center justify-center py-4 text-center space-y-3">
-                                    <div className="p-3 bg-orange-500/15 text-[#F97316] rounded-full animate-bounce">
-                                      <Smartphone className="h-6 w-6" />
+                                  <div className="flex flex-col items-center justify-center py-2 text-center space-y-2">
+                                    <div className="p-2 bg-orange-500/15 text-[#F97316] rounded-full">
+                                      <Smartphone className="h-5 w-5" />
                                     </div>
-                                    <div className="space-y-1">
+                                    <div className="space-y-0.5">
                                       <p className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider">No GPS Data Loaded</p>
                                       <p className="text-[10px] text-slate-500 dark:text-slate-400 font-sans max-w-[240px] mx-auto leading-normal">
-                                        We capture your current live coordinates through your phone GPS for precise towing.
+                                        We capture live coordinates via phone GPS for towing.
                                       </p>
                                     </div>
                                     
@@ -1443,7 +1238,7 @@ _Please confirm my ${isEmergency ? "emergency SOS dispatch" : "slot"} on your da
                                       type="button"
                                       onClick={handleAcquireLocation}
                                       disabled={gpsLoading}
-                                      className="w-full bg-[#F97316] hover:bg-[#ea580c] text-white font-black px-4 py-2.5 rounded-xl transition duration-300 shadow-md shadow-orange-500/15 text-xs uppercase tracking-widest flex items-center justify-center space-x-1.5 cursor-pointer"
+                                      className="w-full bg-[#F97316] hover:bg-[#ea580c] text-white font-black px-4 py-2 rounded-xl transition duration-300 shadow-md shadow-orange-500/15 text-xs uppercase tracking-widest flex items-center justify-center space-x-1.5 cursor-pointer"
                                     >
                                       {gpsLoading ? (
                                         <>
@@ -1462,145 +1257,53 @@ _Please confirm my ${isEmergency ? "emergency SOS dispatch" : "slot"} on your da
                               </div>
                               
                               {gpsError && (
-                                <p className="text-[10px] text-rose-500 font-mono mt-1.5 font-bold flex items-center">
+                                <p className="text-[10px] text-rose-500 font-mono mt-1 font-bold flex items-center">
                                   <AlertTriangle className="h-3 w-3 mr-1" />
                                   {gpsError}
                                 </p>
                               )}
                             </div>
-                          </div>
-                        </div>
 
-                        {/* Column 2: Machine details */}
-                        <div className="space-y-4 text-left">
-                          <h3 className="text-xs font-bold text-slate-900 dark:text-slate-200 uppercase tracking-widest font-mono border-b border-slate-200 dark:border-slate-800/80 pb-2 flex items-center">
-                            <Bike className="h-4 w-4 text-[#F97316] mr-1.5" />
-                            2. Motorcycle Specs
-                          </h3>
-
-                          <div className="space-y-3">
-                            <div className="grid grid-cols-2 gap-3">
+                            {/* Preferred Date & Issue Category side-by-side */}
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
                               <div>
                                 <label className="block text-[10px] font-mono text-slate-900 dark:text-slate-200 uppercase mb-1.5 font-black tracking-wider">
-                                  Bike Brand <span className="text-[#F97316]">*</span>
-                                </label>
-                                <select
-                                  value={formBrand}
-                                  onChange={(e) => setFormBrand(e.target.value)}
-                                  className={`w-full rounded-xl px-3.5 py-3 text-xs outline-none transition border ${inputClass}`}
-                                >
-                                  {majorBrands.map((b, i) => <option key={i} value={b.name}>{b.name}</option>)}
-                                </select>
-                              </div>
-
-                              <div>
-                                <label className="block text-[10px] font-mono text-slate-900 dark:text-slate-200 uppercase mb-1.5 font-black tracking-wider">
-                                  Bike Model <span className="text-[#F97316]">*</span>
+                                  Preferred Date <span className="text-[#F97316]">*</span>
                                 </label>
                                 <input
-                                  type="text"
-                                  required={!isEmergency}
-                                  placeholder="e.g. Classic 350"
-                                  value={formModel}
-                                  onChange={(e) => setFormModel(e.target.value)}
-                                  className={`w-full rounded-xl px-3.5 py-3 text-xs outline-none transition border ${inputClass}`}
+                                  type="date"
+                                  required
+                                  value={formDate}
+                                  onChange={(e) => setFormDate(e.target.value)}
+                                  className={`w-full rounded-xl px-3.5 py-2.5 text-xs outline-none transition border cursor-pointer ${inputClass}`}
                                 />
                               </div>
-                            </div>
 
-                            <div>
-                              <label className="block text-[10px] font-mono text-slate-900 dark:text-slate-200 uppercase mb-1.5 font-black tracking-wider">
-                                Vehicle Plate Number (Optional)
-                              </label>
-                              <input
-                                type="text"
-                                placeholder="e.g. MH-12-QE-4567"
-                                value={formReg}
-                                onChange={(e) => setFormReg(e.target.value)}
-                                className={`w-full rounded-xl px-3.5 py-3 text-xs outline-none transition border ${inputClass}`}
-                              />
-                            </div>
-
-                            <div>
-                              <label className="block text-[10px] font-mono text-slate-900 dark:text-slate-200 uppercase mb-1.5 font-black tracking-wider">
-                                Issue Category
-                              </label>
-                              <select
-                                value={formCategory}
-                                onChange={(e) => setFormCategory(e.target.value)}
-                                className={`w-full rounded-xl px-3.5 py-3 text-xs outline-none transition border ${inputClass}`}
-                              >
-                                <option value="General Maintenance">General Maintenance</option>
-                                <option value="Engine Repair">Engine Repair & Smoking</option>
-                                <option value="Brake Overhaul">Brake Overhaul & Pads</option>
-                                <option value="Fork/Suspension leak">Suspension leaking seals</option>
-                                <option value="Battery/Starter wiring">Wiring & Starter problem</option>
-                                <option value="Chain Kit & sprockets">Chain Kit & sprockets</option>
-                                <option value="Accident/Aesthetic rebuild">Accident Rebuilds</option>
-                                <option value="Custom Restorations">Custom Restorations</option>
-                              </select>
+                              <div>
+                                <label className="block text-[10px] font-mono text-slate-900 dark:text-slate-200 uppercase mb-1.5 font-black tracking-wider">
+                                  Issue Category
+                                </label>
+                                <select
+                                  value={formCategory}
+                                  onChange={(e) => setFormCategory(e.target.value)}
+                                  className={`w-full rounded-xl px-3.5 py-2.5 text-xs outline-none transition border ${inputClass}`}
+                                >
+                                  <option value="General Maintenance">General Maintenance</option>
+                                  <option value="Engine Repair">Engine Repair & Smoking</option>
+                                  <option value="Brake Overhaul">Brake Overhaul & Pads</option>
+                                  <option value="Fork/Suspension leak">Suspension leaking seals</option>
+                                  <option value="Battery/Starter wiring">Wiring & Starter problem</option>
+                                  <option value="Chain Kit & sprockets">Chain Kit & sprockets</option>
+                                  <option value="Accident/Aesthetic rebuild">Accident Rebuilds</option>
+                                  <option value="Custom Restorations">Custom Restorations</option>
+                                </select>
+                              </div>
                             </div>
                           </div>
                         </div>
 
-                      </div>
-
-                      {/* Column 3: Descriptions and Schedule */}
-                      <div className="space-y-4 pt-4 border-t border-slate-200 dark:border-slate-800/60 text-left">
-                        <h3 className="text-xs font-bold text-slate-900 dark:text-slate-200 uppercase tracking-widest font-mono border-b border-slate-200 dark:border-slate-800/80 pb-2 flex items-center">
-                          <Clock className="h-4 w-4 text-[#F97316] mr-1.5" />
-                          3. Troubleshooting & Timing
-                        </h3>
-
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                          <div className="md:col-span-2">
-                            <label className="block text-[10px] font-mono text-[#1E293B] dark:text-slate-200 uppercase mb-1.5 font-black tracking-wider">
-                              Describe Problem (Be as detailed as possible)
-                            </label>
-                            <textarea
-                              placeholder="My bike makes a light metal knocking sound on cold start and has some throttle delay."
-                              value={formDesc}
-                              onChange={(e) => setFormDesc(e.target.value)}
-                              rows={4}
-                              className={`w-full rounded-xl px-3.5 py-3 text-xs outline-none transition border resize-none ${inputClass}`}
-                            />
-                          </div>
-
-                          <div className="space-y-3">
-                            <div>
-                              <label className="block text-[10px] font-mono text-slate-900 dark:text-slate-200 uppercase mb-1.5 font-black tracking-wider">
-                                Preferred Date <span className="text-[#F97316]">*</span>
-                              </label>
-                              <input
-                                type="date"
-                                required={!isEmergency}
-                                value={formDate}
-                                onChange={(e) => setFormDate(e.target.value)}
-                                className={`w-full rounded-xl px-3.5 py-3 text-xs outline-none transition border ${inputClass}`}
-                              />
-                            </div>
-
-                            <div>
-                              <label className="block text-[10px] font-mono text-slate-900 dark:text-slate-200 uppercase mb-1.5 font-black tracking-wider">
-                                Preferred Time Slot
-                              </label>
-                              <select
-                                value={formTime}
-                                onChange={(e) => setFormTime(e.target.value)}
-                                className={`w-full rounded-xl px-3.5 py-3 text-xs outline-none transition border ${inputClass}`}
-                              >
-                                <option value="09:00 AM - 11:00 AM">09:00 AM - 11:00 AM</option>
-                                <option value="11:00 AM - 01:00 PM">11:00 AM - 01:00 PM</option>
-                                <option value="02:00 PM - 04:00 PM">02:00 PM - 04:00 PM</option>
-                                <option value="04:00 PM - 06:00 PM">04:00 PM - 06:00 PM</option>
-                                <option value="06:00 PM - 08:00 PM">06:00 PM - 08:00 PM</option>
-                              </select>
-                            </div>
-                          </div>
-                        </div>
                       </div>
                     </div>
-                  )}
                 </div>
 
                 {/* Submit Trigger / Tail / Footer - Fixed at Bottom */}
@@ -1608,31 +1311,29 @@ _Please confirm my ${isEmergency ? "emergency SOS dispatch" : "slot"} on your da
                   <div className="flex flex-col sm:flex-row gap-2.5 sm:gap-3">
                     <button
                       type="submit"
-                      disabled={isSubmitting}
-                      className={`flex-1 py-3.5 sm:py-4 rounded-2xl text-xs font-black tracking-widest uppercase transition-all duration-300 flex items-center justify-center space-x-2 cursor-pointer ${
-                        isEmergency
-                          ? "bg-rose-600 hover:bg-rose-700 text-white border-b-4 border-rose-800"
-                          : "bg-[#F97316] hover:bg-[#ea580c] text-white border-b-4 border-orange-700"
+                      disabled={isSubmitting || formPhone.replace(/\D/g, "").length !== 10}
+                      className={`flex-1 py-3.5 sm:py-4 rounded-2xl text-xs font-black tracking-widest uppercase transition-all duration-300 flex items-center justify-center space-x-2 ${
+                        formPhone.replace(/\D/g, "").length !== 10
+                          ? "bg-slate-300 dark:bg-slate-800 text-slate-500 cursor-not-allowed border-b-4 border-slate-400 dark:border-slate-700"
+                          : isWhatsApp
+                          ? "bg-emerald-600 hover:bg-emerald-500 text-white border-b-4 border-emerald-800 cursor-pointer"
+                          : "bg-[#F97316] hover:bg-[#ea580c] text-white border-b-4 border-orange-700 cursor-pointer"
                       }`}
                     >
                       {isSubmitting ? (
                         <>
                           <div className="w-5 h-5 rounded-full border-2 border-white border-t-transparent animate-spin" />
-                          <span>{isEmergency ? "Dispatching SOS Signal..." : "Forming WhatsApp Dispatch..."}</span>
+                          <span>Saving Booking Request...</span>
+                        </>
+                      ) : isWhatsApp ? (
+                        <>
+                          <MessageSquare className="h-4.5 w-4.5" />
+                          <span>Confirm & Open WhatsApp Chat</span>
                         </>
                       ) : (
                         <>
-                          {isEmergency ? (
-                            <>
-                              <AlertTriangle className="h-4.5 w-4.5 animate-pulse" />
-                              <span>🚨 Dispatch Emergency SOS 🚨</span>
-                            </>
-                          ) : (
-                            <>
-                              <MessageSquare className="h-4.5 w-4.5" />
-                              <span>Book Appointment via WhatsApp</span>
-                            </>
-                          )}
+                          <Phone className="h-4.5 w-4.5" />
+                          <span>Save Booking & Call Mechanic</span>
                         </>
                       )}
                     </button>
@@ -1646,9 +1347,7 @@ _Please confirm my ${isEmergency ? "emergency SOS dispatch" : "slot"} on your da
                     </button>
                   </div>
                   <p className="text-[10px] text-slate-500 font-mono text-center mt-3 font-bold">
-                    {isEmergency 
-                      ? "🚨 DIRECT PRIORITY LINE • NO WAITING QUEUE" 
-                      : "🔐 NO REGISTRATION REQUIRED • WE VALUE SENSITIVE PRIVACY"}
+                    🔐 NO REGISTRATION REQUIRED • WE VALUE SENSITIVE PRIVACY
                   </p>
                 </div>
               </form>
@@ -1661,30 +1360,56 @@ _Please confirm my ${isEmergency ? "emergency SOS dispatch" : "slot"} on your da
       <section id="about" className={`py-10 md:py-12 border-t border-b ${isDarkMode ? "bg-slate-900/25 border-slate-900/60" : "bg-slate-100/20 border-slate-200"}`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
             
-            {/* Left Column: Mechanic Bio details */}
-            <div className="lg:col-span-5 space-y-6 text-left">
-              <div className="inline-flex items-center space-x-1.5 px-2.5 py-1 bg-[#F97316]/10 text-[#F97316] rounded-md text-[10px] font-mono font-bold uppercase tracking-widest">
+            {/* Left Column: Mechanic Portrait */}
+            <div className="lg:col-span-5 flex justify-center">
+              <div className="relative rounded-3xl overflow-hidden border-2 border-slate-200 shadow-lg bg-slate-100 w-full max-w-sm aspect-square">
+                <img 
+                  src={activeMechanic.photo} 
+                  alt={activeMechanic.name} 
+                  referrerPolicy="no-referrer"
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent opacity-80" />
+                
+                <div className="absolute bottom-5 left-5 right-5 text-left">
+                  <span className="text-[10px] font-mono font-black text-spark-blue tracking-wider uppercase block">
+                    {activeMechanic.roleTitle || "FOUNDER & CHIEF MECHANIC"}
+                  </span>
+                  <h4 className="text-xl font-black text-white">{activeMechanic.name}</h4>
+                  <p className="text-xs text-slate-300 font-sans mt-0.5">{activeMechanic.experience} Precision Bike Repairing Experience</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Right Column: Bio & Animated Bike Repairing Expertise */}
+            <div className="lg:col-span-7 space-y-6 text-left">
+              <div className="inline-flex items-center space-x-1.5 px-3 py-1 bg-[#F97316]/10 text-[#F97316] rounded-md text-[10px] font-mono font-bold uppercase tracking-widest border border-orange-200">
                 <User className="h-3.5 w-3.5" />
                 <span>CHIEF MASTER TECHNICIAN</span>
               </div>
               
               <div className="space-y-2">
                 <h2 className="font-display font-black text-3.5xl sm:text-5xl text-slate-900 dark:text-white tracking-tight leading-none">
-                  Meet Rana Singh.
+                  Meet {activeMechanic.name}.
                 </h2>
-                <p className="text-[#F97316] text-xs sm:text-sm font-mono tracking-wider uppercase font-semibold">
-                  Founder & 12-Year Engineering Veteran
+                <p className="text-[#F97316] text-xs sm:text-sm font-mono tracking-wider uppercase font-bold">
+                  {activeMechanic.roleTitle}
                 </p>
               </div>
 
               <p className={`${textMutedClass} text-xs sm:text-sm leading-relaxed`}>
-                Rana has spent over a decade diagnosing, tuning, and rebuilding machines. From high-compression single cylinders to multi-cylinder superbikes, he handles every machine with mathematical precision.
+                {activeMechanic.bio || `${activeMechanic.name} personally diagnoses, tunes, and rebuilds every machine that enters the garage. From single-cylinder commuter bikes to high-performance multi-cylinder superbikes, he handles every machine with mathematical precision.`}
               </p>
 
-              {/* Skills Progress Bars */}
-              <div className="space-y-3 pt-2">
+              {/* Expertise in Bike Repairing in Animation */}
+              <div className="space-y-3.5 pt-2">
+                <h4 className="text-xs font-black text-slate-900 dark:text-slate-100 uppercase tracking-widest font-mono flex items-center">
+                  <Wrench className="h-4 w-4 text-eager-green mr-2" />
+                  Expertise In Bike Repairing
+                </h4>
+
                 {[
                   { name: "Engine Rebuilds & Honing", percentage: 98 },
                   { name: "ECU Remap Diagnostics", percentage: 94 },
@@ -1693,96 +1418,35 @@ _Please confirm my ${isEmergency ? "emergency SOS dispatch" : "slot"} on your da
                 ].map((skill, i) => (
                   <div key={i} className="space-y-1">
                     <div className="flex justify-between text-xs font-bold">
-                      <span className="text-charcoal">{skill.name}</span>
+                      <span className="text-charcoal dark:text-slate-200">{skill.name}</span>
                       <span className="text-eager-green font-black">{skill.percentage}%</span>
                     </div>
-                    <div className="h-3 w-full bg-slate-100 rounded-full overflow-hidden border-2 border-slate-200">
-                      <div 
-                        className="h-full bg-eager-green rounded-full transition-all duration-1000"
-                        style={{ width: `${skill.percentage}%` }}
+                    <div className="h-3 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden border-2 border-slate-200 dark:border-slate-700">
+                      <motion.div 
+                        initial={{ width: 0 }}
+                        whileInView={{ width: `${skill.percentage}%` }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 1.2, ease: "easeOut", delay: i * 0.15 }}
+                        className="h-full bg-eager-green rounded-full shadow-xs"
                       />
                     </div>
                   </div>
                 ))}
               </div>
 
-              {/* Quick details ribbon */}
-              <div className="space-y-2 text-xs sm:text-sm pt-2">
-                <div className="flex justify-between border-b-2 border-slate-100 pb-2 text-charcoal">
-                  <span className="text-pencil-gray font-bold">LANGUAGES SPOKEN:</span>
-                  <span className="font-bold">{mechanicData.languages.join(", ")}</span>
+              {/* Working Hours & Direct Contact */}
+              <div className="pt-4 flex flex-col sm:flex-row items-center justify-between gap-4 border-t-2 border-slate-100 dark:border-slate-800">
+                <div className="text-xs text-left">
+                  <span className="text-pencil-gray font-bold block text-[10px] uppercase tracking-wider">WORKING HOURS</span>
+                  <span className="font-bold text-slate-900 dark:text-slate-100 text-xs sm:text-sm">{activeMechanic.availableTime}</span>
                 </div>
-                <div className="flex justify-between border-b-2 border-slate-100 pb-2 text-charcoal">
-                  <span className="text-pencil-gray font-bold">WORKING HOURS:</span>
-                  <span className="font-bold">{mechanicData.availableTime}</span>
-                </div>
-                <div className="flex justify-between text-charcoal">
-                  <span className="text-pencil-gray font-bold">STAFF CONTACT:</span>
-                  <span className="font-bold text-spark-blue">{mechanicData.phone}</span>
-                </div>
-              </div>
-
-            </div>
-
-            {/* Right Column: Profile Picture & Career Timeline */}
-            <div className="lg:col-span-7 space-y-8">
-              
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 items-center">
-                {/* Mechanic portrait photo with certificates overlay */}
-                <div className="relative rounded-3xl overflow-hidden border-2 border-slate-200 shadow-md bg-slate-100 aspect-square">
-                  <img 
-                    src={mechanicData.photo} 
-                    alt="Rana Singh Master Mechanic" 
-                    referrerPolicy="no-referrer"
-                    className="w-full h-full object-cover"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent opacity-85" />
-                  
-                  <div className="absolute bottom-4 left-4 right-4 text-left">
-                    <span className="text-[9px] font-mono font-black text-spark-blue tracking-wider uppercase block">
-                      GARAGE CAPTAIN
-                    </span>
-                    <h4 className="text-sm font-black text-white">Rana Singh</h4>
-                    <p className="text-[10px] text-slate-300 font-sans mt-0.5">Approved Technical Expert</p>
-                  </div>
-                </div>
-
-                {/* Certificates checklist */}
-                <div className="space-y-3.5 text-left">
-                  <h4 className="text-xs font-bold text-pencil-gray uppercase tracking-widest font-mono flex items-center">
-                    <Award className="h-4.5 w-4.5 text-eager-green mr-2" />
-                    Board Credentials
-                  </h4>
-
-                  <div className="space-y-3">
-                    {mechanicData.certificates.map((cert, idx) => (
-                      <div key={idx} className="flex items-start space-x-2.5 text-xs text-charcoal bg-slate-50 p-3 rounded-xl border-2 border-slate-200">
-                        <CheckCircle2 className="h-4.5 w-4.5 text-eager-green shrink-0 mt-0.5" />
-                        <span className="font-semibold">{cert}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-
-              {/* Career Timeline */}
-              <div className="space-y-4 text-left">
-                <h4 className="text-xs font-bold text-pencil-gray uppercase tracking-widest font-mono flex items-center border-b-2 border-slate-100 pb-2">
-                  <Clock className="h-4.5 w-4.5 text-spark-blue mr-2" />
-                  Professional Milestone Timeline
-                </h4>
-
-                <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
-                  {mechanicData.timeline.map((item, idx) => (
-                    <div key={idx} className="bg-white border-2 border-b-4 border-slate-200 p-4 rounded-xl space-y-1.5 relative">
-                      <span className="absolute -top-3.5 left-4 bg-spark-blue text-white font-mono font-black text-[10px] px-2.5 py-1 rounded-md shadow-sm border border-sky-600">
-                        {item.year}
-                      </span>
-                      <h5 className="font-black text-xs text-charcoal pt-2">{item.title}</h5>
-                      <p className="text-[11px] text-pencil-gray leading-relaxed font-semibold">{item.desc}</p>
-                    </div>
-                  ))}
-                </div>
+                <a 
+                  href={`tel:${activeMechanic.phone.replace(/[^0-9+]/g, '')}`}
+                  className="px-5 py-2.5 bg-[#F97316] hover:bg-[#ea580c] text-white rounded-xl text-xs font-black uppercase tracking-wider transition-all flex items-center space-x-2 shadow-sm"
+                >
+                  <Phone className="h-4 w-4" />
+                  <span>Call Mechanic ({activeMechanic.phone})</span>
+                </a>
               </div>
 
             </div>
@@ -2122,7 +1786,7 @@ _Please confirm my ${isEmergency ? "emergency SOS dispatch" : "slot"} on your da
 
       {/* 12. CUSTOMER REVIEWS (Carousel Auto-Scroll) */}
       <section id="reviews" className={`py-10 md:py-12 border-t border-b ${isDarkMode ? "bg-slate-900/10 border-slate-900/60" : "bg-white border-slate-200"}`}>
-        <div className="max-w-4xl mx-auto px-4 sm:px-6">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 space-y-6">
           
           <AnimatedSectionHeader
             badge="COMMUNITY VOICE"
@@ -2130,85 +1794,121 @@ _Please confirm my ${isEmergency ? "emergency SOS dispatch" : "slot"} on your da
             description="Read actual feedback from our local two-wheeler community. Auto-scroll enabled, or use the controls below to navigate."
           />
 
+          {/* Write a Review trigger button */}
+          <div className="flex justify-center">
+            <button
+              onClick={() => setIsReviewModalOpen(true)}
+              className="px-5 py-2.5 rounded-full bg-orange-600 hover:bg-orange-500 text-white font-extrabold text-xs tracking-wider uppercase shadow-lg transition flex items-center space-x-2 cursor-pointer"
+            >
+              <Star className="h-4 w-4 fill-white" />
+              <span>Write a Review & Rate Workshop</span>
+            </button>
+          </div>
+
           {/* Carousel main frame */}
           <div className="relative overflow-hidden">
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={activeReviewIdx}
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                transition={{ duration: 0.4 }}
-                className={`${cardClass} border rounded-3xl p-6 sm:p-10 text-left space-y-6 shadow-xl relative`}
-              >
-                {/* Heavy background quote mark */}
-                <span className="absolute right-6 top-2 text-8xl font-display font-black text-slate-800/15 pointer-events-none">
-                  “
-                </span>
-
-                <div className="flex items-center space-x-1 text-[#F97316]">
-                  {Array.from({ length: reviewsData[activeReviewIdx].rating }).map((_, i) => (
-                    <Star key={i} className="h-4.5 w-4.5 fill-[#F97316] text-[#F97316]" />
-                  ))}
-                </div>
-
-                <p className="text-sm sm:text-lg text-slate-700 dark:text-slate-200 font-sans leading-relaxed italic">
-                  "{reviewsData[activeReviewIdx].review}"
+            {displayReviews.length === 0 ? (
+              <div className={`${cardClass} border rounded-3xl p-8 text-center space-y-4 shadow-xl`}>
+                <Star className="h-10 w-10 text-orange-500/40 mx-auto" />
+                <h4 className="text-lg font-bold text-slate-900 dark:text-white">No Customer Reviews Yet</h4>
+                <p className="text-xs text-slate-500 max-w-md mx-auto">
+                  Be the first rider to submit a review and rate your experience at Master Rana Garage!
                 </p>
-
-                <div className="flex items-center justify-between gap-4 pt-4 border-t border-slate-200 dark:border-slate-800/60">
-                  <div className="flex items-center space-x-3.5">
-                    <img 
-                      src={reviewsData[activeReviewIdx].photo} 
-                      alt={reviewsData[activeReviewIdx].name} 
-                      referrerPolicy="no-referrer"
-                      className="w-12 h-12 rounded-full border border-slate-200 dark:border-slate-800 object-cover"
-                    />
-                    <div className="text-left">
-                      <h4 className="text-sm font-bold text-slate-900 dark:text-white">{reviewsData[activeReviewIdx].name}</h4>
-                      <p className="text-[11px] text-[#F97316] font-mono">{reviewsData[activeReviewIdx].bike}</p>
-                    </div>
-                  </div>
-
-                  <div className="text-right text-xs font-mono text-slate-500 hidden sm:block">
-                    <span>Date: {reviewsData[activeReviewIdx].date}</span>
-                    <span className="block text-[10px] uppercase text-slate-600 mt-0.5">Service: {reviewsData[activeReviewIdx].service}</span>
-                  </div>
-                </div>
-              </motion.div>
-            </AnimatePresence>
-
-            {/* Manual controls buttons */}
-            <div className="flex justify-center items-center space-x-3.5 mt-8">
-              <button
-                onClick={() => setActiveReviewIdx((prev) => (prev - 1 + reviewsData.length) % reviewsData.length)}
-                className={`p-2.5 rounded-full border ${borderClass} hover:text-[#F97316] hover:border-[#F97316] transition`}
-              >
-                <ChevronLeft className="h-4.5 w-4.5" />
-              </button>
-
-              <div className="flex items-center space-x-1.5">
-                {reviewsData.map((_, idx) => (
-                  <button
-                    key={idx}
-                    onClick={() => setActiveReviewIdx(idx)}
-                    className={`h-2.5 rounded-full transition-all duration-300 ${
-                      activeReviewIdx === idx ? "w-6 bg-[#F97316]" : "w-2.5 bg-slate-300 dark:bg-slate-800"
-                    }`}
-                  />
-                ))}
+                <button
+                  onClick={() => setIsReviewModalOpen(true)}
+                  className="px-5 py-2.5 rounded-full bg-orange-600 hover:bg-orange-500 text-white font-extrabold text-xs tracking-wider uppercase shadow-md transition cursor-pointer"
+                >
+                  Write First Review
+                </button>
               </div>
+            ) : (
+              <>
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={activeReviewIdx}
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -20 }}
+                    transition={{ duration: 0.4 }}
+                    className={`${cardClass} border rounded-3xl p-6 sm:p-10 text-left space-y-6 shadow-xl relative`}
+                  >
+                    {/* Heavy background quote mark */}
+                    <span className="absolute right-6 top-2 text-8xl font-display font-black text-slate-800/15 pointer-events-none">
+                      “
+                    </span>
 
-              <button
-                onClick={() => setActiveReviewIdx((prev) => (prev + 1) % reviewsData.length)}
-                className={`p-2.5 rounded-full border ${borderClass} hover:text-[#F97316] hover:border-[#F97316] transition`}
-              >
-                <ChevronRight className="h-4.5 w-4.5" />
-              </button>
-            </div>
+                    <div className="flex items-center space-x-1 text-[#F97316]">
+                      {Array.from({ length: displayReviews[activeReviewIdx % displayReviews.length]?.rating || 5 }).map((_, i) => (
+                        <Star key={i} className="h-4.5 w-4.5 fill-[#F97316] text-[#F97316]" />
+                      ))}
+                    </div>
+
+                    <p className="text-sm sm:text-lg text-slate-700 dark:text-slate-200 font-sans leading-relaxed italic">
+                      "{displayReviews[activeReviewIdx % displayReviews.length]?.review}"
+                    </p>
+
+                    <div className="flex items-center justify-between gap-4 pt-4 border-t border-slate-200 dark:border-slate-800/60">
+                      <div className="flex items-center space-x-3.5">
+                        <img 
+                          src={displayReviews[activeReviewIdx % displayReviews.length]?.photo} 
+                          alt={displayReviews[activeReviewIdx % displayReviews.length]?.name} 
+                          referrerPolicy="no-referrer"
+                          className="w-12 h-12 rounded-full border border-slate-200 dark:border-slate-800 object-cover"
+                        />
+                        <div className="text-left">
+                          <h4 className="text-sm font-bold text-slate-900 dark:text-white">{displayReviews[activeReviewIdx % displayReviews.length]?.name}</h4>
+                          <p className="text-[11px] text-[#F97316] font-mono">{displayReviews[activeReviewIdx % displayReviews.length]?.bike}</p>
+                        </div>
+                      </div>
+
+                      <div className="text-right text-xs font-mono text-slate-500 hidden sm:block">
+                        <span>Date: {displayReviews[activeReviewIdx % displayReviews.length]?.date}</span>
+                        <span className="block text-[10px] uppercase text-slate-600 mt-0.5">Service: {displayReviews[activeReviewIdx % displayReviews.length]?.service}</span>
+                      </div>
+                    </div>
+                  </motion.div>
+                </AnimatePresence>
+
+                {/* Manual controls buttons */}
+                <div className="flex justify-center items-center space-x-3.5 mt-8">
+                  <button
+                    onClick={() => setActiveReviewIdx((prev) => (prev - 1 + displayReviews.length) % displayReviews.length)}
+                    className={`p-2.5 rounded-full border ${borderClass} hover:text-[#F97316] hover:border-[#F97316] transition cursor-pointer`}
+                  >
+                    <ChevronLeft className="h-4.5 w-4.5" />
+                  </button>
+
+                  <div className="flex items-center space-x-1.5">
+                    {displayReviews.map((_, idx) => (
+                      <button
+                        key={idx}
+                        onClick={() => setActiveReviewIdx(idx)}
+                        className={`h-2.5 rounded-full transition-all duration-300 cursor-pointer ${
+                          activeReviewIdx % displayReviews.length === idx ? "w-6 bg-[#F97316]" : "w-2.5 bg-slate-300 dark:bg-slate-800"
+                        }`}
+                      />
+                    ))}
+                  </div>
+
+                  <button
+                    onClick={() => setActiveReviewIdx((prev) => (prev + 1) % displayReviews.length)}
+                    className={`p-2.5 rounded-full border ${borderClass} hover:text-[#F97316] hover:border-[#F97316] transition cursor-pointer`}
+                  >
+                    <ChevronRight className="h-4.5 w-4.5" />
+                  </button>
+                </div>
+              </>
+            )}
           </div>
 
         </div>
+
+        {/* Review Form Modal */}
+        <ReviewFormModal
+          isOpen={isReviewModalOpen}
+          onClose={() => setIsReviewModalOpen(false)}
+          onSuccess={() => setActiveReviewIdx(0)}
+        />
       </section>
 
       {/* 13. FAQ SECTION (Horizontal Grid Layout) */}
@@ -2291,8 +1991,7 @@ _Please confirm my ${isEmergency ? "emergency SOS dispatch" : "slot"} on your da
                   <div>
                     <h4 className="text-xs font-bold text-slate-900 dark:text-white font-mono uppercase tracking-wide">Physical Address</h4>
                     <p className="text-xs text-slate-600 dark:text-slate-400 mt-1 leading-relaxed">
-                      Shop No. 12, Koregaon Park Plaza, <br />
-                      Near Lane 5, Koregaon Park, Pune - 411001
+                      {activeMechanic.address || "Lane 7, Koregaon Park, Pune, MH - 411001"}
                     </p>
                   </div>
                 </div>
@@ -2304,8 +2003,7 @@ _Please confirm my ${isEmergency ? "emergency SOS dispatch" : "slot"} on your da
                   <div>
                     <h4 className="text-xs font-bold text-slate-900 dark:text-white font-mono uppercase tracking-wide">Workshop Hours</h4>
                     <p className="text-xs text-slate-600 dark:text-slate-400 mt-1 leading-relaxed">
-                      Monday to Saturday: 9:00 AM - 8:00 PM <br />
-                      Sunday: Closed (Emergency Punctures active on call)
+                      {activeMechanic.availableTime || "9:00 AM - 8:00 PM (Mon - Sat)"}
                     </p>
                   </div>
                 </div>
@@ -2317,8 +2015,8 @@ _Please confirm my ${isEmergency ? "emergency SOS dispatch" : "slot"} on your da
                   <div>
                     <h4 className="text-xs font-bold text-slate-900 dark:text-white font-mono uppercase tracking-wide">Contact Station</h4>
                     <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">
-                      Direct Hotline: +91 98765 43210 <br />
-                      Emergency towing support: +91 99999 88888
+                      Direct Hotline: {activeMechanic.phone} <br />
+                      Emergency WhatsApp Dispatch Active 24/7
                     </p>
                   </div>
                 </div>
@@ -2328,11 +2026,11 @@ _Please confirm my ${isEmergency ? "emergency SOS dispatch" : "slot"} on your da
               {/* Instant Call CTA buttons */}
               <div className="flex gap-3 pt-3">
                 <a
-                  href="tel:+919767824216"
+                  href={`tel:${activeMechanic.phone.replace(/[^0-9+]/g, '')}`}
                   className="flex-1 bg-slate-100 hover:bg-slate-200 dark:bg-slate-900 dark:hover:bg-slate-850 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-800 py-3 rounded-xl text-xs font-bold text-center transition flex items-center justify-center space-x-2"
                 >
                   <Phone className="h-4 w-4 text-[#F97316]" />
-                  <span>Call Hotline</span>
+                  <span>Call Hotline ({activeMechanic.phone})</span>
                 </a>
 
                 <button
@@ -2345,48 +2043,49 @@ _Please confirm my ${isEmergency ? "emergency SOS dispatch" : "slot"} on your da
 
             </div>
 
-            {/* Right Column: Google Maps Placeholder component */}
+            {/* Right Column: Google Maps Interactive Location Component */}
             <div className="lg:col-span-7">
               <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl overflow-hidden relative shadow-2xl h-80 sm:h-96 w-full flex flex-col justify-between">
                 
-                {/* Styled grid vector mapping mimicking google maps */}
-                <div className="absolute inset-0 bg-slate-100 dark:bg-slate-950 bg-[radial-gradient(#94a3b8_1px,transparent_1.5px)] dark:bg-[radial-gradient(#1e293b_1px,transparent_1.5px)] bg-[size:24px_24px] pointer-events-none opacity-40" />
+                {/* Embedded Interactive Google Map */}
+                <iframe
+                  title="Workshop Live Map Location"
+                  width="100%"
+                  height="100%"
+                  style={{ border: 0, filter: "grayscale(15%) contrast(1.05)" }}
+                  loading="lazy"
+                  allowFullScreen
+                  src={`https://maps.google.com/maps?q=${encodeURIComponent(activeMechanic.address || "Koregaon Park Pune")}&t=&z=14&ie=UTF8&iwloc=&output=embed`}
+                  className="w-full h-full"
+                />
 
-                {/* Simulated navigation path layout */}
-                <svg className="absolute inset-0 w-full h-full opacity-10 dark:opacity-20 pointer-events-none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M-10,120 L200,120 L350,300 L600,300" fill="none" stroke="#64748b" strokeWidth="4" />
-                  <path d="M120,0 L120,400" fill="none" stroke="#64748b" strokeWidth="4" />
-                  <path d="M400,0 L400,400" fill="none" stroke="#64748b" strokeWidth="4" />
-                </svg>
-
-                {/* Animated Map pin glow */}
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center z-10">
-                  <span className="w-10 h-10 rounded-full bg-[#F97316]/35 border-2 border-[#F97316] flex items-center justify-center animate-pulse">
-                    <span className="w-4 h-4 rounded-full bg-[#F97316]" />
+                {/* Map Control bar top overlay */}
+                <div className="p-3 bg-slate-900/90 text-white backdrop-blur border-b border-slate-800/80 z-10 flex justify-between items-center text-xs absolute top-0 left-0 right-0">
+                  <span className="font-mono text-slate-300 font-semibold uppercase flex items-center gap-1.5">
+                    <MapPin className="h-3.5 w-3.5 text-orange-400" />
+                    <span>Workshop GPS Location: {activeMechanic.name}</span>
                   </span>
-                  <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-white text-[11px] font-mono font-bold px-3 py-1.5 rounded-xl mt-2.5 shadow-md">
-                    Rana Garage (Koregaon Park)
-                  </div>
+                  <span className="text-[10px] bg-orange-500/20 text-orange-400 border border-orange-500/30 px-2 py-0.5 rounded uppercase font-black">
+                    PUNE WORKSHOP
+                  </span>
                 </div>
 
-                {/* Map Control bar top */}
-                <div className="p-4 bg-slate-50/90 dark:bg-slate-900/90 backdrop-blur border-b border-slate-200 dark:border-slate-800/60 z-10 flex justify-between items-center text-xs">
-                  <span className="font-mono text-slate-500 dark:text-slate-400 font-semibold uppercase">Rana Workshop Coordinates</span>
-                  <span className="text-[10px] bg-white dark:bg-slate-950 text-[#F97316] border border-slate-200 dark:border-slate-800 px-2 py-0.5 rounded uppercase font-black">MH-12</span>
-                </div>
-
-                {/* Map Details bar bottom */}
-                <div className="p-4 bg-slate-50/95 dark:bg-slate-950/95 border-t border-slate-200 dark:border-slate-800/60 z-10 flex flex-col sm:flex-row justify-between items-center gap-3.5 text-xs text-left">
+                {/* Map Details bar bottom overlay */}
+                <div className="p-3.5 bg-slate-950/90 text-white backdrop-blur border-t border-slate-800/80 z-10 flex flex-col sm:flex-row justify-between items-center gap-3 text-xs text-left absolute bottom-0 left-0 right-0">
                   <div>
-                    <h5 className="font-bold text-slate-800 dark:text-white">Rana Garage • Pune</h5>
-                    <p className="text-[11px] text-slate-500 font-sans mt-0.5">Shop No. 12, Koregaon Park Plaza, Near Lane 5</p>
+                    <h5 className="font-bold text-white flex items-center gap-1.5">
+                      <span>Rana Garage • {activeMechanic.name}</span>
+                    </h5>
+                    <p className="text-[11px] text-slate-300 font-sans mt-0.5">
+                      {activeMechanic.address}
+                    </p>
                   </div>
 
                   <a
-                    href="https://maps.google.com/?q=Koregaon+Park+Pune"
+                    href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(activeMechanic.address)}`}
                     target="_blank"
                     rel="noreferrer"
-                    className="bg-[#F97316] hover:bg-[#ea580c] text-white font-black px-4.5 py-2.5 rounded-xl text-xs transition flex items-center space-x-1 shrink-0"
+                    className="bg-[#F97316] hover:bg-[#ea580c] text-white font-black px-4 py-2 rounded-xl text-xs transition flex items-center space-x-1.5 shrink-0 shadow-lg"
                   >
                     <ExternalLink className="h-4 w-4" />
                     <span>Get Live Directions</span>
@@ -2428,7 +2127,6 @@ _Please confirm my ${isEmergency ? "emergency SOS dispatch" : "slot"} on your da
                 <a href="#services" className="hover:text-[#F97316] transition">Services Catalog</a>
                 <a href="#about" className="hover:text-[#F97316] transition">Master Rana</a>
                 <a href="#gallery" className="hover:text-[#F97316] transition">Workshop Log</a>
-                <a href="#repairs" className="hover:text-[#F97316] transition">Before/After</a>
                 <a href="#faq" className="hover:text-[#F97316] transition">Support FAQs</a>
               </div>
             </div>
@@ -2502,27 +2200,53 @@ _Please confirm my ${isEmergency ? "emergency SOS dispatch" : "slot"} on your da
               </div>
 
               <div className="space-y-2">
-                <h3 className="font-display font-black text-2xl text-slate-900 dark:text-white uppercase tracking-tight">Ticket Formed Successfully!</h3>
+                <h3 className="font-display font-black text-xl sm:text-2xl text-slate-900 dark:text-white uppercase tracking-tight">
+                  {isWhatsApp ? "Booking Saved & WhatsApp Dispatched!" : "Booking Saved in Database!"}
+                </h3>
                 <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed font-sans font-semibold">
-                  We have registered your motorcycle ticket <strong>({formBrand} {formModel})</strong> on Pune's active Rana queue. Opening WhatsApp directly to dispatch your booking details...
+                  {isWhatsApp ? (
+                    <>We have saved your request <strong>({formBrand} {formModel})</strong> in our system and opened WhatsApp to message Master Rana Singh.</>
+                  ) : (
+                    <>We have saved your booking request in our system! Since your number is not on WhatsApp, please call Master Rana Singh directly to confirm your slot.</>
+                  )}
                 </p>
               </div>
 
-              <div className="p-5 bg-slate-50 dark:bg-slate-950 rounded-2xl border border-slate-200 dark:border-slate-850/80 text-left space-y-3 font-mono text-[10px] sm:text-xs">
+              <div className="p-5 bg-slate-50 dark:bg-slate-950 rounded-2xl border border-slate-200 dark:border-slate-850/80 text-left space-y-2.5 font-mono text-[10px] sm:text-xs">
                 <p className="text-slate-900 dark:text-slate-100 font-bold"><span className="text-slate-500 dark:text-slate-400 font-black">CLIENT:</span> {formName}</p>
-                <p className="text-slate-900 dark:text-slate-100 font-bold"><span className="text-slate-500 dark:text-slate-400 font-black">PHONE:</span> {formPhone}</p>
+                <p className="text-slate-900 dark:text-slate-100 font-bold"><span className="text-slate-500 dark:text-slate-400 font-black">PHONE:</span> {formPhone} ({isWhatsApp ? "WhatsApp" : "Phone Call"})</p>
+                <p className="text-slate-900 dark:text-slate-100 font-bold"><span className="text-slate-500 dark:text-slate-400 font-black">BIKE:</span> {formBrand} {formModel}</p>
                 <p className="text-slate-900 dark:text-slate-100 font-bold"><span className="text-slate-500 dark:text-slate-400 font-black">SCHEDULE:</span> {formDate} | {formTime}</p>
-                <p className="text-emerald-600 dark:text-emerald-400 font-black"><span className="text-slate-500 dark:text-slate-400 font-black">PRIORITY:</span> {isEmergency ? "🚨 EMERGENCY RED" : "✅ NORMAL GREEN"}</p>
+                <p className="text-emerald-600 dark:text-emerald-400 font-black"><span className="text-slate-500 dark:text-slate-400 font-black">STATUS:</span> ✅ RECORDED IN CSV STORE</p>
               </div>
 
-              <div className="space-y-3 pt-2">
+              <div className="space-y-2.5 pt-2">
+                {!isWhatsApp ? (
+                  <a
+                    href="tel:+919767824216"
+                    className="w-full bg-[#F97316] hover:bg-[#ea580c] text-white py-3.5 rounded-xl text-xs font-black uppercase tracking-widest transition shadow-lg shadow-orange-500/20 flex items-center justify-center space-x-2"
+                  >
+                    <Phone className="h-4 w-4 animate-bounce" />
+                    <span>📞 Call Mechanic (+91 97678 24216)</span>
+                  </a>
+                ) : (
+                  <a
+                    href={`https://wa.me/919767824216?text=${encodeURIComponent(`*🏍️ RANA GARAGE APPOINTMENT REQUEST*\nName: ${formName}\nPhone: ${formPhone}\nBike: ${formBrand} ${formModel}\nDate: ${formDate}`)}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="w-full bg-emerald-600 hover:bg-emerald-500 text-white py-3.5 rounded-xl text-xs font-black uppercase tracking-widest transition shadow-lg shadow-emerald-500/20 flex items-center justify-center space-x-2"
+                  >
+                    <MessageSquare className="h-4 w-4" />
+                    <span>Open WhatsApp Chat</span>
+                  </a>
+                )}
+
                 <button
                   onClick={() => setShowSuccessModal(false)}
-                  className="w-full bg-[#F97316] hover:bg-[#ea580c] text-white py-3.5 rounded-xl text-xs font-black uppercase tracking-widest transition shadow-lg shadow-orange-500/20 cursor-pointer"
+                  className="w-full bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 py-3 rounded-xl text-xs font-black uppercase tracking-wider transition cursor-pointer"
                 >
                   Return to Website
                 </button>
-                <p className="text-[10px] text-slate-500 dark:text-slate-400 font-bold">If your WhatsApp app does not open automatically, please click Book Appointment again.</p>
               </div>
             </motion.div>
           </div>

@@ -2,14 +2,14 @@ import React, { useState } from "react";
 import { AppProvider } from "./AppContext";
 import { LandingPage } from "./components/LandingPage";
 import { BookingWizard } from "./components/BookingWizard";
-import { SOSModal } from "./components/SOSModal";
+import { UsersModal } from "./components/UsersModal";
 import { ServiceType } from "./types";
 import { motion } from "motion/react";
-import { Phone, AlertTriangle, MessageSquare } from "lucide-react";
+import { Phone, MessageSquare } from "lucide-react";
 
 const MainAppContent: React.FC = () => {
   const [isBookingOpen, setIsBookingOpen] = useState(false);
-  const [isSOSOpen, setIsSOSOpen] = useState(false);
+  const [isUsersOpen, setIsUsersOpen] = useState(false);
   const [preselectedService, setPreselectedService] = useState<ServiceType | undefined>(undefined);
 
   const handleOpenBooking = (serviceName?: ServiceType) => {
@@ -24,7 +24,7 @@ const MainAppContent: React.FC = () => {
         <LandingPage
           onOpenBooking={handleOpenBooking}
           onNavigateToRole={() => {}}
-          onOpenSOS={() => setIsSOSOpen(true)}
+          onOpenUsers={() => setIsUsersOpen(true)}
         />
       </main>
 
@@ -39,16 +39,6 @@ const MainAppContent: React.FC = () => {
           <Phone className="h-4 w-4 text-emerald-400 animate-pulse" />
           <span className="hidden xs:inline">+91 97678 24216</span>
         </motion.a>
-
-        <motion.button
-          onClick={() => setIsSOSOpen(true)}
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          className="flex items-center space-x-2 bg-rose-600 hover:bg-rose-500 text-white font-black text-xs px-4 py-2.5 rounded-full shadow-2xl border border-rose-400 tracking-wider uppercase cursor-pointer"
-        >
-          <AlertTriangle className="h-4 w-4 text-white animate-bounce" />
-          <span>🚨 SOS Breakdown</span>
-        </motion.button>
 
         <motion.a
           href="https://wa.me/919767824216?text=Hello%20Rana%20Singh%20(Rana%20Garage),%20I%20have%20an%20inquiry%20regarding%20motorcycle%20repair%20and%20service."
@@ -70,10 +60,10 @@ const MainAppContent: React.FC = () => {
         preselectedService={preselectedService}
       />
 
-      {/* SOS Breakdown Emergency Modal Overlay (Live GPS + WhatsApp) */}
-      <SOSModal
-        isOpen={isSOSOpen}
-        onClose={() => setIsSOSOpen(false)}
+      {/* Website Owner Users & Lead Requests Data Modal (6-Digit PIN Security) */}
+      <UsersModal
+        isOpen={isUsersOpen}
+        onClose={() => setIsUsersOpen(false)}
       />
     </div>
   );

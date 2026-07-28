@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { ServiceType } from "../types";
+import { useApp } from "../AppContext";
 import {
   X,
   MessageSquare,
@@ -9,10 +10,10 @@ import {
   CheckCircle,
   ExternalLink,
   Calendar,
-  Clock,
   MapPin,
   Navigation,
-  FileText
+  FileText,
+  Bike
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 
@@ -22,11 +23,32 @@ interface BookingWizardProps {
   preselectedService?: ServiceType;
 }
 
-const TIME_SLOTS = [
-  "09:00 AM - 11:00 AM",
-  "11:00 AM - 01:00 PM",
-  "02:00 PM - 04:00 PM",
-  "04:00 PM - 06:00 PM"
+const BRANDS = [
+  "Royal Enfield",
+  "Honda",
+  "Yamaha",
+  "TVS",
+  "Bajaj",
+  "Hero",
+  "KTM",
+  "Suzuki",
+  "Jawa",
+  "BMW",
+  "Ather",
+  "Other"
+];
+
+const CATEGORIES = [
+  "General Maintenance",
+  "Engine Repair",
+  "Brake Overhaul",
+  "Oil & Filter Change",
+  "Battery & Electrical",
+  "Chain Lube & Clean",
+  "Suspension Repair",
+  "Tyre & Puncture",
+  "Washing & Polishing",
+  "Custom Repair"
 ];
 
 export const BookingWizard: React.FC<BookingWizardProps> = ({
@@ -34,18 +56,23 @@ export const BookingWizard: React.FC<BookingWizardProps> = ({
   onClose,
   preselectedService
 }) => {
+  const { addUserRequest } = useApp();
+
   const [customerName, setCustomerName] = useState("");
   const [customerPhone, setCustomerPhone] = useState("");
-  const [locationAddress, setLocationAddress] = useState("");
-  const [issueDescription, setIssueDescription] = useState<string>(
-    preselectedService ? `Requesting: ${preselectedService}` : ""
+  const [isWhatsApp, setIsWhatsApp] = useState<boolean>(true);
+  const [bikeBrand, setBikeBrand] = useState("Royal Enfield");
+  const [bikeModel, setBikeModel] = useState("Classic 350");
+  const [serviceCategory, setServiceCategory] = useState<string>(
+    preselectedService || "General Maintenance"
   );
+  const [locationAddress, setLocationAddress] = useState("");
+  const [issueDescription, setIssueDescription] = useState("");
   const [bookingDate, setBookingDate] = useState(() => {
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
     return tomorrow.toISOString().split("T")[0];
   });
-  const [bookingSlot, setBookingSlot] = useState("10:00 AM - 12:00 PM");
 
   // Geolocation states
   const [gpsCoords, setGpsCoords] = useState<{ lat: number; lon: number } | null>(null);
@@ -66,6 +93,9 @@ export const BookingWizard: React.FC<BookingWizardProps> = ({
         const lat = position.coords.latitude;
         const lon = position.coords.longitude;
         setGpsCoords({ lat, lon });
+        if (!locationAddress) {
+          setLocationAddress(`Lat: ${lat.toFixed(5)}, Lon: ${lon.toFixed(5)} (Live GPS)`);
+        }
         setIsLocating(false);
       },
       () => {
@@ -83,7 +113,7 @@ export const BookingWizard: React.FC<BookingWizardProps> = ({
 
   useEffect(() => {
     if (preselectedService) {
-      setIssueDescription(`Requesting: ${preselectedService}`);
+      setServiceCategory(preselectedService);
     }
   }, [preselectedService]);
 
@@ -100,24 +130,42 @@ export const BookingWizard: React.FC<BookingWizardProps> = ({
 
   if (!isOpen) return null;
 
-  const handleSendToWhatsApp = (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
+    const fullBike = `${bikeBrand} ${bikeModel}`.trim();
     let locText = locationAddress.trim();
-    if (gpsCoords) {
+    if (gpsCoords && !locText.includes("GPS")) {
       locText += ` (Live GPS: https://maps.google.com/?q=${gpsCoords.lat.toFixed(6)},${gpsCoords.lon.toFixed(6)})`;
     }
 
-    const message = `🔧 *SLOT BOOKING REQUEST - RANA GARAGE*
+    // Save to user requests store
+    if (addUserRequest) {
+      addUserRequest({
+        name: customerName.trim(),
+        phone: customerPhone.trim(),
+        isWhatsApp: isWhatsApp,
+        bikeModel: fullBike || "Motorcycle",
+        serviceCategory: serviceCategory,
+        description: issueDescription.trim() || "General Maintenance & Inspection",
+        preferredDate: bookingDate,
+        preferredSlot: "Flexible Day Slot",
+        pickupOption: "None",
+        location: locText || "Pune Workshop Visit"
+      });
+    }
+
+    const message = `🔧 *SERVICE BOOKING REQUEST - RANA GARAGE*
 ----------------------------------------
-👤 *Full Name:* ${customerName.trim()}
-📞 *Phone Number:* ${customerPhone.trim()}
-📍 *Location / Address:* ${locText || "Customer Self Visit"}
-📝 *Issue Description:* ${issueDescription.trim() || "General Checkup & Service"}
-📅 *Date:* ${bookingDate}
-⏰ *Time:* ${bookingSlot}
+👤 *Customer Name:* ${customerName.trim()}
+📞 *Phone Number:* ${customerPhone.trim()} (${isWhatsApp ? "WhatsApp Active" : "Call Only"})
+🏍️ *Bike Details:* ${fullBike}
+🛠️ *Issue Category:* ${serviceCategory}
+📝 *Description:* ${issueDescription.trim() || "General Maintenance"}
+📍 *Location:* ${locText || "Pune Workshop Visit"}
+📅 *Preferred Date:* ${bookingDate}
 ----------------------------------------
-📍 *Garage Location:* Lane 7, Koregaon Park, Pune
+📍 *Rana Garage:* Lane 7, Koregaon Park, Pune
 📞 *Helpline:* +91 97678 24216`;
 
     const encoded = encodeURIComponent(message);
@@ -126,7 +174,9 @@ export const BookingWizard: React.FC<BookingWizardProps> = ({
     setFormattedWaUrl(url);
     setIsSubmitted(true);
 
-    window.open(url, "_blank");
+    if (isWhatsApp) {
+      window.open(url, "_blank");
+    }
   };
 
   const handleReset = () => {
@@ -142,17 +192,17 @@ export const BookingWizard: React.FC<BookingWizardProps> = ({
           animate={{ scale: 1, opacity: 1, y: 0 }}
           exit={{ scale: 0.94, opacity: 0, y: 15 }}
           transition={{ type: "spring", damping: 25, stiffness: 280 }}
-          className="relative w-full max-w-md bg-slate-900 border-2 border-emerald-500/80 text-white rounded-3xl shadow-2xl overflow-hidden flex flex-col z-10 my-auto max-h-[92vh]"
+          className="relative w-full max-w-lg bg-slate-900 border-2 border-emerald-500/80 text-white rounded-3xl shadow-2xl overflow-hidden flex flex-col z-10 my-auto max-h-[92vh]"
         >
-          {/* Header Banner - High Visibility Emerald Green */}
-          <div className="bg-emerald-600 px-5 py-4 flex items-center justify-between text-white shrink-0 shadow-md">
+          {/* Header Banner */}
+          <div className="bg-emerald-600 px-5 py-3.5 flex items-center justify-between text-white shrink-0 shadow-md">
             <div className="flex items-center space-x-3">
               <span className="p-2 bg-white/20 rounded-xl">
                 <Wrench className="h-5 w-5 text-white" />
               </span>
               <div>
-                <h3 className="font-display font-black text-sm uppercase tracking-wider">🔧 STANDARD SLOT BOOKING</h3>
-                <p className="text-[11px] text-emerald-100 font-medium">Direct Connect to Rana Garage</p>
+                <h3 className="font-display font-black text-sm uppercase tracking-wider">🔧 QUICK SERVICE BOOKING</h3>
+                <p className="text-[11px] text-emerald-100 font-medium">Direct Connect to Master Rana Garage</p>
               </div>
             </div>
 
@@ -165,162 +215,287 @@ export const BookingWizard: React.FC<BookingWizardProps> = ({
           </div>
 
           {!isSubmitted ? (
-            <form onSubmit={handleSendToWhatsApp} className="p-5 space-y-4 overflow-y-auto">
-              {/* 1. Full Name */}
-              <div>
-                <label className="block text-xs font-bold text-slate-200 mb-1.5 flex items-center gap-1.5">
+            <form onSubmit={handleSubmit} className="p-5 space-y-4 overflow-y-auto">
+              
+              {/* SECTION 1: CONTACT INFORMATION */}
+              <div className="space-y-3 bg-slate-800/60 p-4 rounded-2xl border border-slate-700/70">
+                <div className="flex items-center gap-1.5 border-b border-slate-700 pb-2">
                   <User className="h-4 w-4 text-emerald-400" />
-                  <span>Full Name *</span>
-                </label>
-                <input
-                  type="text"
-                  required
-                  placeholder="Enter full name"
-                  value={customerName}
-                  onChange={(e) => setCustomerName(e.target.value)}
-                  className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-xs text-white placeholder-slate-400 focus:border-emerald-500 focus:bg-slate-800/90 focus:ring-1 focus:ring-emerald-500 outline-none transition font-medium"
-                />
-              </div>
+                  <span className="text-xs font-bold text-emerald-400 uppercase tracking-wider">1. Contact Details</span>
+                </div>
 
-              {/* 2. Phone Number */}
-              <div>
-                <label className="block text-xs font-bold text-slate-200 mb-1.5 flex items-center gap-1.5">
-                  <Phone className="h-4 w-4 text-emerald-400" />
-                  <span>Phone Number *</span>
-                </label>
-                <input
-                  type="tel"
-                  required
-                  placeholder="e.g. 9767824216"
-                  value={customerPhone}
-                  onChange={(e) => setCustomerPhone(e.target.value)}
-                  className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-xs text-white placeholder-slate-400 focus:border-emerald-500 focus:bg-slate-800/90 focus:ring-1 focus:ring-emerald-500 outline-none transition font-mono font-medium"
-                />
-              </div>
-
-              {/* 3. Live Phone GPS Location / Landmark Address */}
-              <div>
-                <div className="flex items-center justify-between mb-1.5">
-                  <label className="text-xs font-bold text-slate-200 flex items-center gap-1.5">
-                    <MapPin className="h-4 w-4 text-emerald-400" />
-                    <span>Live GPS Location / Landmark Address</span>
+                {/* Input with Label under Placeholder */}
+                <div>
+                  <input
+                    type="text"
+                    required
+                    placeholder="Enter Full Name (e.g. Rajkumar Shinde)"
+                    value={customerName}
+                    onChange={(e) => setCustomerName(e.target.value)}
+                    className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-400 focus:border-emerald-500 outline-none transition font-medium"
+                  />
+                  <label className="block text-[11px] font-bold text-slate-400 mt-1 pl-1">
+                    Customer Full Name *
                   </label>
+                </div>
+
+                <div>
+                  <input
+                    type="tel"
+                    required
+                    placeholder="Enter 10-Digit Phone Number (e.g. 9823045678)"
+                    value={customerPhone}
+                    onChange={(e) => setCustomerPhone(e.target.value)}
+                    className={`w-full bg-slate-800 border rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-400 outline-none transition font-mono font-medium ${
+                      customerPhone.replace(/\D/g, "").length === 10
+                        ? "border-emerald-500 focus:ring-1 focus:ring-emerald-500"
+                        : customerPhone.length > 0
+                        ? "border-amber-500"
+                        : "border-slate-700"
+                    }`}
+                  />
+                  <label className="block text-[11px] font-bold text-slate-400 mt-1 pl-1">
+                    Mobile Phone Number *
+                  </label>
+                  <div className="mt-0.5 text-[10px] font-mono pl-1">
+                    {customerPhone.replace(/\D/g, "").length === 10 ? (
+                      <span className="text-emerald-400 font-bold">✓ Valid 10-digit phone number</span>
+                    ) : (
+                      <span className="text-slate-500">Must be 10 digits</span>
+                    )}
+                  </div>
+                </div>
+
+                {/* ASK: IS THIS YOUR WHATSAPP NUMBER? */}
+                <div className="pt-2 border-t border-slate-700/60">
+                  <div className="grid grid-cols-2 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setIsWhatsApp(true)}
+                      className={`py-2 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 border cursor-pointer ${
+                        isWhatsApp
+                          ? "bg-emerald-600 border-emerald-400 text-white shadow-md shadow-emerald-950/50"
+                          : "bg-slate-800 border-slate-700 text-slate-400 hover:text-slate-200"
+                      }`}
+                    >
+                      <span className="w-2 h-2 rounded-full bg-emerald-400" />
+                      <span>Yes, WhatsApp Active</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setIsWhatsApp(false)}
+                      className={`py-2 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 border cursor-pointer ${
+                        !isWhatsApp
+                          ? "bg-amber-600 border-amber-400 text-white shadow-md shadow-amber-950/50"
+                          : "bg-slate-800 border-slate-700 text-slate-400 hover:text-slate-200"
+                      }`}
+                    >
+                      <Phone className="h-3 w-3" />
+                      <span>No, Call Only</span>
+                    </button>
+                  </div>
+                  <label className="block text-[11px] font-bold text-slate-400 mt-1 pl-1 text-center">
+                    Is this your WhatsApp active phone number? *
+                  </label>
+                </div>
+              </div>
+
+              {/* SECTION 2: BIKE BRAND AND MODEL */}
+              <div className="space-y-3 bg-slate-800/60 p-4 rounded-2xl border border-slate-700/70">
+                <div className="flex items-center gap-1.5 border-b border-slate-700 pb-2">
+                  <Bike className="h-4 w-4 text-emerald-400" />
+                  <span className="text-xs font-bold text-emerald-400 uppercase tracking-wider">2. Bike Details</span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <select
+                      value={bikeBrand}
+                      onChange={(e) => setBikeBrand(e.target.value)}
+                      className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2.5 text-xs text-white focus:border-emerald-500 outline-none cursor-pointer font-medium"
+                    >
+                      {BRANDS.map((b) => (
+                        <option key={b} value={b} className="bg-slate-900 text-slate-100">
+                          {b}
+                        </option>
+                      ))}
+                    </select>
+                    <label className="block text-[11px] font-bold text-slate-400 mt-1 pl-1">
+                      Motorcycle Manufacturer / Brand *
+                    </label>
+                  </div>
+
+                  <div>
+                    <input
+                      type="text"
+                      required
+                      placeholder="e.g. Classic 350 / Duke 200"
+                      value={bikeModel}
+                      onChange={(e) => setBikeModel(e.target.value)}
+                      className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-400 focus:border-emerald-500 outline-none transition font-medium"
+                    />
+                    <label className="block text-[11px] font-bold text-slate-400 mt-1 pl-1">
+                      Specific Bike Model Name *
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              {/* SECTION 3: LOCATION & DATE */}
+              <div className="space-y-2 bg-slate-800/60 p-4 rounded-2xl border border-slate-700/70">
+                <div className="flex items-center justify-between border-b border-slate-700 pb-2">
+                  <div className="flex items-center gap-1.5">
+                    <MapPin className="h-4 w-4 text-emerald-400" />
+                    <span className="text-xs font-bold text-emerald-400 uppercase tracking-wider">3. Location & Preferred Date</span>
+                  </div>
+
                   <button
                     type="button"
                     onClick={acquirePhoneLocation}
                     disabled={isLocating}
-                    className="text-[11px] font-extrabold text-emerald-400 hover:underline flex items-center gap-1 cursor-pointer"
+                    className="text-[11px] font-bold text-emerald-400 hover:underline flex items-center gap-1 cursor-pointer"
                   >
                     <Navigation className={`h-3 w-3 ${isLocating ? "animate-spin" : ""}`} />
-                    <span>{isLocating ? "Locating..." : "FETCH GPS"}</span>
+                    <span>{isLocating ? "Locating..." : "Auto Fetch GPS"}</span>
                   </button>
                 </div>
 
-                <input
-                  type="text"
-                  placeholder={gpsCoords ? `GPS Locked: ${gpsCoords.lat.toFixed(4)}, ${gpsCoords.lon.toFixed(4)} (or type address)` : "Enter locality or landmark address"}
-                  value={locationAddress}
-                  onChange={(e) => setLocationAddress(e.target.value)}
-                  className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-xs text-white placeholder-slate-400 focus:border-emerald-500 focus:bg-slate-800/90 focus:ring-1 focus:ring-emerald-500 outline-none transition font-medium"
-                />
-                {gpsCoords && (
-                  <p className="text-[11px] text-emerald-400 mt-1 font-mono font-semibold">
-                    ✓ GPS Lat: {gpsCoords.lat.toFixed(5)}, Lon: {gpsCoords.lon.toFixed(5)}
-                  </p>
-                )}
+                <div>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. Lane 7, Koregaon Park, Pune"
+                    value={locationAddress}
+                    onChange={(e) => setLocationAddress(e.target.value)}
+                    className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-400 focus:border-emerald-500 outline-none transition font-medium"
+                  />
+                  <label className="block text-[11px] font-bold text-slate-400 mt-1 pl-1">
+                    Service Area / Workshop Address Location *
+                  </label>
+                  {gpsCoords && (
+                    <p className="text-[10px] text-emerald-400 font-mono mt-0.5 pl-1">
+                      ✓ Live GPS Captured: {gpsCoords.lat.toFixed(5)}, {gpsCoords.lon.toFixed(5)}
+                    </p>
+                  )}
+                </div>
+
+                <div className="pt-2">
+                  <input
+                    type="date"
+                    required
+                    value={bookingDate}
+                    onChange={(e) => setBookingDate(e.target.value)}
+                    className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-white focus:border-emerald-500 outline-none transition font-medium cursor-pointer"
+                  />
+                  <label className="block text-[11px] font-bold text-slate-400 mt-1 pl-1">
+                    Preferred Service Date *
+                  </label>
+                </div>
               </div>
 
-              {/* 4. Issue Description */}
-              <div>
-                <label className="block text-xs font-bold text-slate-200 mb-1.5 flex items-center gap-1.5">
+              {/* SECTION 4: ISSUE CATEGORY */}
+              <div className="space-y-3 bg-slate-800/60 p-4 rounded-2xl border border-slate-700/70">
+                <div className="flex items-center gap-1.5 border-b border-slate-700 pb-2">
                   <FileText className="h-4 w-4 text-emerald-400" />
-                  <span>Issue Description</span>
-                </label>
-                <textarea
-                  rows={2}
-                  placeholder="Describe the issue or service needed..."
-                  value={issueDescription}
-                  onChange={(e) => setIssueDescription(e.target.value)}
-                  className="w-full bg-slate-800 border border-slate-700 rounded-xl p-3 text-xs text-white placeholder-slate-400 focus:border-emerald-500 focus:bg-slate-800/90 focus:ring-1 focus:ring-emerald-500 outline-none transition font-medium"
-                />
+                  <span className="text-xs font-bold text-emerald-400 uppercase tracking-wider">4. Issue Category</span>
+                </div>
+
+                <div>
+                  <select
+                    value={serviceCategory}
+                    onChange={(e) => setServiceCategory(e.target.value)}
+                    className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2.5 text-xs text-white focus:border-emerald-500 outline-none cursor-pointer font-medium"
+                  >
+                    {CATEGORIES.map((cat) => (
+                      <option key={cat} value={cat} className="bg-slate-900 text-slate-100">
+                        {cat}
+                      </option>
+                    ))}
+                  </select>
+                  <label className="block text-[11px] font-bold text-slate-400 mt-1 pl-1">
+                    Selected Repair Category *
+                  </label>
+                </div>
               </div>
 
-              {/* 5. Date */}
-              <div>
-                <label className="block text-xs font-bold text-slate-200 mb-1.5 flex items-center gap-1.5">
-                  <Calendar className="h-4 w-4 text-emerald-400" />
-                  <span>Date *</span>
-                </label>
-                <input
-                  type="date"
-                  required
-                  value={bookingDate}
-                  onChange={(e) => setBookingDate(e.target.value)}
-                  className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-xs text-white focus:border-emerald-500 focus:bg-slate-800/90 outline-none transition font-medium cursor-pointer"
-                />
-              </div>
-
-              {/* 6. Time */}
-              <div>
-                <label className="block text-xs font-bold text-slate-200 mb-1.5 flex items-center gap-1.5">
-                  <Clock className="h-4 w-4 text-emerald-400" />
-                  <span>Time *</span>
-                </label>
-                <select
-                  value={bookingSlot}
-                  onChange={(e) => setBookingSlot(e.target.value)}
-                  className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-xs text-white focus:border-emerald-500 focus:bg-slate-800/90 outline-none cursor-pointer transition font-medium"
-                >
-                  {TIME_SLOTS.map((slot) => (
-                    <option key={slot} value={slot} className="bg-slate-900 text-slate-100">
-                      {slot}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Submit Button */}
+              {/* SUBMIT BUTTON */}
               <button
                 type="submit"
-                className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold py-3.5 rounded-2xl text-xs uppercase tracking-wider transition shadow-lg shadow-emerald-950/60 flex items-center justify-center space-x-2 cursor-pointer mt-2 active:scale-[0.99]"
+                disabled={customerPhone.replace(/\D/g, "").length !== 10}
+                className={`w-full font-extrabold py-3.5 rounded-2xl text-xs uppercase tracking-wider transition shadow-lg flex items-center justify-center space-x-2 mt-2 ${
+                  customerPhone.replace(/\D/g, "").length === 10
+                    ? isWhatsApp
+                      ? "bg-emerald-600 hover:bg-emerald-500 text-white cursor-pointer active:scale-[0.99]"
+                      : "bg-amber-600 hover:bg-amber-500 text-white cursor-pointer active:scale-[0.99]"
+                    : "bg-slate-800 text-slate-500 border border-slate-700/80 cursor-not-allowed opacity-60"
+                }`}
               >
-                <MessageSquare className="h-4 w-4" />
-                <span>Confirm Slot on WhatsApp</span>
+                {isWhatsApp ? (
+                  <>
+                    <MessageSquare className="h-4 w-4" />
+                    <span>Confirm Booking & Dispatch on WhatsApp</span>
+                  </>
+                ) : (
+                  <>
+                    <Phone className="h-4 w-4" />
+                    <span>Save Booking & Call Mechanic Directly</span>
+                  </>
+                )}
               </button>
             </form>
           ) : (
             <div className="p-6 text-center space-y-4">
-              <div className="w-14 h-14 bg-emerald-500/20 text-emerald-400 rounded-full flex items-center justify-center mx-auto border border-emerald-500/40">
+              <div className={`w-14 h-14 rounded-full flex items-center justify-center mx-auto border ${
+                isWhatsApp ? "bg-emerald-500/20 text-emerald-400 border-emerald-500/40" : "bg-amber-500/20 text-amber-400 border-amber-500/40"
+              }`}>
                 <CheckCircle className="h-8 w-8" />
               </div>
 
               <div className="space-y-1.5">
-                <h3 className="text-lg font-bold text-white">Booking Prepared</h3>
+                <h3 className="text-lg font-bold text-white">
+                  {isWhatsApp ? "Booking Saved & WhatsApp Opened!" : "Booking Saved in Database!"}
+                </h3>
                 <p className="text-xs text-slate-300 leading-relaxed">
-                  Your slot request has been sent to WhatsApp. Chief Mechanic Rana Singh will review and confirm your booking.
+                  {isWhatsApp
+                    ? "Your booking details are recorded in our database and sent via WhatsApp to Chief Mechanic Master Rana Singh."
+                    : "Your request is saved in our database! Since your number is not on WhatsApp, please call Master Rana Singh directly to confirm."}
                 </p>
               </div>
 
-              <div className="p-3.5 bg-slate-800 border border-slate-700 rounded-2xl text-xs text-slate-300 font-mono shadow-inner">
-                <p>Mechanic Phone: <strong className="text-emerald-400 font-bold">+91 97678 24216</strong></p>
+              <div className="p-3.5 bg-slate-800 border border-slate-700 rounded-2xl text-xs text-slate-300 font-mono space-y-1 text-left">
+                <p><span className="text-slate-400">Customer:</span> <strong className="text-white">{customerName}</strong></p>
+                <p><span className="text-slate-400">Phone:</span> <strong className="text-white">{customerPhone}</strong> ({isWhatsApp ? "WhatsApp" : "Phone Call"})</p>
+                <p><span className="text-slate-400">Bike:</span> <strong className="text-emerald-400">{bikeBrand} {bikeModel}</strong></p>
+                <p><span className="text-slate-400">Category:</span> <strong className="text-amber-400">{serviceCategory}</strong></p>
               </div>
 
               <div className="flex flex-col gap-2.5 pt-1">
-                <a
-                  href={formattedWaUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded-xl text-xs transition flex items-center justify-center space-x-2 shadow-lg shadow-emerald-950/40"
-                >
-                  <ExternalLink className="h-4 w-4" />
-                  <span>Open WhatsApp</span>
-                </a>
+                {isWhatsApp ? (
+                  <a
+                    href={formattedWaUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded-xl text-xs transition flex items-center justify-center space-x-2 shadow-lg"
+                  >
+                    <ExternalLink className="h-4 w-4" />
+                    <span>Open WhatsApp Message</span>
+                  </a>
+                ) : (
+                  <a
+                    href="tel:+919767824216"
+                    className="w-full bg-amber-600 hover:bg-amber-500 text-white font-bold py-3.5 rounded-xl text-xs transition flex items-center justify-center space-x-2 shadow-lg"
+                  >
+                    <Phone className="h-4 w-4 animate-bounce" />
+                    <span>📞 Call Mechanic Master Rana (+91 97678 24216)</span>
+                  </a>
+                )}
 
                 <button
                   onClick={handleReset}
                   className="w-full bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold py-2.5 rounded-xl text-xs transition cursor-pointer"
                 >
-                  Close
+                  Done / Close
                 </button>
               </div>
             </div>

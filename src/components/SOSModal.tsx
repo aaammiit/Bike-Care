@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { generateGoogleMapsUrl } from "../utils/locationUtils";
+import { useApp } from "../AppContext";
 import { motion, AnimatePresence } from "motion/react";
 import {
   X,
@@ -26,6 +27,7 @@ const MECHANIC_PHONE = "+91 97678 24216";
 const MECHANIC_RAW_PHONE = "+919767824216";
 
 export const SOSModal: React.FC<SOSModalProps> = ({ isOpen, onClose }) => {
+  const { addUserRequest } = useApp();
   const [customerName, setCustomerName] = useState("");
   const [customerPhone, setCustomerPhone] = useState("");
   const [manualLocation, setManualLocation] = useState("");
@@ -116,6 +118,21 @@ export const SOSModal: React.FC<SOSModalProps> = ({ isOpen, onClose }) => {
 
   const handleSendSOSWhatsApp = (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (addUserRequest) {
+      addUserRequest({
+        name: customerName.trim() || "Roadside Rider",
+        phone: customerPhone.trim() || "9767824216",
+        bikeModel: "Breakdown Motorcycle",
+        serviceCategory: "Emergency SOS Breakdown",
+        description: issueNote.trim() || "Immediate roadside breakdown rescue required",
+        preferredDate: new Date().toISOString().slice(0, 10),
+        preferredSlot: "Immediate Breakdown",
+        pickupOption: "Both",
+        location: manualLocation.trim() || "Pune Breakdown Area"
+      });
+    }
+
     const data = prepareDispatchData();
     setFormattedWaUrl(data.waUrl);
     setFormattedSmsUrl(data.smsUrl);
@@ -228,8 +245,23 @@ export const SOSModal: React.FC<SOSModalProps> = ({ isOpen, onClose }) => {
                   placeholder="e.g. 9767824216"
                   value={customerPhone}
                   onChange={(e) => setCustomerPhone(e.target.value)}
-                  className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-xs text-white placeholder-slate-400 focus:border-rose-500 focus:bg-slate-800/90 focus:ring-1 focus:ring-rose-500 outline-none transition font-mono font-medium"
+                  className={`w-full bg-slate-800 border rounded-xl px-4 py-3 text-xs text-white placeholder-slate-400 outline-none transition font-mono font-medium ${
+                    customerPhone.replace(/\D/g, "").length === 10
+                      ? "border-emerald-500 focus:ring-1 focus:ring-emerald-500"
+                      : customerPhone.length > 0
+                      ? "border-amber-500 focus:ring-1 focus:ring-amber-500"
+                      : "border-slate-700 focus:border-rose-500 focus:ring-1 focus:ring-rose-500"
+                  }`}
                 />
+                <div className="flex items-center justify-between mt-1 text-[11px] font-mono">
+                  {customerPhone.replace(/\D/g, "").length === 0 ? (
+                    <span className="text-slate-400">Enter exactly 10 digits</span>
+                  ) : customerPhone.replace(/\D/g, "").length === 10 ? (
+                    <span className="text-emerald-400 font-bold">✓ Valid 10-digit phone number</span>
+                  ) : (
+                    <span className="text-amber-400 font-bold">⚠️ {customerPhone.replace(/\D/g, "").length}/10 digits (must be 10 digits)</span>
+                  )}
+                </div>
               </div>
 
               {/* 3. Location / Address Input */}
@@ -270,10 +302,19 @@ export const SOSModal: React.FC<SOSModalProps> = ({ isOpen, onClose }) => {
               <div className="pt-2">
                 <button
                   type="submit"
-                  className="w-full bg-rose-600 hover:bg-rose-500 text-white font-extrabold py-3.5 rounded-2xl text-xs uppercase tracking-wider transition shadow-lg shadow-rose-950/60 flex items-center justify-center space-x-2 cursor-pointer active:scale-[0.99]"
+                  disabled={customerPhone.replace(/\D/g, "").length !== 10}
+                  className={`w-full font-extrabold py-3.5 rounded-2xl text-xs uppercase tracking-wider transition shadow-lg flex items-center justify-center space-x-2 ${
+                    customerPhone.replace(/\D/g, "").length === 10
+                      ? "bg-rose-600 hover:bg-rose-500 text-white cursor-pointer active:scale-[0.99] shadow-rose-950/60"
+                      : "bg-slate-800 text-slate-500 border border-slate-700/80 cursor-not-allowed opacity-60"
+                  }`}
                 >
                   <MessageSquare className="h-4 w-4" />
-                  <span>Send SOS via WhatsApp</span>
+                  <span>
+                    {customerPhone.replace(/\D/g, "").length === 10
+                      ? "Send SOS via WhatsApp"
+                      : "Enter 10-Digit Phone to Trigger SOS"}
+                  </span>
                 </button>
               </div>
             </form>

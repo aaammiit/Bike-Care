@@ -11,8 +11,12 @@ import {
   BIKE_SERVICES_LIST,
   RepairStatus,
   BookingStatus,
-  PartItem
+  PartItem,
+  UserRequest,
+  CustomerReviewItem,
+  MechanicProfile
 } from "./types";
+import { mechanicData, reviewsData } from "./components/garageData";
 
 interface Notification {
   id: string;
@@ -45,6 +49,25 @@ interface AppContextType {
   inventory: InventoryItem[];
   employees: Employee[];
   notifications: Notification[];
+  userRequests: UserRequest[];
+  customerReviews: CustomerReviewItem[];
+  mechanicProfile: MechanicProfile;
+  
+  // Mechanic Profile Methods
+  updateMechanicProfile: (profile: MechanicProfile) => void;
+  
+  // User Request Methods
+  addUserRequest: (reqData: Omit<UserRequest, "id" | "createdAt" | "status">) => UserRequest;
+  updateUserRequestStatus: (id: string, status: UserRequest["status"]) => void;
+  deleteUserRequest: (id: string) => void;
+  clearAllUserRequests: () => void;
+  exportRequestsCSV: () => void;
+
+  // Customer Review Methods
+  addCustomerReview: (reviewData: Omit<CustomerReviewItem, "id" | "date">) => CustomerReviewItem;
+  deleteCustomerReview: (id: string) => void;
+  clearAllCustomerReviews: () => void;
+  exportReviewsCSV: () => void;
   
   // Core methods
   addBike: (bike: Omit<Bike, "id">) => Bike;
@@ -374,6 +397,24 @@ const INITIAL_NOTIFICATIONS: Notification[] = [
   }
 ];
 
+const INITIAL_USER_REQUESTS: UserRequest[] = [];
+
+const INITIAL_MECHANIC_PROFILE: MechanicProfile = {
+  name: mechanicData.name,
+  phone: mechanicData.phone,
+  experience: mechanicData.experience,
+  age: mechanicData.age,
+  photo: mechanicData.photo,
+  roleTitle: "Founder & Master Mechanic",
+  availableTime: mechanicData.availableTime,
+  address: "Lane 7, Koregaon Park, Pune, MH - 411001",
+  bio: "Rana personally diagnoses, tunes, and rebuilds every machine that enters the garage. From single-cylinder commuter bikes to high-performance multi-cylinder superbikes, he handles every machine with mathematical precision.",
+  skills: mechanicData.skills,
+  languages: mechanicData.languages,
+  certificates: mechanicData.certificates,
+  pin: "123456"
+};
+
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [currentRole, setCurrentRole] = useState<"Customer" | "Admin" | "Mechanic">(() => {
     return (localStorage.getItem("garage_role") as any) || "Customer";
@@ -382,6 +423,21 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [currentCustomer, setCurrentCustomer] = useState(() => {
     const saved = localStorage.getItem("garage_customer");
     return saved ? JSON.parse(saved) : DEFAULT_CUSTOMER;
+  });
+
+  const [mechanicProfile, setMechanicProfile] = useState<MechanicProfile>(() => {
+    const saved = localStorage.getItem("garage_mechanic_profile");
+    return saved ? JSON.parse(saved) : INITIAL_MECHANIC_PROFILE;
+  });
+
+  const [userRequests, setUserRequests] = useState<UserRequest[]>(() => {
+    const saved = localStorage.getItem("garage_user_requests");
+    return saved ? JSON.parse(saved) : INITIAL_USER_REQUESTS;
+  });
+
+  const [customerReviews, setCustomerReviews] = useState<CustomerReviewItem[]>(() => {
+    const saved = localStorage.getItem("garage_customer_reviews");
+    return saved ? JSON.parse(saved) : reviewsData;
   });
 
   const [bikes, setBikes] = useState<Bike[]>(() => {
@@ -480,7 +536,152 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     localStorage.setItem("garage_message_log", JSON.stringify(sentMessagesLog));
   }, [sentMessagesLog]);
 
+  useEffect(() => {
+    localStorage.setItem("garage_user_requests", JSON.stringify(userRequests));
+  }, [userRequests]);
+
+  useEffect(() => {
+    localStorage.setItem("garage_customer_reviews", JSON.stringify(customerReviews));
+  }, [customerReviews]);
+
+  useEffect(() => {
+    localStorage.setItem("garage_mechanic_profile", JSON.stringify(mechanicProfile));
+  }, [mechanicProfile]);
+
   // Methods
+  const updateMechanicProfile = (newProfile: MechanicProfile) => {
+    setMechanicProfile(newProfile);
+  };
+
+  const clearAllUserRequests = () => {
+    setUserRequests([]);
+    localStorage.setItem("garage_user_requests", JSON.stringify([]));
+  };
+
+  const clearAllCustomerReviews = () => {
+    setCustomerReviews([]);
+    localStorage.setItem("garage_customer_reviews", JSON.stringify([]));
+  };
+  const addUserRequest = (reqData: Omit<UserRequest, "id" | "createdAt" | "status">) => {
+    const newReq: UserRequest = {
+      ...reqData,
+      id: "req_" + Math.random().toString(36).substring(2, 9),
+      status: "New",
+      createdAt: new Date().toISOString()
+    };
+    setUserRequests(prev => [newReq, ...prev]);
+
+    addNotification(
+      "New Website User Request",
+      `${reqData.name} (${reqData.phone}) submitted a request for ${reqData.bikeModel}: ${reqData.serviceCategory}.`,
+      "info",
+      "Admin"
+    );
+    return newReq;
+  };
+
+  const updateUserRequestStatus = (id: string, status: UserRequest["status"]) => {
+    setUserRequests(prev => prev.map(r => r.id === id ? { ...r, status } : r));
+  };
+
+  const deleteUserRequest = (id: string) => {
+    setUserRequests(prev => prev.filter(r => r.id !== id));
+  };
+
+  const exportRequestsCSV = (userPin?: string) => {
+    // CSV Export Security PIN Check
+    const requiredPin = "271201";
+    let pinToVerify = userPin;
+    if (!pinToVerify) {
+      pinToVerify = window.prompt("🔐 Enter CSV Database Export Security PIN (Default PIN: 271201):", "271201") || "";
+    }
+
+    if (pinToVerify !== requiredPin) {
+      alert("❌ Invalid PIN Code! CSV Export Denied. Correct Security PIN is 271201.");
+      return;
+    }
+
+    const headers = [
+      "Request ID",
+      "Customer Name",
+      "Phone Number",
+      "WhatsApp Active",
+      "Bike Model",
+      "Service Category",
+      "Preferred Date",
+      "Preferred Time Slot",
+      "Area PIN Code",
+      "Description",
+      "Pickup Option",
+      "Location",
+      "Status",
+      "Request Timestamp"
+    ];
+
+    const rows = userRequests.map(r => [
+      `"${r.id}"`,
+      `"${(r.name || "").replace(/"/g, '""')}"`,
+      `"${(r.phone || "").replace(/"/g, '""')}"`,
+      `"${r.isWhatsApp === false ? "No (Call Only)" : "Yes (WhatsApp)"}"`,
+      `"${(r.bikeModel || "").replace(/"/g, '""')}"`,
+      `"${(r.serviceCategory || "").replace(/"/g, '""')}"`,
+      `"${r.preferredDate || new Date().toISOString().slice(0, 10)}"`,
+      `"${r.preferredSlot || "10:00 AM - 12:00 PM"}"`,
+      `"271201"`,
+      `"${(r.description || "").replace(/"/g, '""')}"`,
+      `"${r.pickupOption || "None"}"`,
+      `"${(r.location || "").replace(/"/g, '""')}"`,
+      `"${r.status}"`,
+      `"${r.createdAt || new Date().toISOString()}"`
+    ]);
+
+    const csvContent = "data:text/csv;charset=utf-8," + [headers.join(","), ...rows.map(e => e.join(","))].join("\n");
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", `rana_garage_requests_PIN271201_${new Date().toISOString().slice(0, 10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const addCustomerReview = (reviewData: Omit<CustomerReviewItem, "id" | "date">) => {
+    const newRev: CustomerReviewItem = {
+      ...reviewData,
+      id: "rev_" + Math.random().toString(36).substring(2, 9),
+      date: new Date().toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" }),
+      photo: reviewData.photo || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&h=150&q=80"
+    };
+    setCustomerReviews(prev => [newRev, ...prev]);
+    return newRev;
+  };
+
+  const deleteCustomerReview = (id: string) => {
+    setCustomerReviews(prev => prev.filter(r => r.id !== id));
+  };
+
+  const exportReviewsCSV = () => {
+    const headers = ["Review ID", "Customer Name", "Bike Model", "Service Received", "Rating (Stars)", "Review Comment", "Date"];
+    const rows = customerReviews.map(r => [
+      `"${r.id}"`,
+      `"${(r.name || "").replace(/"/g, '""')}"`,
+      `"${(r.bike || "").replace(/"/g, '""')}"`,
+      `"${(r.service || "").replace(/"/g, '""')}"`,
+      `"${r.rating}"`,
+      `"${(r.review || "").replace(/"/g, '""')}"`,
+      `"${r.date}"`
+    ]);
+
+    const csvContent = "data:text/csv;charset=utf-8," + [headers.join(","), ...rows.map(e => e.join(","))].join("\n");
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", `rana_garage_customer_reviews_${new Date().toISOString().slice(0, 10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   const updateCustomerProfile = (name: string, email: string, mobile: string, address: string) => {
     setCurrentCustomer({ ...currentCustomer, name, email, mobile, address });
   };
@@ -1197,6 +1398,19 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         inventory,
         employees,
         notifications,
+        userRequests,
+        customerReviews,
+        mechanicProfile,
+        updateMechanicProfile,
+        addUserRequest,
+        updateUserRequestStatus,
+        deleteUserRequest,
+        clearAllUserRequests,
+        exportRequestsCSV,
+        addCustomerReview,
+        deleteCustomerReview,
+        clearAllCustomerReviews,
+        exportReviewsCSV,
         addBike,
         createBooking,
         cancelBooking,

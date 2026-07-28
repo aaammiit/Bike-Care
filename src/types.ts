@@ -321,3 +321,46 @@ export const BIKE_SERVICES_LIST: {
     description: "Custom tailored mechanical or cosmetic repair depending on physical inspection and customer description."
   }
 ];
+
+export interface UserRequest {
+  id: string;
+  name: string;
+  phone: string;
+  isWhatsApp?: boolean;
+  bikeModel: string;
+  serviceCategory: string;
+  description: string;
+  preferredDate?: string;
+  preferredSlot?: string;
+  pickupOption?: string;
+  location?: string;
+  status: "New" | "Contacted" | "In Service" | "Completed";
+  createdAt: string;
+}
+
+export interface CustomerReviewItem {
+  id: string;
+  name: string;
+  photo?: string;
+  bike: string;
+  service: string;
+  rating: number;
+  review: string;
+  date: string;
+}
+
+export interface MechanicProfile {
+  name: string;
+  phone: string;
+  experience: string;
+  age: number;
+  photo: string;
+  roleTitle: string;
+  availableTime: string;
+  address: string;
+  bio: string;
+  skills: string[];
+  languages: string[];
+  certificates: string[];
+  pin?: string;
+}

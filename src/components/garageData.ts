@@ -1,3 +1,9 @@
+import workshopLiftImg from "../assets/images/workshop_lift_bay_1785236179122.jpg";
+import clutchEngineImg from "../assets/images/clutch_engine_repair_1785236194121.jpg";
+import suspensionImg from "../assets/images/suspension_tuning_service_1785236209600.jpg";
+import foamWashImg from "../assets/images/foam_wash_polishing_1785236222167.jpg";
+import engineOilImg from "../assets/images/engine_oil_inspection_1785236244156.jpg";
+
 export interface MechanicInfo {
   photo: string;
   name: string;
@@ -92,169 +98,50 @@ export const mechanicData: MechanicInfo = {
   ]
 };
 
-export const reviewsData: ReviewItem[] = [
-  {
-    id: "r1",
-    name: "Rahul Deshmukh",
-    photo: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&h=150&q=80",
-    bike: "Royal Enfield Classic 350",
-    service: "Engine Overhaul",
-    rating: 5,
-    review: "Rana Bhai completely cured my engine knocking issue. The bike runs smoother than the day I bought it. Highly recommended!",
-    date: "12 July 2026"
-  },
-  {
-    id: "r2",
-    name: "Pooja Sharma",
-    photo: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=150&h=150&q=80",
-    bike: "Honda Activa 6G",
-    service: "General Maintenance",
-    rating: 5,
-    review: "As a student, I don't know much about engines. Rana explained the spark issues clearly, didn't charge for extra parts, and booked me on WhatsApp easily.",
-    date: "09 July 2026"
-  },
-  {
-    id: "r3",
-    name: "Amit Patel",
-    photo: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=150&h=150&q=80",
-    bike: "KTM Duke 390",
-    service: "Fork Oil & Suspension",
-    rating: 5,
-    review: "WP forks were leaking damping fluid. They replaced seals, refilled high-performance oil, and the front end feels rock-solid on high corners.",
-    date: "05 July 2026"
-  },
-  {
-    id: "r4",
-    name: "Sandeep Gill",
-    photo: "https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?auto=format&fit=crop&w=150&h=150&q=80",
-    bike: "Suzuki Hayabusa",
-    service: "Chain Replacement",
-    rating: 5,
-    review: "Exceptional care taken for my superbike. Cleaned the sprocket shaft, torqued the DID chain to exact specs. True professionals here.",
-    date: "28 June 2026"
-  },
-  {
-    id: "r5",
-    name: "Neha Nair",
-    photo: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&h=150&q=80",
-    bike: "Yamaha R15 V4",
-    service: "Brake Service & Pads",
-    rating: 5,
-    review: "Superb stopping power now. They put in ceramic brake pads and cleaned the rear calipers perfectly. Pricing was very reasonable.",
-    date: "25 June 2026"
-  },
-  {
-    id: "r6",
-    name: "Vikram Rathore",
-    photo: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=150&h=150&q=80",
-    bike: "Jawa 42",
-    service: "Wiring & Spark Issue",
-    rating: 4,
-    review: "My Jawa had a weird headlight flicker. Rana found a pinched wire inside the loom. Solved it quickly and wrapped it in heat-shield tape.",
-    date: "21 June 2026"
-  },
-  {
-    id: "r7",
-    name: "Aditya Roy",
-    photo: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=150&h=150&q=80",
-    bike: "TVS Apache RTR 200",
-    service: "Oil Change & Carb Clean",
-    rating: 5,
-    review: "My throttle response is so crisp now! Cleaned the carb jets and filled premium Motul oil. Best local garage in Pune, hands down.",
-    date: "18 June 2026"
-  },
-  {
-    id: "r8",
-    name: "Meera Sen",
-    photo: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=150&h=150&q=80",
-    bike: "Vespa VXL 150",
-    service: "Polishing & Washing",
-    rating: 5,
-    review: "The foam wash and Teflon coat made my pink Vespa look absolutely sparkling! Not a speck of mud left. Splendid service.",
-    date: "14 June 2026"
-  },
-  {
-    id: "r9",
-    name: "Gaurav Joshi",
-    photo: "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=150&h=150&q=80",
-    bike: "Harley-Davidson Iron 883",
-    service: "Battery Replacement",
-    rating: 5,
-    review: "Quick and easy. Old battery died during monsoons, they fitted an Exide battery, checked the alternator voltage, and got me on my way.",
-    date: "10 June 2026"
-  },
-  {
-    id: "r10",
-    name: "Ananya Dave",
-    photo: "https://images.unsplash.com/photo-1567532939604-b6b5b0db2604?auto=format&fit=crop&w=150&h=150&q=80",
-    bike: "KTM RC 200",
-    service: "Accident Repair",
-    rating: 5,
-    review: "Damaged my fairings in a slide. Rana Garage sourced original parts, matched the paint perfectly, and got the insurance inspection done smoothly.",
-    date: "04 June 2026"
-  },
-  {
-    id: "r11",
-    name: "Rohan Kulkarni",
-    photo: "https://images.unsplash.com/photo-1552058544-f2b08422138a?auto=format&fit=crop&w=150&h=150&q=80",
-    bike: "Bajaj Pulsar 150",
-    service: "General Maintenance",
-    rating: 4,
-    review: "Very honest pricing. They cleaned my air filter, adjusted my chain, and changed spark plugs for a tiny charge. Bike feels light!",
-    date: "30 May 2026"
-  },
-  {
-    id: "r12",
-    name: "Deepak Chawla",
-    photo: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=150&h=150&q=80",
-    bike: "BMW G310GS",
-    service: "Tyre Replacement",
-    rating: 5,
-    review: "Fitted Metzeler dual-sport tyres. Wheel balancing was done professionally. This place has better tools than many authorized showrooms.",
-    date: "26 May 2026"
-  }
-];
+export const reviewsData: ReviewItem[] = [];
+
+export { workshopLiftImg, clutchEngineImg, suspensionImg, foamWashImg, engineOilImg };
 
 export const galleryData: GalleryItem[] = [
   {
     id: "g1",
-    title: "Classic Engine Head Rebuild",
+    title: "Clutch & Flywheel Assembly Overhaul",
     category: "engine",
-    categoryLabel: "Engine Rebuild",
-    img: "https://images.unsplash.com/photo-1486006920555-c77dce18193b?auto=format&fit=crop&w=600&q=80",
-    desc: "Scrubbing heavy carbon crust from cylinder heads and seating new valves for optimal compression on a Classic 350."
+    categoryLabel: "Engine & Clutch",
+    img: clutchEngineImg,
+    desc: "Disassembling clutch basket plates, replacing worn friction discs, and torquing flywheel bolts to OEM specification."
   },
   {
     id: "g2",
-    title: "Cafe Racer Frame Welding",
-    category: "painting",
-    categoryLabel: "Restorations",
-    img: "https://images.unsplash.com/photo-1615887023516-9b6bcd559e87?auto=format&fit=crop&w=600&q=80",
-    desc: "Stripping surface rust scaling and executing precision TIG welds on a vintage custom cafe racer frame."
+    title: "Rear Shock Absorber & Coilover Service",
+    category: "suspension",
+    categoryLabel: "Suspension & Damping",
+    img: suspensionImg,
+    desc: "Precision tuning of rear coilover shock absorber preload, replacing nitrogen seals, and adjusting damping rebound."
   },
   {
     id: "g3",
-    title: "Hydraulic Caliper Overhaul",
-    category: "brake",
-    categoryLabel: "Brakes & Suspension",
-    img: "https://images.unsplash.com/photo-1511919884226-fd3cad34687c?auto=format&fit=crop&w=600&q=80",
-    desc: "Replacing piston dust seals, rebuilding corroded caliper guides, and executing a complete brake fluid vacuum flush."
+    title: "Hydraulic Lift Bay Scooter Servicing",
+    category: "servicing",
+    categoryLabel: "Hydraulic Lift Bay",
+    img: workshopLiftImg,
+    desc: "Elevated hydraulic lift servicing for automatic scooters, including variator belt checks, brake drums, and engine fluid flush."
   },
   {
     id: "g4",
-    title: "Laser Drivetrain Alignment",
-    category: "chain",
-    categoryLabel: "Drive Transmission",
-    img: "https://images.unsplash.com/photo-1508962914676-134849a727f0?auto=format&fit=crop&w=600&q=80",
-    desc: "Installing a gold-plated DID O-Ring drive chain with precise alignment using a professional laser line alignment guide."
+    title: "Microfiber Buffing & Vintage Detailing",
+    category: "polishing",
+    categoryLabel: "Detailing & Polish",
+    img: foamWashImg,
+    desc: "Hand-wiping, microfiber detailing, and applying Teflon wax sealant on custom black vintage bike tanks."
   },
   {
     id: "g5",
-    title: "ECU Diagnostics & Map Flash",
+    title: "Engine Oil Level & Dipstick Inspection",
     category: "servicing",
-    categoryLabel: "Tuning & Tech",
-    img: "https://images.unsplash.com/photo-1542128962-9d50ad7bf744?auto=format&fit=crop&w=600&q=80",
-    desc: "Mapping high-rpm fuel delivery curves on the electronic control unit (ECU) to resolve cold-idle stutter and lag."
+    categoryLabel: "Routine Diagnostics",
+    img: engineOilImg,
+    desc: "Inspecting oil viscosity and contamination with protective white gloves before draining and filling fresh Motul 4T 10W40."
   },
   {
     id: "g6",
@@ -271,6 +158,14 @@ export const galleryData: GalleryItem[] = [
     categoryLabel: "Vintage Tuning",
     img: "https://images.unsplash.com/photo-1599819811279-d5ad9cccf838?auto=format&fit=crop&w=600&q=80",
     desc: "Ultrasonic chemical tank bath for clogged brass jets, setting correct float pin height, and synchronizing vacuum draws."
+  },
+  {
+    id: "g8",
+    title: "Laser Drivetrain & Gold Chain Alignment",
+    category: "chain",
+    categoryLabel: "Drive Transmission",
+    img: "https://images.unsplash.com/photo-1508962914676-134849a727f0?auto=format&fit=crop&w=600&q=80",
+    desc: "Installing a gold-plated DID O-Ring drive chain with precise alignment using a professional laser line alignment guide."
   }
 ];
 
@@ -302,7 +197,7 @@ export const beforeAfterData: BeforeAfterItem[] = [
     title: "WP USD Fork Resealing",
     bike: "KTM Duke 250",
     beforeImg: "https://images.unsplash.com/photo-1568772585407-9361f9bf3a87?auto=format&fit=crop&w=800&q=80",
-    afterImg: "https://images.unsplash.com/photo-1485965120184-e220f721d03e?auto=format&fit=crop&w=800&q=80",
+    afterImg: "https://images.unsplash.com/photo-1542128962-9d50ad7bf744?auto=format&fit=crop&w=800&q=80",
     desc: "Polished stanchion pits, fitted high-pressure dual-lip NOK seals, and filled Motul 10W racing fork fluid.",
     duration: "4 Hours",
     satisfaction: "98%",

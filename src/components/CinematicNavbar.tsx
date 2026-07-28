@@ -8,7 +8,7 @@ interface CinematicNavbarProps {
   activeSection: string;
   onNavigateToRole: (role: "Customer" | "Admin" | "Mechanic") => void;
   onOpenBooking: () => void;
-  onOpenSOS: () => void;
+  onOpenUsers?: () => void;
 }
 
 export const CinematicNavbar: React.FC<CinematicNavbarProps> = ({
@@ -17,7 +17,7 @@ export const CinematicNavbar: React.FC<CinematicNavbarProps> = ({
   activeSection,
   onNavigateToRole,
   onOpenBooking,
-  onOpenSOS,
+  onOpenUsers,
 }) => {
   // Ensure the interactive navbar with all links is immediately visible on page load
   const [introStage, setIntroStage] = useState<"intro" | "interactive">("interactive");
@@ -33,13 +33,12 @@ export const CinematicNavbar: React.FC<CinematicNavbarProps> = ({
   const lastActiveLeft = useRef<number>(0);
 
   const navLinks = [
-    { id: "home", label: "Home" },
     { id: "services", label: "Services" },
-    { id: "repairs", label: "Repairs" },
     { id: "gallery", label: "Gallery" },
     { id: "reviews", label: "Reviews" },
     { id: "about", label: "About" },
     { id: "contact", label: "Contact" },
+    { id: "users", label: "Mechanic 🔑" },
   ];
 
   // Track Scrolling for Glassmorphism & Shadow
@@ -89,6 +88,14 @@ export const CinematicNavbar: React.FC<CinematicNavbarProps> = ({
   const handleLinkClick = (e: React.MouseEvent<HTMLAnchorElement>, id: string) => {
     e.preventDefault();
     setIsMobileMenuOpen(false);
+    if (id === "home") {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      return;
+    }
+    if (id === "users") {
+      if (onOpenUsers) onOpenUsers();
+      return;
+    }
     const target = document.getElementById(id);
     if (target) {
       const offset = 80; // height of navbar
@@ -542,17 +549,6 @@ export const CinematicNavbar: React.FC<CinematicNavbarProps> = ({
                 <span>BOOK</span>
               </motion.button>
 
-              {/* Emergency SOS button */}
-              <button
-                onClick={onOpenSOS}
-                className="hidden lg:inline-flex items-center space-x-1.5 px-3.5 py-2 border-2 border-rose-400 rounded-full text-xs font-black tracking-wider uppercase transition-all bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 shadow-2xs cursor-pointer"
-                title="Trigger Emergency SOS Roadside Assistance"
-              >
-                <AlertTriangle className="h-3.5 w-3.5 text-rose-600 dark:text-rose-400 animate-bounce" />
-                <span>SOS</span>
-              </button>
-
-
               {/* Mobile menu hamburger */}
               <button
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -650,17 +646,6 @@ export const CinematicNavbar: React.FC<CinematicNavbarProps> = ({
                 >
                   <MessageSquare className="h-4 w-4 text-white" />
                   <span>WhatsApp Slot</span>
-                </button>
-                
-                <button
-                  onClick={() => {
-                    setIsMobileMenuOpen(false);
-                    onOpenSOS();
-                  }}
-                  className="w-full flex items-center justify-center space-x-1.5 py-2.5 rounded-xl text-[10px] font-bold tracking-widest uppercase border-2 border-rose-500/80 text-rose-600 bg-rose-50 hover:bg-rose-100/50 animate-pulse"
-                >
-                  <AlertTriangle className="h-3.5 w-3.5 text-rose-500" />
-                  <span>Emergency SOS Rescue</span>
                 </button>
               </div>
 
