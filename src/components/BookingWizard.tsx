@@ -16,6 +16,7 @@ import {
   Bike
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
+import { ServiceCategorySelector } from "./ServiceCategorySelector";
 
 interface BookingWizardProps {
   isOpen: boolean;
@@ -401,21 +402,29 @@ export const BookingWizard: React.FC<BookingWizardProps> = ({
                   <span className="text-xs font-bold text-emerald-400 uppercase tracking-wider">4. Issue Category</span>
                 </div>
 
-                <div>
-                  <select
-                    value={serviceCategory}
-                    onChange={(e) => setServiceCategory(e.target.value)}
-                    className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2.5 text-xs text-white focus:border-emerald-500 outline-none cursor-pointer font-medium"
-                  >
-                    {CATEGORIES.map((cat) => (
-                      <option key={cat} value={cat} className="bg-slate-900 text-slate-100">
-                        {cat}
-                      </option>
-                    ))}
-                  </select>
-                  <label className="block text-[11px] font-bold text-slate-400 mt-1 pl-1">
-                    Selected Repair Category *
-                  </label>
+                <div className="space-y-3">
+                  <ServiceCategorySelector
+                    selectedCategory={serviceCategory}
+                    onSelectCategory={(cat) => setServiceCategory(cat)}
+                    theme="dark"
+                  />
+
+                  <div className="pt-2 border-t border-slate-700/60">
+                    <select
+                      value={serviceCategory}
+                      onChange={(e) => setServiceCategory(e.target.value)}
+                      className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:border-emerald-500 outline-none cursor-pointer font-medium"
+                    >
+                      {CATEGORIES.map((cat) => (
+                        <option key={cat} value={cat} className="bg-slate-900 text-slate-100">
+                          {cat}
+                        </option>
+                      ))}
+                    </select>
+                    <label className="block text-[11px] font-bold text-slate-400 mt-1 pl-1">
+                      Selected Repair Category *
+                    </label>
+                  </div>
                 </div>
               </div>
 

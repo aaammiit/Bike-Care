@@ -25,6 +25,7 @@ import {
 } from "lucide-react";
 import { motion } from "motion/react";
 import { BeforeAfterItem, GalleryItem } from "./garageData";
+import { compressImageFile } from "../utils/imageCompressor";
 
 export interface ServiceJourneyStep {
   phase: string;
@@ -157,8 +158,8 @@ export const SectionEditorModal: React.FC<SectionEditorModalProps> = ({
 
   if (!isOpen) return null;
 
-  // File Upload Helper (Reads image file into base64 Data URL)
-  const handleImageFileUpload = (e: React.ChangeEvent<HTMLInputElement>, callback: (url: string) => void) => {
+  // File Upload Helper (Reads image file into base64 Data URL with automatic lightweight compression)
+  const handleImageFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, callback: (url: string) => void) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -167,13 +168,14 @@ export const SectionEditorModal: React.FC<SectionEditorModalProps> = ({
       return;
     }
 
-    const reader = new FileReader();
-    reader.onload = () => {
-      if (typeof reader.result === "string") {
-        callback(reader.result);
+    try {
+      const compressedBase64 = await compressImageFile(file, 1000, 1000, 0.82);
+      if (compressedBase64) {
+        callback(compressedBase64);
       }
-    };
-    reader.readAsDataURL(file);
+    } catch (err) {
+      console.error("Error compressing image file:", err);
+    }
   };
 
   const notifySave = (msg: string) => {

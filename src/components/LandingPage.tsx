@@ -25,6 +25,9 @@ import {
 import { AnimatedMotorcycle } from "./AnimatedMotorcycle";
 import { CinematicNavbar } from "./CinematicNavbar";
 import { ServicesCarousel } from "./ServicesCarousel";
+import { SafeImage } from "./SafeImage";
+import { ServiceCategorySelector } from "./ServiceCategorySelector";
+import { AnimatedSection } from "./AnimatedSection";
 import { 
   Wrench, 
   Clock, 
@@ -269,17 +272,29 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenBooking, onNavig
 
   const handleSaveJourneySteps = (updatedSteps: ServiceJourneyStep[]) => {
     setServiceJourneyStepsList(updatedSteps);
-    localStorage.setItem("rana_service_journey_steps", JSON.stringify(updatedSteps));
+    try {
+      localStorage.setItem("rana_service_journey_steps", JSON.stringify(updatedSteps));
+    } catch (e) {
+      console.warn("Failed to persist journey steps in localStorage:", e);
+    }
   };
 
   const handleSaveWorkshopLogs = (updatedLogs: WorkshopLogItem[]) => {
     setWorkshopLogsList(updatedLogs);
-    localStorage.setItem("rana_garage_logs", JSON.stringify(updatedLogs));
+    try {
+      localStorage.setItem("rana_garage_logs", JSON.stringify(updatedLogs));
+    } catch (e) {
+      console.warn("Failed to persist workshop logs in localStorage:", e);
+    }
   };
 
   const handleSaveBeforeAfterItems = (updatedItems: BeforeAfterItem[]) => {
     setBeforeAfterList(updatedItems);
-    localStorage.setItem("rana_before_after_items", JSON.stringify(updatedItems));
+    try {
+      localStorage.setItem("rana_before_after_items", JSON.stringify(updatedItems));
+    } catch (e) {
+      console.warn("Failed to persist before-after items in localStorage:", e);
+    }
   };
 
   // FAQ Accordion states
@@ -715,7 +730,7 @@ _Please confirm my slot on your dashboard, Master Rana. Thank you!_`;
       </section>
  
       {/* 3. TRUST SECTION (Animated Counter Cards) */}
-      <section className={`py-6 border-t border-b ${isDarkMode ? "bg-slate-900/10 border-slate-900/60" : "bg-slate-100/50 border-slate-200"}`}>
+      <AnimatedSection className={`py-6 border-t border-b ${isDarkMode ? "bg-slate-900/10 border-slate-900/60" : "bg-slate-100/50 border-slate-200"}`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -762,10 +777,10 @@ _Please confirm my slot on your dashboard, Master Rana. Thank you!_`;
           </div>
 
         </div>
-      </section>
+      </AnimatedSection>
 
       {/* 4. INTERACTIVE SERVICES CATALOG SECTION */}
-      <section id="services" className="py-10 md:py-12">
+      <AnimatedSection id="services" className="py-10 md:py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
           
           <AnimatedSectionHeader
@@ -785,12 +800,12 @@ _Please confirm my slot on your dashboard, Master Rana. Thank you!_`;
           />
 
         </div>
-      </section>
+      </AnimatedSection>
 
 
 
       {/* 5. PRICING PACKAGES (Clearly Show Inclusions) */}
-      <section className="py-8 md:py-12 bg-slate-50/70 dark:bg-slate-950/60 border-t-2 border-b-2 border-slate-100 dark:border-slate-900">
+      <AnimatedSection className="py-8 md:py-12 bg-slate-50/70 dark:bg-slate-950/60 border-t-2 border-b-2 border-slate-100 dark:border-slate-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           
           <div className="max-w-2xl mx-auto mb-8 space-y-1.5">
@@ -866,10 +881,10 @@ _Please confirm my slot on your dashboard, Master Rana. Thank you!_`;
           </div>
 
         </div>
-      </section>
+      </AnimatedSection>
 
       {/* 6. BRANDS WE REPAIR GRID */}
-      <section className="py-8 md:py-10">
+      <AnimatedSection className="py-8 md:py-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-10">
           
           <AnimatedSectionHeader
@@ -891,10 +906,10 @@ _Please confirm my slot on your dashboard, Master Rana. Thank you!_`;
           </div>
 
         </div>
-      </section>
+      </AnimatedSection>
 
       {/* 8. APPOINTMENT / ISSUE FORM TRIGGER BANNER (WhatsApp Redirect Gateway) */}
-      <section id="appointment-portal" className="py-8 md:py-10 border-t-2 border-b-2 bg-brand-50/15 border-slate-100">
+      <AnimatedSection id="appointment-portal" className="py-8 md:py-10 border-t-2 border-b-2 bg-brand-50/15 border-slate-100">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 text-center">
           
           <div className="duo-card p-6 sm:p-10 relative overflow-hidden flex flex-col items-center space-y-6 bg-white text-charcoal">
@@ -941,7 +956,7 @@ _Please confirm my slot on your dashboard, Master Rana. Thank you!_`;
           </div>
 
         </div>
-      </section>
+      </AnimatedSection>
 
       {/* MODAL APPOINTMENT FORM OVERLAY */}
       <AnimatePresence>
@@ -1242,8 +1257,8 @@ _Please confirm my slot on your dashboard, Master Rana. Thank you!_`;
                               )}
                             </div>
 
-                            {/* Preferred Date & Issue Category side-by-side */}
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                            {/* Preferred Date & Issue Category */}
+                            <div className="space-y-3 pt-1">
                               <div>
                                 <label className="block text-[10px] font-mono text-slate-900 dark:text-slate-200 uppercase mb-1.5 font-black tracking-wider">
                                   Preferred Date <span className="text-[#F97316]">*</span>
@@ -1258,23 +1273,33 @@ _Please confirm my slot on your dashboard, Master Rana. Thank you!_`;
                               </div>
 
                               <div>
-                                <label className="block text-[10px] font-mono text-slate-900 dark:text-slate-200 uppercase mb-1.5 font-black tracking-wider">
-                                  Issue Category
+                                <label className="block text-[10px] font-mono text-slate-900 dark:text-slate-200 uppercase mb-2 font-black tracking-wider">
+                                  Service Category Selection
                                 </label>
-                                <select
-                                  value={formCategory}
-                                  onChange={(e) => setFormCategory(e.target.value)}
-                                  className={`w-full rounded-xl px-3.5 py-2.5 text-xs outline-none transition border ${inputClass}`}
-                                >
-                                  <option value="General Maintenance">General Maintenance</option>
-                                  <option value="Engine Repair">Engine Repair & Smoking</option>
-                                  <option value="Brake Overhaul">Brake Overhaul & Pads</option>
-                                  <option value="Fork/Suspension leak">Suspension leaking seals</option>
-                                  <option value="Battery/Starter wiring">Wiring & Starter problem</option>
-                                  <option value="Chain Kit & sprockets">Chain Kit & sprockets</option>
-                                  <option value="Accident/Aesthetic rebuild">Accident Rebuilds</option>
-                                  <option value="Custom Restorations">Custom Restorations</option>
-                                </select>
+                                <ServiceCategorySelector
+                                  selectedCategory={formCategory}
+                                  onSelectCategory={(cat) => setFormCategory(cat)}
+                                  theme="light"
+                                />
+
+                                <div className="mt-2.5">
+                                  <select
+                                    value={formCategory}
+                                    onChange={(e) => setFormCategory(e.target.value)}
+                                    className={`w-full rounded-xl px-3.5 py-2.5 text-xs outline-none transition border ${inputClass}`}
+                                  >
+                                    <option value="General Maintenance">General Maintenance</option>
+                                    <option value="Engine Repair">Engine Repair & Smoking</option>
+                                    <option value="Brake Overhaul">Brake Overhaul & Pads</option>
+                                    <option value="Oil & Filter Change">Oil & Filter Change</option>
+                                    <option value="Battery & Electrical">Wiring & Battery Problem</option>
+                                    <option value="Chain Lube & Clean">Chain Kit & Sprockets</option>
+                                    <option value="Suspension Repair">Suspension Leaking Seals</option>
+                                    <option value="Tyre & Puncture">Tyre & Puncture</option>
+                                    <option value="Washing & Polishing">Foam Wash & Polish</option>
+                                    <option value="Custom Repair">Custom Restorations & Mods</option>
+                                  </select>
+                                </div>
                               </div>
                             </div>
                           </div>
@@ -1335,7 +1360,7 @@ _Please confirm my slot on your dashboard, Master Rana. Thank you!_`;
       </AnimatePresence>
 
       {/* 9. MECHANIC PROFILE OF RANA SINGH */}
-      <section id="about" className={`py-10 md:py-12 border-t border-b ${isDarkMode ? "bg-slate-900/25 border-slate-900/60" : "bg-slate-100/20 border-slate-200"}`}>
+      <AnimatedSection id="about" className={`py-10 md:py-12 border-t border-b ${isDarkMode ? "bg-slate-900/25 border-slate-900/60" : "bg-slate-100/20 border-slate-200"}`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
@@ -1343,13 +1368,11 @@ _Please confirm my slot on your dashboard, Master Rana. Thank you!_`;
             {/* Left Column: Mechanic Portrait */}
             <div className="lg:col-span-5 flex justify-center">
               <div className="relative rounded-3xl overflow-hidden border-2 border-slate-200 shadow-lg bg-slate-100 w-full max-w-sm aspect-square">
-                <img 
+                <SafeImage 
                   src={activeMechanic.photo} 
                   alt={activeMechanic.name} 
-                  referrerPolicy="no-referrer"
-                  onError={(e) => {
-                    (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1568602471122-7832951cc4c5?auto=format&fit=crop&w=400&h=400&q=80";
-                  }}
+                  fallbackSrc="https://images.unsplash.com/photo-1568602471122-7832951cc4c5?auto=format&fit=crop&w=400&h=400&q=80"
+                  iconFallback={<User className="h-12 w-12 text-orange-500" />}
                   className="w-full h-full object-cover"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent opacity-80" />
@@ -1435,10 +1458,10 @@ _Please confirm my slot on your dashboard, Master Rana. Thank you!_`;
           </div>
 
         </div>
-      </section>
+      </AnimatedSection>
 
       {/* 10. VISUAL SERVICE JOURNEY */}
-      <section id="journey" className="py-12 md:py-16 border-t-2 border-b-2 bg-gradient-to-b from-slate-50 to-slate-100 dark:from-slate-950 dark:to-slate-900 border-slate-200/60 dark:border-slate-800 [perspective:1500px] overflow-hidden">
+      <AnimatedSection id="journey" className="py-12 md:py-16 border-t-2 border-b-2 bg-gradient-to-b from-slate-50 to-slate-100 dark:from-slate-950 dark:to-slate-900 border-slate-200/60 dark:border-slate-800 [perspective:1500px] overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           
           <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-6">
@@ -1482,13 +1505,11 @@ _Please confirm my slot on your dashboard, Master Rana. Thank you!_`;
 
                 {/* Image panel with dark zoom and perspective tilt */}
                 <div className="relative aspect-[16/10] overflow-hidden bg-slate-950 shrink-0 border-b border-slate-100 dark:border-slate-800">
-                  <img 
+                  <SafeImage 
                     src={step.img} 
                     alt={step.title} 
-                    referrerPolicy="no-referrer"
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1558981806-ec527fa84c39?auto=format&fit=crop&q=80&w=1200";
-                    }}
+                    fallbackSrc="https://images.unsplash.com/photo-1558981806-ec527fa84c39?auto=format&fit=crop&q=80&w=1200"
+                    iconFallback={<Wrench className="h-10 w-10 text-orange-500" />}
                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 group-hover:rotate-1"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/30 to-transparent" />
@@ -1542,10 +1563,10 @@ _Please confirm my slot on your dashboard, Master Rana. Thank you!_`;
           </div>
 
         </div>
-      </section>
+      </AnimatedSection>
 
       {/* 11. REPAIR PORTFOLIO GALLERY (Masonry Grid with Lightbox Preview) */}
-      <section id="gallery" className={`py-12 md:py-16 border-t border-b ${isDarkMode ? "bg-slate-950/40 border-slate-900/60" : "bg-slate-100/70 border-slate-200"}`}>
+      <AnimatedSection id="gallery" className={`py-12 md:py-16 border-t border-b ${isDarkMode ? "bg-slate-950/40 border-slate-900/60" : "bg-slate-100/70 border-slate-200"}`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           
           <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-6">
@@ -1613,13 +1634,11 @@ _Please confirm my slot on your dashboard, Master Rana. Thank you!_`;
 
                   {/* Image Frame */}
                   <div className="relative aspect-[4/3] rounded-xl overflow-hidden bg-slate-950 shadow-inner shrink-0">
-                    <img 
+                    <SafeImage 
                       src={item.img} 
                       alt={item.title} 
-                      referrerPolicy="no-referrer"
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1558981806-ec527fa84c39?auto=format&fit=crop&q=80&w=1200";
-                      }}
+                      fallbackSrc="https://images.unsplash.com/photo-1558981806-ec527fa84c39?auto=format&fit=crop&q=80&w=1200"
+                      iconFallback={<Wrench className="h-8 w-8 text-orange-500" />}
                       className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-transparent to-transparent opacity-80" />
@@ -1720,13 +1739,11 @@ _Please confirm my slot on your dashboard, Master Rana. Thank you!_`;
 
                 {/* Big Visual Diagnostic Image */}
                 <div className="relative aspect-[16/10] bg-slate-950 rounded-2xl overflow-hidden border-2 border-slate-300 dark:border-slate-800 shadow-inner">
-                  <img 
+                  <SafeImage 
                     src={lightboxImg.url} 
                     alt={lightboxImg.title} 
-                    referrerPolicy="no-referrer"
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1558981806-ec527fa84c39?auto=format&fit=crop&q=80&w=1200";
-                    }}
+                    fallbackSrc="https://images.unsplash.com/photo-1558981806-ec527fa84c39?auto=format&fit=crop&q=80&w=1200"
+                    iconFallback={<Wrench className="h-12 w-12 text-orange-500" />}
                     className="w-full h-full object-cover"
                   />
                   {/* Grease Stamp Overlay */}
@@ -1793,10 +1810,10 @@ _Please confirm my slot on your dashboard, Master Rana. Thank you!_`;
             </div>
           )}
         </AnimatePresence>
-      </section>
+      </AnimatedSection>
 
       {/* 12. CUSTOMER REVIEWS (Carousel Auto-Scroll) */}
-      <section id="reviews" className={`py-10 md:py-12 border-t border-b ${isDarkMode ? "bg-slate-900/10 border-slate-900/60" : "bg-white border-slate-200"}`}>
+      <AnimatedSection id="reviews" className={`py-10 md:py-12 border-t border-b ${isDarkMode ? "bg-slate-900/10 border-slate-900/60" : "bg-white border-slate-200"}`}>
         <div className="max-w-4xl mx-auto px-4 sm:px-6 space-y-6">
           
           <AnimatedSectionHeader
@@ -1860,14 +1877,13 @@ _Please confirm my slot on your dashboard, Master Rana. Thank you!_`;
 
                     <div className="flex items-center justify-between gap-4 pt-4 border-t border-slate-200 dark:border-slate-800/60">
                       <div className="flex items-center space-x-3.5">
-                        <img 
+                        <SafeImage 
                           src={displayReviews[activeReviewIdx % displayReviews.length]?.photo} 
                           alt={displayReviews[activeReviewIdx % displayReviews.length]?.name} 
-                          referrerPolicy="no-referrer"
-                          onError={(e) => {
-                            (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80";
-                          }}
+                          fallbackSrc="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80"
+                          iconFallback={<User className="h-6 w-6 text-slate-400" />}
                           className="w-12 h-12 rounded-full border border-slate-200 dark:border-slate-800 object-cover"
+                          containerClassName="w-12 h-12 rounded-full min-h-0 p-0"
                         />
                         <div className="text-left">
                           <h4 className="text-sm font-bold text-slate-900 dark:text-white">{displayReviews[activeReviewIdx % displayReviews.length]?.name}</h4>
@@ -1923,10 +1939,10 @@ _Please confirm my slot on your dashboard, Master Rana. Thank you!_`;
           onClose={() => setIsReviewModalOpen(false)}
           onSuccess={() => setActiveReviewIdx(0)}
         />
-      </section>
+      </AnimatedSection>
 
       {/* 13. FAQ SECTION (Horizontal Grid Layout) */}
-      <section id="faq" className={`py-12 md:py-16 border-t border-b ${isDarkMode ? "bg-slate-950" : "bg-slate-50"}`}>
+      <AnimatedSection id="faq" className={`py-12 md:py-16 border-t border-b ${isDarkMode ? "bg-slate-950" : "bg-slate-50"}`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           
           <AnimatedSectionHeader
@@ -1975,10 +1991,10 @@ _Please confirm my slot on your dashboard, Master Rana. Thank you!_`;
           </div>
 
         </div>
-      </section>
+      </AnimatedSection>
 
       {/* 14. CONTACT SECTION & GOOGLE MAPS PLACEHOLDER */}
-      <section id="contact" className={`py-10 md:py-12 border-t ${isDarkMode ? "bg-slate-900/15 border-slate-900/60" : "bg-slate-100/10 border-slate-200"}`}>
+      <AnimatedSection id="contact" className={`py-10 md:py-12 border-t ${isDarkMode ? "bg-slate-900/15 border-slate-900/60" : "bg-slate-100/10 border-slate-200"}`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
@@ -2112,7 +2128,7 @@ _Please confirm my slot on your dashboard, Master Rana. Thank you!_`;
           </div>
 
         </div>
-      </section>
+      </AnimatedSection>
 
       {/* 15. FOOTER SECTION */}
       <footer className={`py-6 border-t ${isDarkMode ? "bg-slate-950 border-slate-900 text-slate-400" : "bg-slate-100 border-slate-200 text-slate-600"} transition-all`}>

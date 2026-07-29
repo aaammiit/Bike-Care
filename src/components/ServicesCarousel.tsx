@@ -33,6 +33,8 @@ interface ServiceItem {
   icon: React.ElementType;
 }
 
+import { SafeImage } from "./SafeImage";
+
 interface ServicesCarouselProps {
   onSelectService: (serviceName: string) => void;
 }
@@ -246,13 +248,10 @@ export const ServicesCarousel: React.FC<ServicesCarouselProps> = ({ onSelectServ
               >
                 {/* Bike Image Container */}
                 <div className="relative h-48 w-full overflow-hidden bg-slate-950 shrink-0">
-                  <img 
+                  <SafeImage 
                     src={service.img} 
                     alt={service.title} 
-                    referrerPolicy="no-referrer"
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).src = FALLBACK_BIKE_IMAGE;
-                    }}
+                    fallbackSrc={FALLBACK_BIKE_IMAGE}
                     className="w-full h-full object-cover transition-transform duration-700 group-hover/card:scale-110"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent" />
@@ -262,9 +261,9 @@ export const ServicesCarousel: React.FC<ServicesCarouselProps> = ({ onSelectServ
                     🏍️ {service.bikeModel}
                   </span>
 
-                  {/* Icon badge */}
-                  <div className="absolute bottom-2.5 left-3 p-2.5 bg-sky-50 text-spark-blue dark:bg-sky-950 dark:text-sky-300 border-2 border-sky-100 dark:border-sky-800 rounded-xl shrink-0 shadow-md">
-                    <IconComp className="h-5 w-5" />
+                  {/* Icon badge with hover micro-animation (scale and rotate) */}
+                  <div className="absolute bottom-2.5 left-3 p-2.5 bg-sky-50 text-spark-blue dark:bg-sky-950 dark:text-sky-300 border-2 border-sky-100 dark:border-sky-800 rounded-xl shrink-0 shadow-md transition-transform duration-300 group-hover/card:scale-110 group-hover/card:rotate-6">
+                    <IconComp className="h-5 w-5 transition-transform duration-300 group-hover/card:scale-110 group-hover/card:-rotate-6" />
                   </div>
 
                   {/* Category Status pill */}

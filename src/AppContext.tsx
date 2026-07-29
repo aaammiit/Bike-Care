@@ -499,53 +499,62 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     ];
   });
 
+  // Safe localStorage helper functions to prevent quota crashes in production
+  const safeSetItem = (key: string, value: string) => {
+    try {
+      localStorage.setItem(key, value);
+    } catch (e) {
+      console.warn(`localStorage setItem failed for key "${key}":`, e);
+    }
+  };
+
   // Sync to local storage
   useEffect(() => {
-    localStorage.setItem("garage_role", currentRole);
+    safeSetItem("garage_role", currentRole);
   }, [currentRole]);
 
   useEffect(() => {
-    localStorage.setItem("garage_customer", JSON.stringify(currentCustomer));
+    safeSetItem("garage_customer", JSON.stringify(currentCustomer));
   }, [currentCustomer]);
 
   useEffect(() => {
-    localStorage.setItem("garage_bikes", JSON.stringify(bikes));
+    safeSetItem("garage_bikes", JSON.stringify(bikes));
   }, [bikes]);
 
   useEffect(() => {
-    localStorage.setItem("garage_bookings", JSON.stringify(bookings));
+    safeSetItem("garage_bookings", JSON.stringify(bookings));
   }, [bookings]);
 
   useEffect(() => {
-    localStorage.setItem("garage_repairs", JSON.stringify(repairs));
+    safeSetItem("garage_repairs", JSON.stringify(repairs));
   }, [repairs]);
 
   useEffect(() => {
-    localStorage.setItem("garage_invoices", JSON.stringify(invoices));
+    safeSetItem("garage_invoices", JSON.stringify(invoices));
   }, [invoices]);
 
   useEffect(() => {
-    localStorage.setItem("garage_inventory", JSON.stringify(inventory));
+    safeSetItem("garage_inventory", JSON.stringify(inventory));
   }, [inventory]);
 
   useEffect(() => {
-    localStorage.setItem("garage_notifications", JSON.stringify(notifications));
+    safeSetItem("garage_notifications", JSON.stringify(notifications));
   }, [notifications]);
 
   useEffect(() => {
-    localStorage.setItem("garage_message_log", JSON.stringify(sentMessagesLog));
+    safeSetItem("garage_message_log", JSON.stringify(sentMessagesLog));
   }, [sentMessagesLog]);
 
   useEffect(() => {
-    localStorage.setItem("garage_user_requests", JSON.stringify(userRequests));
+    safeSetItem("garage_user_requests", JSON.stringify(userRequests));
   }, [userRequests]);
 
   useEffect(() => {
-    localStorage.setItem("garage_customer_reviews", JSON.stringify(customerReviews));
+    safeSetItem("garage_customer_reviews", JSON.stringify(customerReviews));
   }, [customerReviews]);
 
   useEffect(() => {
-    localStorage.setItem("garage_mechanic_profile", JSON.stringify(mechanicProfile));
+    safeSetItem("garage_mechanic_profile", JSON.stringify(mechanicProfile));
   }, [mechanicProfile]);
 
   // Methods
@@ -555,12 +564,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const clearAllUserRequests = () => {
     setUserRequests([]);
-    localStorage.setItem("garage_user_requests", JSON.stringify([]));
+    safeSetItem("garage_user_requests", JSON.stringify([]));
   };
 
   const clearAllCustomerReviews = () => {
     setCustomerReviews([]);
-    localStorage.setItem("garage_customer_reviews", JSON.stringify([]));
+    safeSetItem("garage_customer_reviews", JSON.stringify([]));
   };
   const addUserRequest = (reqData: Omit<UserRequest, "id" | "createdAt" | "status">) => {
     const newReq: UserRequest = {

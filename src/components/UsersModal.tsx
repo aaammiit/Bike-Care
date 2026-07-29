@@ -34,6 +34,7 @@ import {
 import { useApp } from "../AppContext";
 import { MechanicProfile } from "../types";
 import { mechanicData } from "./garageData";
+import { compressImageFile } from "../utils/imageCompressor";
 
 interface UsersModalProps {
   isOpen: boolean;
@@ -140,20 +141,21 @@ export const UsersModal: React.FC<UsersModalProps> = ({ isOpen, onClose }) => {
     }
   };
 
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      if (file.size > 5 * 1024 * 1024) {
-        alert("Image size should be less than 5MB");
+      if (file.size > 12 * 1024 * 1024) {
+        alert("Image size should be less than 12MB");
         return;
       }
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        if (typeof reader.result === "string") {
-          setFormData(prev => ({ ...prev, photo: reader.result as string }));
+      try {
+        const compressedBase64 = await compressImageFile(file, 800, 800, 0.85);
+        if (compressedBase64) {
+          setFormData(prev => ({ ...prev, photo: compressedBase64 }));
         }
-      };
-      reader.readAsDataURL(file);
+      } catch (err) {
+        console.error("Image processing error:", err);
+      }
     }
   };
 
