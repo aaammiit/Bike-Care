@@ -44,7 +44,7 @@ export const WebsiteInitialLoader: React.FC<WebsiteInitialLoaderProps> = ({ onLo
       initial={{ opacity: 1 }}
       exit={{ opacity: 0, scale: 1.03 }}
       transition={{ duration: 0.5, ease: "easeInOut" }}
-      className="fixed inset-0 z-[100] bg-slate-950 text-white flex flex-col justify-between overflow-hidden select-none"
+      className="fixed inset-0 z-[9999] bg-slate-950 text-white flex flex-col justify-between overflow-hidden select-none"
     >
       {/* Background ambient lighting */}
       <div className="absolute inset-0 z-0 opacity-20 pointer-events-none">
