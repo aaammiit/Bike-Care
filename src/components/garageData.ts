@@ -1,9 +1,9 @@
-// Direct image URLs for high performance and reliable builds
-const workshopLiftImg = "https://images.unsplash.com/photo-1558981806-ec527fa84c39?auto=format&fit=crop&q=80&w=1200";
+// Direct image URLs for high performance and reliable builds - strictly motorcycle and bike repair assets (no cars or people)
+const workshopLiftImg = "https://images.unsplash.com/photo-1558981403-c5f9899a28bc?auto=format&fit=crop&q=80&w=1200";
 const clutchEngineImg = "https://images.unsplash.com/photo-1568772585407-9361f9bf3a87?auto=format&fit=crop&q=80&w=1200";
-const suspensionImg = "https://images.unsplash.com/photo-1486006920555-c77dce18193b?auto=format&fit=crop&q=80&w=1200";
-const foamWashImg = "https://images.unsplash.com/photo-1607860108855-64acf2078ed9?auto=format&fit=crop&q=80&w=1200";
-const engineOilImg = "https://images.unsplash.com/photo-1617814076367-b759c7d7e738?auto=format&fit=crop&q=80&w=1200";
+const suspensionImg = "https://images.unsplash.com/photo-1558980664-769d59546b3d?auto=format&fit=crop&q=80&w=1200";
+const foamWashImg = "https://images.unsplash.com/photo-1558981359-219d6364c9c8?auto=format&fit=crop&q=80&w=1200";
+const engineOilImg = "https://images.unsplash.com/photo-1558981806-ec527fa84c39?auto=format&fit=crop&q=80&w=1200";
 
 export interface MechanicInfo {
   photo: string;
@@ -149,7 +149,7 @@ export const galleryData: GalleryItem[] = [
     title: "Inverted USD Fork Resealing",
     category: "suspension",
     categoryLabel: "Brakes & Suspension",
-    img: "https://images.unsplash.com/photo-1568772585407-9361f9bf3a87?auto=format&fit=crop&w=600&q=80",
+    img: "https://images.unsplash.com/photo-1542128962-9d50ad7bf744?auto=format&fit=crop&w=600&q=80",
     desc: "Replacing leaking oil seals with double-lip NOK seals, polishing the stanchion tubes, and refilling premium 10W fork fluid."
   },
   {
@@ -157,7 +157,7 @@ export const galleryData: GalleryItem[] = [
     title: "Mikuni Twin-Carb Calibration",
     category: "engine",
     categoryLabel: "Vintage Tuning",
-    img: "https://images.unsplash.com/photo-1599819811279-d5ad9cccf838?auto=format&fit=crop&w=600&q=80",
+    img: "https://images.unsplash.com/photo-1609630875171-b1321377ee65?auto=format&fit=crop&w=600&q=80",
     desc: "Ultrasonic chemical tank bath for clogged brass jets, setting correct float pin height, and synchronizing vacuum draws."
   },
   {
@@ -165,7 +165,7 @@ export const galleryData: GalleryItem[] = [
     title: "Laser Drivetrain & Gold Chain Alignment",
     category: "chain",
     categoryLabel: "Drive Transmission",
-    img: "https://images.unsplash.com/photo-1508962914676-134849a727f0?auto=format&fit=crop&w=600&q=80",
+    img: "https://images.unsplash.com/photo-1558981804-05561a35563a?auto=format&fit=crop&w=600&q=80",
     desc: "Installing a gold-plated DID O-Ring drive chain with precise alignment using a professional laser line alignment guide."
   }
 ];
@@ -186,8 +186,8 @@ export const beforeAfterData: BeforeAfterItem[] = [
     id: "ba2",
     title: "Cafe Racer Wheel Restoration",
     bike: "Yamaha RX100 Vintage",
-    beforeImg: "https://images.unsplash.com/photo-1508962914676-134849a727f0?auto=format&fit=crop&w=800&q=80",
-    afterImg: "https://images.unsplash.com/photo-1615887023516-9b6bcd559e87?auto=format&fit=crop&w=800&q=80",
+    beforeImg: "https://images.unsplash.com/photo-1558981804-05561a35563a?auto=format&fit=crop&w=800&q=80",
+    afterImg: "https://images.unsplash.com/photo-1558980664-769d59546b3d?auto=format&fit=crop&w=800&q=80",
     desc: "Frame sandblasting, rust conversion spray, electrostatic powder coating, and wheel chrome detailing.",
     duration: "24 Hours",
     satisfaction: "100%",

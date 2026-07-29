@@ -3,11 +3,13 @@ import { AppProvider } from "./AppContext";
 import { LandingPage } from "./components/LandingPage";
 import { BookingWizard } from "./components/BookingWizard";
 import { UsersModal } from "./components/UsersModal";
+import { WebsiteInitialLoader } from "./components/WebsiteInitialLoader";
 import { ServiceType } from "./types";
-import { motion } from "motion/react";
+import { motion, AnimatePresence } from "motion/react";
 import { Phone, MessageSquare } from "lucide-react";
 
 const MainAppContent: React.FC = () => {
+  const [isAppLoading, setIsAppLoading] = useState(true);
   const [isBookingOpen, setIsBookingOpen] = useState(false);
   const [isUsersOpen, setIsUsersOpen] = useState(false);
   const [preselectedService, setPreselectedService] = useState<ServiceType | undefined>(undefined);
@@ -19,6 +21,13 @@ const MainAppContent: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-slate-900 text-slate-100 flex flex-col relative selection:bg-rose-500 selection:text-white">
+      {/* Full Screen Initial Website Loader */}
+      <AnimatePresence>
+        {isAppLoading && (
+          <WebsiteInitialLoader onLoadingComplete={() => setIsAppLoading(false)} />
+        )}
+      </AnimatePresence>
+
       {/* Main Animated Website */}
       <main className="flex-grow">
         <LandingPage
@@ -28,8 +37,19 @@ const MainAppContent: React.FC = () => {
         />
       </main>
 
-      {/* Floating Action Bar (Call & WhatsApp Direct Access) */}
+      {/* Floating Action Bar (Call, WhatsApp & Replay Loader Direct Access) */}
       <div className="fixed bottom-5 right-5 z-40 flex flex-col sm:flex-row items-end sm:items-center gap-2.5">
+        <motion.button
+          onClick={() => setIsAppLoading(true)}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          className="flex items-center space-x-2 bg-slate-800 hover:bg-slate-700 text-amber-400 text-xs font-bold px-3.5 py-2.5 rounded-full shadow-xl border border-amber-500/40 tracking-wide cursor-pointer"
+          title="Replay Loader Animation"
+        >
+          <span className="text-base leading-none">🎬</span>
+          <span className="hidden xs:inline">Replay Loader GIF</span>
+        </motion.button>
+
         <motion.a
           href="tel:+919767824216"
           whileHover={{ scale: 1.05 }}

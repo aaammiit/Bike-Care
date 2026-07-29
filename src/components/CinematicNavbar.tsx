@@ -327,7 +327,7 @@ export const CinematicNavbar: React.FC<CinematicNavbarProps> = ({
                     {/* Brand name */}
                     <div>
                       <h1 className="font-display font-black text-xl leading-none tracking-tight flex items-center text-white">
-                        RANA <span className="text-orange-500 font-sans font-bold ml-1.5 text-xs tracking-widest uppercase border-l border-slate-700 pl-1.5">GARAGE</span>
+                        RANA <span className="text-orange-500 font-sans font-bold ml-1.5 text-xs tracking-widest uppercase border-l border-slate-700 pl-1.5">BIKE CARE</span>
                       </h1>
                       <p className="text-[9px] text-[#FDBA74] font-mono tracking-widest uppercase mt-0.5 font-bold">Premium Motorcare</p>
                     </div>
@@ -435,7 +435,7 @@ export const CinematicNavbar: React.FC<CinematicNavbarProps> = ({
 
               <div className="text-left">
                 <h1 className="font-display font-black text-xl sm:text-2xl leading-none tracking-tight flex items-center text-charcoal">
-                  R<span className="text-eager-green font-extrabold ml-1 text-base sm:text-lg font-sans">Cares</span>
+                  Rana <span className="text-eager-green font-extrabold ml-1 text-base sm:text-lg font-sans">Bike Care</span>
                 </h1>
               </div>
             </a>

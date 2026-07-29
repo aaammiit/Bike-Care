@@ -399,14 +399,12 @@ export const AnimatedMotorcycle: React.FC = () => {
     setSelectedBike(randomIndex);
   }, []);
 
-  // Set up intervals to handle automatic day/night toggling and bike cycling
+  // Set up intervals to handle automatic day/night toggling and bike cycling continuously in ALWAYS AUTO MODE
   useEffect(() => {
-    if (!autoCycle) return;
-
-    // Cycle bike design automatically every 6 seconds
+    // Cycle bike design automatically every 5 seconds
     const bikeInterval = setInterval(() => {
       setSelectedBike((prev) => (prev + 1) % bikeModels.length);
-    }, 6000);
+    }, 5000);
 
     // Toggle day/night backdrop automatically every 12 seconds
     const environmentInterval = setInterval(() => {
@@ -417,7 +415,7 @@ export const AnimatedMotorcycle: React.FC = () => {
       clearInterval(bikeInterval);
       clearInterval(environmentInterval);
     };
-  }, [autoCycle]);
+  }, []);
 
   const handleNextBike = () => {
     setSelectedBike((prev) => (prev + 1) % bikeModels.length);
@@ -523,7 +521,7 @@ export const AnimatedMotorcycle: React.FC = () => {
   const terminalLogs = getTerminalLogs();
 
   return (
-    <div className="relative w-full overflow-hidden select-none transition-all duration-300 h-64 xs:h-72 sm:h-80 md:h-96 bg-slate-950/20 rounded-3xl border border-slate-900/60 shadow-2xl flex flex-col">
+    <div className="relative w-full overflow-hidden select-none transition-all duration-300 h-[380px] xs:h-[440px] sm:h-[520px] md:h-[600px] lg:h-[650px] bg-slate-950/20 rounded-none border-y border-slate-900/60 shadow-2xl flex flex-col">
       {/* 1. CSS Keyframes and styling rules */}
       <style>{`
         /* Ground scrolling */
@@ -536,114 +534,155 @@ export const AnimatedMotorcycle: React.FC = () => {
           animation: scroll-dashed 1.2s linear infinite;
         }
 
-        /* Bike riding across the screen from left to right */
+        /* Bike riding endlessly across screen from far left to far right - Smoother slower speed */
         @keyframes bike-ride-path {
           0% {
-            left: -320px;
+            left: -360px;
           }
           100% {
-            left: 110%;
+            left: calc(100% + 300px);
           }
         }
 
-        /* Unified Responsive Sizing & Scaling */
+        /* City Buildings Infinite Parallax Scrolling */
+        @keyframes city-parallax {
+          0% { transform: translateX(0); }
+          100% { transform: translateX(-50%); }
+        }
+        .city-scrolling-layer {
+          display: flex;
+          width: 200%;
+          height: 100%;
+          align-items: flex-end;
+          animation: city-parallax 36s linear infinite;
+        }
+        .city-scrolling-layer.paused {
+          animation-play-state: paused;
+        }
+
+        .city-skyline-container {
+          position: absolute;
+          left: 0;
+          right: 0;
+          bottom: 56px;
+          height: 140px;
+          overflow: hidden;
+          pointer-events: none;
+          z-index: 5;
+        }
+
+        /* Unified Responsive Sizing & Scaling - Elevated Bike & Road Position with Proportional Scaling */
         .skyline-silhouette-container {
-          bottom: 30px !important;
-          height: 80px !important;
-          opacity: 0.15 !important;
+          bottom: 65px !important;
+          height: 120px !important;
+          opacity: 0.18 !important;
         }
         .highway-line-primary {
-          bottom: 24px !important;
-          height: 2px !important;
+          bottom: 55px !important;
+          height: 3px !important;
         }
         .highway-line-scrolling {
-          bottom: 10px !important;
-          height: 4px !important;
+          bottom: 32px !important;
+          height: 6px !important;
         }
         .bike-rider-unit {
           position: absolute;
-          bottom: 14px !important;
+          bottom: 38px !important;
           width: 140px;
           height: 85px;
-          animation: bike-ride-path 11s linear infinite;
+          animation: bike-ride-path 22s linear infinite;
           will-change: left;
           transform-origin: bottom center;
-          transform: scale(1.1) !important;
+          transform: scale(0.92) !important;
+          z-index: 45 !important;
+          opacity: 1 !important;
         }
 
         @media (min-width: 640px) {
+          .city-skyline-container {
+            bottom: 81px !important;
+            height: 150px !important;
+          }
           .skyline-silhouette-container {
-            bottom: 40px !important;
-            height: 110px !important;
+            bottom: 95px !important;
+            height: 160px !important;
           }
           .highway-line-primary {
-            bottom: 34px !important;
-            height: 2.5px !important;
+            bottom: 80px !important;
+            height: 3.5px !important;
           }
           .highway-line-scrolling {
-            bottom: 16px !important;
-            height: 5px !important;
+            bottom: 48px !important;
+            height: 7px !important;
           }
           .bike-rider-unit {
-            bottom: 20px !important;
-            transform: scale(1.4) !important;
+            bottom: 58px !important;
+            transform: scale(1.15) !important;
           }
         }
 
         @media (min-width: 768px) {
+          .city-skyline-container {
+            bottom: 106px !important;
+            height: 180px !important;
+          }
           .skyline-silhouette-container {
-            bottom: 50px !important;
-            height: 140px !important;
+            bottom: 120px !important;
+            height: 190px !important;
           }
           .highway-line-primary {
-            bottom: 44px !important;
-            height: 3px !important;
+            bottom: 105px !important;
+            height: 4px !important;
           }
           .highway-line-scrolling {
-            bottom: 20px !important;
-            height: 6px !important;
+            bottom: 68px !important;
+            height: 9px !important;
           }
           .bike-rider-unit {
-            bottom: 26px !important;
-            transform: scale(1.6) !important;
+            bottom: 80px !important;
+            transform: scale(1.35) !important;
           }
         }
 
         @media (min-width: 1024px) {
+          .city-skyline-container {
+            bottom: 129px !important;
+            height: 210px !important;
+          }
           .skyline-silhouette-container {
-            bottom: 60px !important;
-            height: 170px !important;
+            bottom: 145px !important;
+            height: 220px !important;
           }
           .highway-line-primary {
-            bottom: 52px !important;
-            height: 3.5px !important;
+            bottom: 128px !important;
+            height: 4.5px !important;
           }
           .highway-line-scrolling {
-            bottom: 24px !important;
-            height: 7px !important;
+            bottom: 85px !important;
+            height: 10px !important;
           }
           .bike-rider-unit {
-            bottom: 30px !important;
-            transform: scale(1.9) !important;
+            bottom: 100px !important;
+            transform: scale(1.55) !important;
           }
         }
 
         @media (min-width: 1280px) {
           .skyline-silhouette-container {
-            bottom: 70px !important;
-            height: 200px !important;
+            bottom: 170px !important;
+            height: 250px !important;
           }
           .highway-line-primary {
-            bottom: 62px !important;
-            height: 4px !important;
+            bottom: 150px !important;
+            height: 5px !important;
           }
           .highway-line-scrolling {
-            bottom: 28px !important;
-            height: 8px !important;
+            bottom: 102px !important;
+            height: 12px !important;
           }
           .bike-rider-unit {
-            bottom: 36px !important;
-            transform: scale(2.2) !important;
+            bottom: 120px !important;
+            transform: scale(1.75) !important;
           }
         }
 
@@ -808,6 +847,26 @@ export const AnimatedMotorcycle: React.FC = () => {
           animation: twinkle 1.8s ease-in-out infinite;
         }
 
+        /* 3D Flying Banner Trailer Animation behind Back Tyre */
+        @keyframes trailer-banner-wave {
+          0%, 100% {
+            transform: translateY(0px) rotate(-1.5deg) scale(1);
+          }
+          25% {
+            transform: translateY(-4px) rotate(1.8deg) scale(1.01);
+          }
+          50% {
+            transform: translateY(2px) rotate(-2.2deg) scale(0.99);
+          }
+          75% {
+            transform: translateY(-3px) rotate(1.2deg) scale(1.01);
+          }
+        }
+        .animate-trailer-banner {
+          animation: trailer-banner-wave 1.6s ease-in-out infinite;
+          transform-origin: right center;
+        }
+
       `}</style>
 
       {/* Visual Simulation Stage Container */}
@@ -886,6 +945,90 @@ export const AnimatedMotorcycle: React.FC = () => {
         <div className={`w-60 h-20 sm:w-80 sm:h-28 rounded-t-full shrink-0 transition-colors duration-1000 ${isNight ? "bg-[#F8FAFC]" : "bg-teal-600/15"}`} />
       </div>
 
+      {/* 2.3 CITY BUILDINGS ALONG THE ANIMATION ROAD */}
+      <div className="city-skyline-container">
+        <div className={`city-scrolling-layer ${selectedProcedure ? "paused" : ""}`}>
+          {[0, 1].map((stripIndex) => (
+            <div key={stripIndex} className="flex items-end justify-around w-1/2 shrink-0 px-2 sm:px-6 space-x-2 sm:space-x-6 pb-0">
+              
+              {/* Building 1: Skyscraper Tower */}
+              <div className={`relative w-14 sm:w-22 h-24 sm:h-40 ${isNight ? "bg-slate-900/90 border-slate-700/80" : "bg-slate-700/40 border-slate-600/50"} rounded-t-sm border-t-2 border-x shadow-md flex flex-col justify-between p-1 shrink-0 transition-colors duration-1000`}>
+                <div className="absolute -top-5 left-1/2 -translate-x-1/2 w-0.5 h-5 bg-slate-500">
+                  <span className="absolute -top-1 -left-1 w-2 h-2 rounded-full bg-red-500 animate-ping" />
+                </div>
+                <div className="grid grid-cols-3 gap-1 my-auto">
+                  {[...Array(9)].map((_, i) => (
+                    <div key={i} className={`h-2 rounded-xs ${i % 3 === 0 ? "bg-amber-300/90 shadow-[0_0_4px_#fde047]" : i % 2 === 0 ? "bg-cyan-300/70" : isNight ? "bg-slate-800/60" : "bg-white/40"}`} />
+                  ))}
+                </div>
+              </div>
+
+              {/* Street Lamp 1 */}
+              <div className="relative flex flex-col items-center shrink-0 bottom-0 h-14 sm:h-22">
+                <div className="w-1.5 h-full bg-slate-600 rounded-t-sm" />
+                <div className="absolute top-0 -left-2 w-5 h-1.5 bg-slate-500 rounded-full flex items-center justify-center">
+                  <div className={`w-2 h-2 rounded-full ${isNight ? "bg-amber-300 shadow-[0_0_12px_#fde047]" : "bg-amber-200"}`} />
+                </div>
+              </div>
+
+              {/* Building 2: Commercial Office Complex */}
+              <div className={`relative w-20 sm:w-28 h-20 sm:h-32 ${isNight ? "bg-slate-900/85 border-slate-700/70" : "bg-slate-800/35 border-slate-600/40"} rounded-t-md border-t border-x p-1.5 shrink-0 transition-colors duration-1000`}>
+                <div className="text-[6.5px] sm:text-[7.5px] font-mono font-bold text-amber-400 bg-black/60 px-1 py-0.5 rounded border border-amber-400/30 text-center mb-1.5 truncate">
+                  TECH PARK
+                </div>
+                <div className="grid grid-cols-4 gap-1">
+                  {[...Array(12)].map((_, i) => (
+                    <div key={i} className={`h-2 rounded-xs ${i % 4 === 1 ? "bg-sky-300/90 shadow-[0_0_4px_#38bdf8]" : i % 3 === 0 ? "bg-amber-200/80" : isNight ? "bg-slate-800/50" : "bg-white/30"}`} />
+                  ))}
+                </div>
+              </div>
+
+              {/* Building 3: Bike Care Garage Workshop */}
+              <div className={`relative w-22 sm:w-32 h-[4.2rem] sm:h-[6.8rem] ${isNight ? "bg-slate-950/95 border-amber-500/80" : "bg-slate-800/50 border-amber-600/70"} rounded-t-lg border-t-2 border-x p-1 shrink-0 transition-colors duration-1000`}>
+                <div className="bg-gradient-to-r from-red-600 to-amber-600 text-white text-[6.5px] sm:text-[8px] font-black tracking-wider text-center py-0.5 rounded shadow-sm uppercase mb-1">
+                  🔧 BIKE WORKSHOP
+                </div>
+                <div className="w-full h-8 sm:h-12 bg-black/70 rounded border border-slate-700/80 flex items-center justify-center relative overflow-hidden">
+                  <div className="w-10 h-6 bg-amber-400/20 rounded border border-amber-400/40 flex items-center justify-center text-[10px]">
+                    🏍️
+                  </div>
+                </div>
+              </div>
+
+              {/* Street Lamp 2 */}
+              <div className="relative flex flex-col items-center shrink-0 bottom-0 h-14 sm:h-22">
+                <div className="w-1.5 h-full bg-slate-600 rounded-t-sm" />
+                <div className="absolute top-0 -left-2 w-5 h-1.5 bg-slate-500 rounded-full flex items-center justify-center">
+                  <div className={`w-2 h-2 rounded-full ${isNight ? "bg-amber-300 shadow-[0_0_12px_#fde047]" : "bg-amber-200"}`} />
+                </div>
+              </div>
+
+              {/* Building 4: Telecom Antenna Tower */}
+              <div className={`relative w-12 sm:w-18 h-28 sm:h-44 ${isNight ? "bg-slate-900/90 border-slate-700/80" : "bg-slate-700/40 border-slate-600/50"} rounded-t-sm border-t-2 border-cyan-400/60 border-x p-1 shrink-0 transition-colors duration-1000`}>
+                <div className="absolute -top-7 left-1/2 -translate-x-1/2 w-1 h-7 bg-slate-500 flex justify-center">
+                  <div className="w-2 h-2 rounded-full bg-red-500 animate-ping" />
+                </div>
+                <div className="grid grid-cols-2 gap-1 mt-1">
+                  {[...Array(12)].map((_, i) => (
+                    <div key={i} className={`h-2.5 rounded-xs ${i % 2 === 0 ? "bg-amber-300/80 shadow-[0_0_5px_#fde047]" : "bg-cyan-200/60"}`} />
+                  ))}
+                </div>
+              </div>
+
+              {/* Building 5: Apartment Tower */}
+              <div className={`relative w-18 sm:w-26 h-22 sm:h-36 ${isNight ? "bg-slate-900/85 border-slate-700/70" : "bg-slate-800/35 border-slate-600/40"} rounded-t-md border-t border-x p-1.5 shrink-0 transition-colors duration-1000`}>
+                <div className="grid grid-cols-3 gap-1">
+                  {[...Array(12)].map((_, i) => (
+                    <div key={i} className={`h-2 rounded-xs ${i % 4 === 0 ? "bg-orange-300/80 shadow-[0_0_4px_#fdba74]" : i % 2 === 0 ? "bg-amber-100/70" : isNight ? "bg-slate-800/50" : "bg-white/30"}`} />
+                  ))}
+                </div>
+              </div>
+
+            </div>
+          ))}
+        </div>
+      </div>
+
       {/* 3. The Highway lines */}
       <div className="absolute inset-x-0 bottom-8 h-[2.5px] bg-slate-800 dark:bg-slate-700 highway-line-primary transition-all" />
       <div 
@@ -901,6 +1044,104 @@ export const AnimatedMotorcycle: React.FC = () => {
       {/* 4. Active Motorcycle Rider Group */}
       <div className={`bike-rider-unit ${selectedProcedure ? "docked" : ""}`}>
         
+        {/* 3D RANA BIKE CARE FLYING BANNER - SOLID OPAQUE HIGH-CONTRAST DESIGN */}
+        <div className="absolute -left-[46px] sm:-left-[62px] bottom-[86px] sm:bottom-[96px] w-[232px] sm:w-[274px] pointer-events-none z-50 select-none transform-gpu animate-trailer-banner opacity-100">
+          
+          {/* Modern 3D Signboard Card Floating Above Bike - Solid Opaque Background */}
+          <div className="relative rounded-2xl overflow-hidden bg-red-700 bg-gradient-to-r from-red-950 via-red-600 to-red-900 border-2 border-amber-300 shadow-[0_8px_30px_rgba(220,38,38,0.95),0_0_15px_rgba(245,158,11,0.6)] p-2 sm:p-2.5 text-white transform transition-transform opacity-100">
+            
+            {/* Glossy Metallic Light-Sweep & Spotlight overlay */}
+            <div className="absolute inset-0 bg-gradient-to-b from-white/20 via-transparent to-black/40 pointer-events-none" />
+            <div className="absolute -inset-full top-0 bg-gradient-to-r from-transparent via-white/10 to-transparent transform -skew-x-12 animate-pulse" />
+            
+            {/* Top Header Bar: Official Workshop badge & Emergency Contact */}
+            <div className="flex items-center justify-between border-b border-amber-300/50 pb-1 mb-1 relative z-10">
+              <div className="flex items-center space-x-1 sm:space-x-1.5 bg-black/60 px-1.5 sm:px-2 py-0.5 rounded-full border border-amber-300/40">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+                <span className="text-[8px] sm:text-[9.5px] font-black tracking-widest text-amber-200 uppercase">OFFICIAL WORKSHOP</span>
+              </div>
+              <span className="text-[8.5px] sm:text-[10px] font-mono font-black text-amber-300 bg-slate-950 px-1.5 sm:px-2 py-0.5 rounded-full border border-amber-400/60 shadow-md flex items-center space-x-1">
+                <span>📞</span>
+                <span className="tracking-wider">9766881194</span>
+              </span>
+            </div>
+
+            {/* Main Shop Name: High-impact Hindi & English typography */}
+            <div className="text-center my-1 relative z-10">
+              <h3 className="text-sm sm:text-lg leading-tight font-black tracking-tight text-white drop-shadow-[0_2px_6px_rgba(0,0,0,0.95)] font-sans">
+                राणा बाइक केयर
+              </h3>
+              <h4 className="text-[10px] sm:text-[11.5px] font-black tracking-[0.2em] text-amber-300 uppercase drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] leading-none mt-0.5">
+                RANA BIKE CARE
+              </h4>
+              <p className="text-[7px] sm:text-[8.5px] font-bold text-amber-100 tracking-wider uppercase mt-1">
+                ⚡ COMPLETE TWO-WHEELER SERVICE & REPAIR
+              </p>
+            </div>
+
+            {/* Bottom Multi-brand badge strip: Clean modern pill format */}
+            <div className="mt-1 pt-0.5 sm:pt-1 border-t border-amber-300/50 bg-white text-slate-900 rounded-xl px-1.5 sm:px-2 py-0.5 sm:py-1 flex items-center justify-around text-[7.5px] sm:text-[9px] font-black tracking-tighter shadow-md relative z-10">
+              <span className="text-red-700 bg-red-50 px-1.5 py-0.2 rounded border border-red-300/60">HERO</span>
+              <span className="text-blue-800 bg-blue-50 px-1.5 py-0.2 rounded border border-blue-300/60">TVS</span>
+              <span className="text-indigo-900 bg-indigo-50 px-1.5 py-0.2 rounded border border-indigo-300/60">BAJAJ</span>
+              <span className="text-red-600 bg-red-50 px-1.5 py-0.2 rounded border border-red-300/60">HONDA</span>
+              <span className="text-slate-950 bg-slate-100 px-1.5 py-0.2 rounded border border-slate-400/60">YAMAHA</span>
+            </div>
+
+          </div>
+
+        </div>
+
+        {/* Realistic Tether Ropes & Knots Tied DIRECTLY to Motorcycle Handlebars (104,18) & Rear Seat/Rack (38,34) */}
+        <svg className="absolute inset-0 w-full h-full overflow-visible pointer-events-none z-35" viewBox="0 0 140 85">
+          <defs>
+            <linearGradient id="rope-grad-tied" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#fef08a" />
+              <stop offset="50%" stopColor="#f59e0b" />
+              <stop offset="100%" stopColor="#b45309" />
+            </linearGradient>
+            <filter id="rope-shadow" x="-20%" y="-20%" width="140%" height="140%">
+              <feDropShadow dx="0" dy="1" stdDeviation="0.8" floodColor="#000" floodOpacity="0.6" />
+            </filter>
+          </defs>
+
+          {/* LEFT ROPE: From Banner Bottom-Left (x=-25, y=-2) down to Bike Rear Seat/Rack (x=38, y=34) */}
+          <g filter="url(#rope-shadow)">
+            <path d="M -25,-2 Q 10,16 38,34" fill="none" stroke="#451a03" strokeWidth="2.5" opacity="0.6" />
+            <path d="M -25,-2 Q 10,16 38,34" fill="none" stroke="url(#rope-grad-tied)" strokeWidth="2" />
+            <path d="M -25,-2 Q 10,16 38,34" fill="none" stroke="#fef08a" strokeWidth="0.8" strokeDasharray="2 1.5" className="animate-pulse" />
+          </g>
+
+          {/* RIGHT ROPE: From Banner Bottom-Right (x=165, y=-2) down to Bike Front Handlebar Stem (x=104, y=18) */}
+          <g filter="url(#rope-shadow)">
+            <path d="M 165,-2 Q 135,8 104,18" fill="none" stroke="#451a03" strokeWidth="2.5" opacity="0.6" />
+            <path d="M 165,-2 Q 135,8 104,18" fill="none" stroke="url(#rope-grad-tied)" strokeWidth="2" />
+            <path d="M 165,-2 Q 135,8 104,18" fill="none" stroke="#fef08a" strokeWidth="0.8" strokeDasharray="2 1.5" className="animate-pulse" />
+          </g>
+
+          {/* REAR SEAT KNOT & TIED LOOPS ON BIKE SEAT (38, 34) */}
+          <g className="animate-pulse" filter="url(#rope-shadow)">
+            {/* Loop wrapped around bike seat frame */}
+            <ellipse cx="38" cy="34" rx="3.5" ry="2" fill="none" stroke="#f59e0b" strokeWidth="1.8" />
+            <ellipse cx="38" cy="35" rx="4.5" ry="2.5" fill="none" stroke="#b45309" strokeWidth="1.2" />
+            <circle cx="38" cy="34" r="2.5" fill="#fef08a" stroke="#78350f" strokeWidth="0.8" />
+            {/* Tied loose rope tail hanging from rear seat */}
+            <path d="M 38,34 Q 36,40 34,44" fill="none" stroke="#f59e0b" strokeWidth="1.5" strokeLinecap="round" />
+            <path d="M 38,34 Q 40,40 41,43" fill="none" stroke="#b45309" strokeWidth="1.2" strokeLinecap="round" />
+          </g>
+
+          {/* FRONT HANDLEBAR KNOT & TIED LOOPS ON BIKE HANDLEBAR (104, 18) */}
+          <g className="animate-pulse" filter="url(#rope-shadow)">
+            {/* Loop wrapped around handlebar stem */}
+            <ellipse cx="104" cy="18" rx="3.5" ry="2" fill="none" stroke="#f59e0b" strokeWidth="1.8" />
+            <ellipse cx="104" cy="19" rx="4.5" ry="2.5" fill="none" stroke="#b45309" strokeWidth="1.2" />
+            <circle cx="104" cy="18" r="2.5" fill="#fef08a" stroke="#78350f" strokeWidth="0.8" />
+            {/* Tied loose rope tail hanging from handlebar */}
+            <path d="M 104,18 Q 106,24 108,28" fill="none" stroke="#f59e0b" strokeWidth="1.5" strokeLinecap="round" />
+            <path d="M 104,18 Q 102,23 100,26" fill="none" stroke="#b45309" strokeWidth="1.2" strokeLinecap="round" />
+          </g>
+        </svg>
+
         {/* Exhaust Smoke Generators */}
         <div className="absolute left-[8px] bottom-[16px] w-2 h-2">
           <div className="smoke-puff smoke-puff-1 w-3.5 h-3.5" />
@@ -1309,82 +1550,7 @@ export const AnimatedMotorcycle: React.FC = () => {
         </div>
       </div>
 
-      {/* Interactive Garage Control Dashboard on the top left */}
-      <div className="absolute top-5 left-5 z-20 flex flex-wrap items-center gap-2 sm:gap-3 bg-slate-950/85 text-white pl-4 pr-1.5 py-1.5 rounded-2xl border border-slate-800/80 backdrop-blur-sm transition-all duration-300 shadow-2xl max-w-[85%] md:max-w-none">
-        {/* Active model label (hidden on small viewports) */}
-        <div className="flex flex-col text-left pr-3 border-r border-slate-800/80 hidden sm:flex">
-          <span className="text-[7px] font-mono font-black text-slate-400 uppercase tracking-widest leading-none">BIKE STYLE</span>
-          <span className="text-xs font-black text-[#F97316] leading-tight mt-0.5 whitespace-nowrap">
-            {currentBike.name}
-          </span>
-        </div>
 
-        {/* Automatic Cycle Mode switch */}
-        <button
-          onClick={() => setAutoCycle((prev) => !prev)}
-          className={`border px-2.5 py-1.5 rounded-xl text-[9px] font-mono tracking-widest uppercase font-black transition-all flex items-center space-x-1.5 cursor-pointer ${
-            autoCycle 
-              ? "bg-emerald-950/40 border-emerald-800/70 text-[#58cc02] shadow-[0_0_10px_rgba(88,204,2,0.15)]" 
-              : "bg-slate-900 border-slate-800 text-slate-400 hover:text-slate-200"
-          }`}
-          title={autoCycle ? "Pause automatic cycling transitions" : "Enable automatic cycling transitions"}
-        >
-          <span className={`w-1.5 h-1.5 rounded-full ${autoCycle ? "bg-[#58cc02] animate-pulse" : "bg-slate-500"}`} />
-          <span>{autoCycle ? "Auto: On" : "Auto: Off"}</span>
-        </button>
-
-        {/* Shuffle/Cycle Bike trigger */}
-        <button
-          onClick={handleNextBike}
-          className="bg-slate-900 hover:bg-slate-800 border border-slate-800/60 text-[#F97316] px-2.5 py-1.5 rounded-xl text-[9px] font-mono tracking-widest uppercase font-black transition-all flex items-center space-x-1.5 cursor-pointer group"
-          title="Switch to next premium motorcycle model"
-        >
-          <span className="group-hover:rotate-12 transition-transform">🏍️</span>
-          <span className="hidden xs:inline">Next Bike</span>
-        </button>
-
-        {/* Cycle Procedure trigger */}
-        <button
-          onClick={handleNextProcedure}
-          className={`border px-2.5 py-1.5 rounded-xl text-[9px] font-mono tracking-widest uppercase font-black transition-all flex items-center space-x-1.5 cursor-pointer ${
-            selectedProcedure 
-              ? "bg-amber-950/40 border-amber-800/70 text-amber-400 shadow-[0_0_10px_rgba(245,158,11,0.15)]" 
-              : "bg-slate-900 border-slate-800 text-slate-400 hover:text-slate-200"
-          }`}
-          title="Toggle and cycle live service procedure overlays"
-        >
-          <span>🛠️</span>
-          <span>{selectedProcedure ? `Proc: ${selectedProcedure.toUpperCase()}` : "Procedure HUD"}</span>
-        </button>
-
-        {/* Day / Night Environment Toggle Switch */}
-        <div className="flex items-center bg-slate-900 border border-slate-800/60 p-0.5 rounded-xl">
-          <button
-            onClick={() => setIsNight(false)}
-            className={`flex items-center space-x-1 px-2.5 py-1 rounded-lg text-[9px] font-mono tracking-widest uppercase font-black transition-all cursor-pointer ${
-              !isNight
-                ? "bg-[#58cc02] text-white shadow-sm"
-                : "text-slate-500 hover:text-slate-300"
-            }`}
-            title="Switch to Daylight scenery"
-          >
-            <span>☀️</span>
-            <span className="hidden md:inline">Day</span>
-          </button>
-          <button
-            onClick={() => setIsNight(true)}
-            className={`flex items-center space-x-1 px-2.5 py-1 rounded-lg text-[9px] font-mono tracking-widest uppercase font-black transition-all cursor-pointer ${
-              isNight
-                ? "bg-[#1cb0f6] text-white shadow-sm"
-                : "text-slate-500 hover:text-slate-300"
-            }`}
-            title="Switch to Night sky simulation"
-          >
-            <span>🌙</span>
-            <span className="hidden md:inline">Night</span>
-          </button>
-        </div>
-      </div>
 
       {/* Mini Diagnostic Floating HUD (Visible in all sizes, fully integrated) */}
       {selectedProcedure && (

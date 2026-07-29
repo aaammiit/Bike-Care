@@ -6,6 +6,7 @@ import {
   mechanicData, 
   reviewsData, 
   galleryData, 
+  beforeAfterData,
   pricingPackages, 
   faqItems, 
   majorBrands,
@@ -13,10 +14,17 @@ import {
   clutchEngineImg,
   suspensionImg,
   foamWashImg,
-  engineOilImg
+  engineOilImg,
+  BeforeAfterItem
 } from "./garageData";
+import { 
+  SectionEditorModal, 
+  ServiceJourneyStep, 
+  WorkshopLogItem 
+} from "./SectionEditorModal";
 import { AnimatedMotorcycle } from "./AnimatedMotorcycle";
 import { CinematicNavbar } from "./CinematicNavbar";
+import { ServicesCarousel } from "./ServicesCarousel";
 import { 
   Wrench, 
   Clock, 
@@ -48,7 +56,9 @@ import {
   AlertTriangle,
   Menu,
   ChevronLeft,
-  DollarSign
+  DollarSign,
+  Upload,
+  Layers
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { ServiceType } from "../types";
@@ -211,6 +221,66 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenBooking, onNavig
 
   // Lightbox State
   const [lightboxImg, setLightboxImg] = useState<{ url: string; title: string; desc: string } | null>(null);
+
+  // Editable Website Sections State (Persisted in localStorage)
+  const [serviceJourneyStepsList, setServiceJourneyStepsList] = useState<ServiceJourneyStep[]>(() => {
+    const saved = localStorage.getItem("rana_service_journey_steps");
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch (e) {
+        console.error(e);
+      }
+    }
+    return serviceJourneySteps;
+  });
+
+  const [workshopLogsList, setWorkshopLogsList] = useState<WorkshopLogItem[]>(() => {
+    const saved = localStorage.getItem("rana_garage_logs");
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch (e) {
+        console.error(e);
+      }
+    }
+    return galleryData as WorkshopLogItem[];
+  });
+
+  const [beforeAfterList, setBeforeAfterList] = useState<BeforeAfterItem[]>(() => {
+    const saved = localStorage.getItem("rana_before_after_items");
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch (e) {
+        console.error(e);
+      }
+    }
+    return beforeAfterData;
+  });
+
+  const [isSectionEditorOpen, setIsSectionEditorOpen] = useState(false);
+  const [activeEditorSection, setActiveEditorSection] = useState<"journey" | "diaries" | "transformations">("journey");
+
+  const openSectionEditor = (section: "journey" | "diaries" | "transformations") => {
+    setActiveEditorSection(section);
+    setIsSectionEditorOpen(true);
+  };
+
+  const handleSaveJourneySteps = (updatedSteps: ServiceJourneyStep[]) => {
+    setServiceJourneyStepsList(updatedSteps);
+    localStorage.setItem("rana_service_journey_steps", JSON.stringify(updatedSteps));
+  };
+
+  const handleSaveWorkshopLogs = (updatedLogs: WorkshopLogItem[]) => {
+    setWorkshopLogsList(updatedLogs);
+    localStorage.setItem("rana_garage_logs", JSON.stringify(updatedLogs));
+  };
+
+  const handleSaveBeforeAfterItems = (updatedItems: BeforeAfterItem[]) => {
+    setBeforeAfterList(updatedItems);
+    localStorage.setItem("rana_before_after_items", JSON.stringify(updatedItems));
+  };
 
   // FAQ Accordion states
   const [openFaqIdx, setOpenFaqIdx] = useState<number | null>(null);
@@ -389,7 +459,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenBooking, onNavig
       if (isWhatsApp) {
         // Create prefilled WhatsApp text block
         const mapsUrl = generateGoogleMapsUrl(formLoc, gpsCoords);
-        const whatsappMessage = `*🏍️ RANA GARAGE APPOINTMENT REQUEST*
+        const whatsappMessage = `*🏍️ RANA BIKE CARE APPOINTMENT REQUEST*
 *Customer Details:*
 • Name: ${formName}
 • Phone: ${formPhone} (WhatsApp Active)
@@ -560,40 +630,47 @@ _Please confirm my slot on your dashboard, Master Rana. Thank you!_`;
       />
 
       {/* 2. HERO SECTION */}
-      <section id="home" className="relative pt-28 pb-10 md:pt-36 md:pb-14 overflow-hidden">
+      <section id="home" className="relative pt-12 pb-10 md:pt-16 md:pb-14 overflow-hidden">
         {/* Glow ambient effects */}
         <div className="absolute top-[-5%] left-[5%] w-[30rem] h-[30rem] bg-[#58cc02]/3 rounded-full blur-[110px] pointer-events-none" />
         <div className="absolute bottom-[5%] right-[5%] w-[25rem] h-[25rem] bg-[#1cb0f6]/3 rounded-full blur-[130px] pointer-events-none" />
- 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center space-y-8">
-          
+
+        {/* Hero Title & Badge at Top */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center space-y-3 mb-6">
           <motion.div 
-            initial={{ opacity: 0, y: -15 }}
+            initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="inline-flex items-center space-x-2 px-4 py-1.5 bg-brand-50 text-eager-green rounded-full border-2 border-brand-100 text-[11px] font-bold tracking-wider uppercase shadow-[0_2px_0_0_#d7ffb8]"
+            className="inline-flex items-center space-x-2 px-4 py-1.5 rounded-full bg-brand-50 border-2 border-brand-200 text-eager-green text-xs sm:text-sm font-bold tracking-wide"
           >
-            <Sparkles className="h-3.5 w-3.5 text-eager-green shrink-0" />
-            <span>Pune's Most Reliable Two-Wheeler Workshop</span>
+            <Sparkles className="h-4 w-4 animate-spin-slow text-eager-green" />
+            <span>PUNE'S MOST RELIABLE TWO-WHEELER WORKSHOP</span>
           </motion.div>
- 
-          <div className="space-y-4 max-w-4xl mx-auto">
-            <motion.h2 
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 }}
-              className="font-display font-black text-4xl sm:text-6xl lg:text-7xl leading-tight tracking-tight text-charcoal"
-            >
-              Rana Bike Care.
-            </motion.h2>
-          </div>
+
+          <motion.h1 
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="text-4xl sm:text-6xl md:text-7xl font-display font-black tracking-tight text-charcoal leading-[1.08]"
+          >
+            Rana Bike Care.
+          </motion.h1>
+
+          <motion.p
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="max-w-2xl mx-auto text-sm sm:text-base md:text-lg text-pencil-gray font-sans font-medium"
+          >
+            Expert repair, genuine OEM spare parts, engine overhaul & roadside assistance for all motorcycle models in Pune.
+          </motion.p>
         </div>
 
-        {/* Full Screen Width (Full Bleed) Interactive Riding Motorcycle animation block */}
+        {/* Interactive Riding Motorcycle animation block - full bleed edge-to-edge without side margins */}
         <motion.div 
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.3 }}
-          className="w-full py-2 relative z-10"
+          transition={{ delay: 0.1 }}
+          className="w-full px-0 pt-0 pb-2 relative z-10"
         >
           <div className="w-full">
             <AnimatedMotorcycle />
@@ -689,122 +766,23 @@ _Please confirm my slot on your dashboard, Master Rana. Thank you!_`;
 
       {/* 4. INTERACTIVE SERVICES CATALOG SECTION */}
       <section id="services" className="py-10 md:py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
           
           <AnimatedSectionHeader
             badge="GARAGE SERVICES DECK"
             title="Tuned and Treated to Perfection."
-            description="We diagnose and repair all motorcycle categories with 100% genuine spares across every bike model."
+            description="We diagnose and repair all motorcycle categories with 100% genuine spares across every bike model. Explore our animated single-row service carousel below."
           />
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {[
-              { 
-                title: "General Maintenance", 
-                bikeModel: "Hero Splendor / Honda Shine",
-                img: engineOilImg,
-                desc: "42-point safety checkup, oil dipstick level test, chain tension adjust, filter cleaning, clean spark plugs.", 
-                status: "Included Work", 
-                icon: Wrench 
-              },
-              { 
-                title: "Engine & Clutch Repair", 
-                bikeModel: "Royal Enfield Bullet 350",
-                img: clutchEngineImg,
-                desc: "Clutch basket friction plate assembly, valve lapping, piston rings replacement, synthetic oil flushing.", 
-                status: "Expert Engine Bay", 
-                icon: Gauge 
-              },
-              { 
-                title: "Brakes & Shock Suspension", 
-                bikeModel: "KTM Duke 200 / 390",
-                img: suspensionImg,
-                desc: "Rear shock absorber tuning, caliper cleaning, ceramic brake pads fitting, WP fork oil seal replacement.", 
-                status: "Safety Checked", 
-                icon: Activity 
-              },
-              { 
-                title: "Scooter Hydraulic Lift Bay", 
-                bikeModel: "Honda Activa / Jupiter / Vespa",
-                img: workshopLiftImg,
-                desc: "Elevated hydraulic lift servicing for scooters, variator belt checks, brake drum cleaning & oil change.", 
-                status: "Lift Bay Active", 
-                icon: Bike 
-              },
-              { 
-                title: "Foam Snow Wash & Teflon", 
-                bikeModel: "Vintage Cruiser / Street Bikes",
-                img: foamWashImg,
-                desc: "High-pressure active foam wash, microfiber wiping, tire gloss shine, buffer wax orbital Teflon polishing.", 
-                status: "Gloss Finished", 
-                icon: Sparkles 
-              },
-              { 
-                title: "Battery & Electricals", 
-                bikeModel: "TVS Apache / Pulsar",
-                img: "https://images.unsplash.com/photo-1558981403-c5f9899a28bc?auto=format&fit=crop&w=600&q=80",
-                desc: "Exide battery load testing, wiring loom short diagnostics, solid-state starter relay fitting, bulb wraps.", 
-                status: "Diagnostic Check", 
-                icon: Sparkles 
-              },
-              { 
-                title: "Chain & Drive Repair", 
-                bikeModel: "Yamaha R15 V4 / MT-15",
-                img: "https://images.unsplash.com/photo-1508962914676-134849a727f0?auto=format&fit=crop&w=600&q=80",
-                desc: "Gold O-ring heavy-duty drive chain installation, laser alignment, wheel tension checking.", 
-                status: "Precision Setup", 
-                icon: Sliders 
-              },
-              { 
-                title: "Carburetor & ECU Tune", 
-                bikeModel: "Kawasaki Ninja / Sports",
-                img: "https://images.unsplash.com/photo-1609630875171-b1321377ee65?auto=format&fit=crop&w=600&q=80",
-                desc: "Mikuni carb dismantling, sonic cleaning, float setups, fuel-map OBD flashing for maximum throttle response.", 
-                status: "Tuning Bench", 
-                icon: Cpu 
-              }
-            ].map((service, idx) => {
-              const IconComp = service.icon;
-              return (
-                <div
-                  key={idx}
-                  className="duo-card hover:border-spark-blue hover:-translate-y-1 hover:shadow-[0_4px_0_0_#1899d6] transition-all duration-200 group relative overflow-hidden flex flex-col justify-between bg-white text-charcoal rounded-2xl border-2 border-slate-200"
-                >
-                  <div className="relative h-44 w-full overflow-hidden bg-slate-100">
-                    <img 
-                      src={service.img} 
-                      alt={service.title} 
-                      referrerPolicy="no-referrer"
-                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent" />
-                    <span className="absolute top-3 left-3 bg-slate-900/90 text-white font-mono text-[9px] font-bold px-2.5 py-1 rounded-md backdrop-blur-md border border-slate-700">
-                      🏍️ {service.bikeModel}
-                    </span>
-                    <div className="absolute bottom-2.5 left-3 p-2 bg-sky-50 text-spark-blue border-2 border-sky-100 rounded-xl shrink-0">
-                      <IconComp className="h-5 w-5" />
-                    </div>
-                  </div>
-
-                  <div className="p-5 flex-1 flex flex-col justify-between space-y-3">
-                    <div className="text-left space-y-1.5">
-                      <h3 className="font-display font-black text-base text-charcoal group-hover:text-spark-blue transition-colors">
-                        {service.title}
-                      </h3>
-                      <p className="text-xs text-pencil-gray font-medium leading-relaxed">
-                        {service.desc}
-                      </p>
-                    </div>
-
-                    <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
-                      <span className="text-pencil-gray font-bold text-[11px]">Work Category</span>
-                      <span className="text-spark-blue font-extrabold text-[11px] uppercase tracking-wide">{service.status}</span>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+          {/* Animated Single Row Carousel */}
+          <ServicesCarousel 
+            onSelectService={(serviceName) => {
+              playDiagnosticBeep(800, 100);
+              setFormCategory(serviceName);
+              setFormDesc(`Requesting service: "${serviceName}" from single row carousel.`);
+              setIsBookingModalOpen(true);
+            }} 
+          />
 
         </div>
       </section>
@@ -1369,6 +1347,9 @@ _Please confirm my slot on your dashboard, Master Rana. Thank you!_`;
                   src={activeMechanic.photo} 
                   alt={activeMechanic.name} 
                   referrerPolicy="no-referrer"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1568602471122-7832951cc4c5?auto=format&fit=crop&w=400&h=400&q=80";
+                  }}
                   className="w-full h-full object-cover"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent opacity-80" />
@@ -1457,17 +1438,28 @@ _Please confirm my slot on your dashboard, Master Rana. Thank you!_`;
       </section>
 
       {/* 10. VISUAL SERVICE JOURNEY */}
-      <section id="journey" className="py-12 md:py-16 border-t-2 border-b-2 bg-gradient-to-b from-slate-50 to-slate-100 dark:from-slate-950 dark:to-slate-900 border-slate-200/60 [perspective:1500px] overflow-hidden">
+      <section id="journey" className="py-12 md:py-16 border-t-2 border-b-2 bg-gradient-to-b from-slate-50 to-slate-100 dark:from-slate-950 dark:to-slate-900 border-slate-200/60 dark:border-slate-800 [perspective:1500px] overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           
-          <AnimatedSectionHeader
-            badge="WORKSHOP PIPELINE 3D"
-            title="Our Service Journey"
-            description="We maintain absolute transparency at every phase. See how your motorcycle moves smoothly from digital submission to diagnostics, tuning, and pristine road testing inside our interactive 3D pipeline."
-          />
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-6">
+            <div className="flex-grow">
+              <AnimatedSectionHeader
+                badge="WORKSHOP PIPELINE 3D"
+                title="Our Service Journey"
+                description="We maintain absolute transparency at every phase. See how your motorcycle moves smoothly from digital submission to diagnostics, tuning, and pristine road testing inside our interactive 3D pipeline."
+              />
+            </div>
+            <button
+              onClick={() => openSectionEditor("journey")}
+              className="px-4 py-2.5 bg-slate-900 dark:bg-slate-800 hover:bg-slate-800 dark:hover:bg-slate-700 text-orange-400 font-mono font-bold text-xs rounded-xl border-2 border-orange-500/50 hover:border-orange-500 flex items-center space-x-2 transition shadow-lg cursor-pointer shrink-0"
+            >
+              <Upload className="h-4 w-4 text-orange-500" />
+              <span>🔧 Upload Photos & Edit Journey</span>
+            </button>
+          </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 max-w-7xl mx-auto mt-12">
-            {serviceJourneySteps.map((step, idx) => (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 max-w-7xl mx-auto mt-8">
+            {serviceJourneyStepsList.map((step, idx) => (
               <motion.div
                 key={idx}
                 initial={{ opacity: 0, y: 50, rotateX: -15 }}
@@ -1494,6 +1486,9 @@ _Please confirm my slot on your dashboard, Master Rana. Thank you!_`;
                     src={step.img} 
                     alt={step.title} 
                     referrerPolicy="no-referrer"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1558981806-ec527fa84c39?auto=format&fit=crop&q=80&w=1200";
+                    }}
                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 group-hover:rotate-1"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/30 to-transparent" />
@@ -1550,18 +1545,29 @@ _Please confirm my slot on your dashboard, Master Rana. Thank you!_`;
       </section>
 
       {/* 11. REPAIR PORTFOLIO GALLERY (Masonry Grid with Lightbox Preview) */}
-      <section id="gallery" className={`py-12 md:py-16 border-t ${isDarkMode ? "bg-slate-950/40 border-slate-900/60" : "bg-slate-100/70 border-slate-200"}`}>
+      <section id="gallery" className={`py-12 md:py-16 border-t border-b ${isDarkMode ? "bg-slate-950/40 border-slate-900/60" : "bg-slate-100/70 border-slate-200"}`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           
-          <AnimatedSectionHeader
-            badge="ACTIVE WORKSHOP JOBS"
-            title="Workshop Diaries. Real Garage Logs."
-            description="Inspect authentic mechanical repair logs straight from our Koregaon Park service bays. Click any job card to view Rana's grease-stained physical workshop workbench file, diagnostics, and tools used."
-          />
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-6">
+            <div className="flex-grow">
+              <AnimatedSectionHeader
+                badge="ACTIVE WORKSHOP JOBS"
+                title="Workshop Diaries. Real Garage Logs."
+                description="Inspect authentic mechanical repair logs straight from our Koregaon Park service bays. Click any job card to view Rana's grease-stained physical workshop workbench file, diagnostics, and tools used."
+              />
+            </div>
+            <button
+              onClick={() => openSectionEditor("diaries")}
+              className="px-4 py-2.5 bg-slate-900 dark:bg-slate-800 hover:bg-slate-800 dark:hover:bg-slate-700 text-orange-400 font-mono font-bold text-xs rounded-xl border-2 border-orange-500/50 hover:border-orange-500 flex items-center space-x-2 transition shadow-lg cursor-pointer shrink-0"
+            >
+              <Upload className="h-4 w-4 text-orange-500" />
+              <span>🔧 Upload Photos & Edit Garage Logs</span>
+            </button>
+          </div>
 
           {/* Masonry-like layout columns */}
-          <div className="columns-1 sm:columns-2 md:columns-3 lg:columns-4 gap-6 space-y-6 mt-12">
-            {galleryData.map((item) => {
+          <div className="columns-1 sm:columns-2 md:columns-3 lg:columns-4 gap-6 space-y-6 mt-8">
+            {workshopLogsList.map((item) => {
               // Dynamically associate realistic greasy garage workshop logs based on ID
               const getWorkshopMeta = (id: string) => {
                 const logs: Record<string, { tool: string; diagnostic: string; spec: string; technician: string; greaseLevel: string; severity: string }> = {
@@ -1576,7 +1582,7 @@ _Please confirm my slot on your dashboard, Master Rana. Thank you!_`;
                   g9: { tool: "Sonic Jet Carb Solvents", diagnostic: "Mikuni carburettor float chamber pin stuck, running rich.", spec: "Adjusted brass float, chemically cleared jets", technician: "Rana Singh", greaseLevel: "80% Solvent", severity: "HIGH" },
                   g10: { tool: "Heavy Torque Wrench", diagnostic: "Flange joint manifold gasket blown, loud decibel leak.", spec: "Fitted dual-wall gasket, torqued 35 Nm", technician: "Dilpreet Singh", greaseLevel: "40% Exhaust", severity: "MEDIUM" },
                 };
-                return logs[id] || { tool: "General Handtools", diagnostic: "Routine wear & mechanical verification checklist.", spec: "Verified 5km road-test passed", technician: "Rana Singh", greaseLevel: "30% Greasy", severity: "MEDIUM" };
+                return logs[id] || { tool: (item as any).tool || "General Handtools", diagnostic: (item as any).diagnostic || item.desc, spec: (item as any).spec || "Verified 5km road-test passed", technician: (item as any).technician || "Rana Singh", greaseLevel: (item as any).greaseLevel || "30% Greasy", severity: (item as any).severity || "MEDIUM" };
               };
 
               const meta = getWorkshopMeta(item.id);
@@ -1588,7 +1594,6 @@ _Please confirm my slot on your dashboard, Master Rana. Thank you!_`;
                     url: item.img, 
                     title: item.title, 
                     desc: item.desc,
-                    // Pass extra greasy details to the custom job card lightbox!
                     tool: meta.tool,
                     diagnostic: meta.diagnostic,
                     spec: meta.spec,
@@ -1612,6 +1617,9 @@ _Please confirm my slot on your dashboard, Master Rana. Thank you!_`;
                       src={item.img} 
                       alt={item.title} 
                       referrerPolicy="no-referrer"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1558981806-ec527fa84c39?auto=format&fit=crop&q=80&w=1200";
+                      }}
                       className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-transparent to-transparent opacity-80" />
@@ -1716,6 +1724,9 @@ _Please confirm my slot on your dashboard, Master Rana. Thank you!_`;
                     src={lightboxImg.url} 
                     alt={lightboxImg.title} 
                     referrerPolicy="no-referrer"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1558981806-ec527fa84c39?auto=format&fit=crop&q=80&w=1200";
+                    }}
                     className="w-full h-full object-cover"
                   />
                   {/* Grease Stamp Overlay */}
@@ -1853,6 +1864,9 @@ _Please confirm my slot on your dashboard, Master Rana. Thank you!_`;
                           src={displayReviews[activeReviewIdx % displayReviews.length]?.photo} 
                           alt={displayReviews[activeReviewIdx % displayReviews.length]?.name} 
                           referrerPolicy="no-referrer"
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80";
+                          }}
                           className="w-12 h-12 rounded-full border border-slate-200 dark:border-slate-800 object-cover"
                         />
                         <div className="text-left">
@@ -2107,18 +2121,7 @@ _Please confirm my slot on your dashboard, Master Rana. Thank you!_`;
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-10 text-left">
             
             {/* Column 1: Logo and motto */}
-            <div className="space-y-4">
-              <div className="flex items-center space-x-2.5">
-                <div className="bg-[#F97316] text-white p-1.5 rounded-lg">
-                  <Wrench className="h-4 w-4" />
-                </div>
-                <h3 className="font-display font-black text-lg text-slate-900 dark:text-white">RANA GARAGE</h3>
-              </div>
-              <p className="text-xs leading-relaxed text-slate-500">
-                Premium motorcycle diagnostic testing and repair solutions. 100% offline payment guarantees with absolute transparency since 2026.
-              </p>
-            </div>
-
+            
             {/* Column 2: Navigation shortcut */}
             <div className="space-y-3.5">
               <h4 className="text-xs font-bold text-slate-800 dark:text-white font-mono uppercase tracking-wider">Quick Jump Links</h4>
@@ -2168,7 +2171,7 @@ _Please confirm my slot on your dashboard, Master Rana. Thank you!_`;
           {/* Copyright notice row */}
           <div className="pt-8 border-t border-slate-200 dark:border-slate-900 flex flex-col sm:flex-row justify-between items-center gap-4 text-xs">
             <p className="text-slate-500">
-              © {new Date().getFullYear()} Rana Garage. All rights reserved. Registered under Maharashtra Automotive Association.
+              © {new Date().getFullYear()} Rana Bike Care. All rights reserved. Registered under Maharashtra Automotive Association.
             </p>
             <p className="text-slate-500 flex items-center">
               Designed with ❤️ for Pune Riders
@@ -2231,7 +2234,7 @@ _Please confirm my slot on your dashboard, Master Rana. Thank you!_`;
                   </a>
                 ) : (
                   <a
-                    href={`https://wa.me/919767824216?text=${encodeURIComponent(`*🏍️ RANA GARAGE APPOINTMENT REQUEST*\nName: ${formName}\nPhone: ${formPhone}\nBike: ${formBrand} ${formModel}\nDate: ${formDate}`)}`}
+                    href={`https://wa.me/919767824216?text=${encodeURIComponent(`*🏍️ RANA BIKE CARE APPOINTMENT REQUEST*\nName: ${formName}\nPhone: ${formPhone}\nBike: ${formBrand} ${formModel}\nDate: ${formDate}`)}`}
                     target="_blank"
                     rel="noreferrer"
                     className="w-full bg-emerald-600 hover:bg-emerald-500 text-white py-3.5 rounded-xl text-xs font-black uppercase tracking-widest transition shadow-lg shadow-emerald-500/20 flex items-center justify-center space-x-2"
@@ -2252,6 +2255,19 @@ _Please confirm my slot on your dashboard, Master Rana. Thank you!_`;
           </div>
         )}
       </AnimatePresence>
+
+      {/* 17. MECHANIC WEBSITE SECTION CONTENT MANAGER MODAL */}
+      <SectionEditorModal
+        isOpen={isSectionEditorOpen}
+        onClose={() => setIsSectionEditorOpen(false)}
+        sectionType={activeEditorSection}
+        journeySteps={serviceJourneyStepsList}
+        onSaveJourneySteps={handleSaveJourneySteps}
+        workshopLogs={workshopLogsList}
+        onSaveWorkshopLogs={handleSaveWorkshopLogs}
+        beforeAfterItems={beforeAfterList}
+        onSaveBeforeAfterItems={handleSaveBeforeAfterItems}
+      />
 
     </div>
   );
