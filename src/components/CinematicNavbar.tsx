@@ -594,15 +594,28 @@ export const CinematicNavbar: React.FC<CinematicNavbarProps> = ({
               onClick={(e) => e.stopPropagation()} // Prevent closing when clicking drawer content
             >
               <div className="space-y-7">
-                {/* Mobile Drawer Top logo profile card */}
-                <div className="flex items-center space-x-3.5 pb-5 border-b border-orange-500/10">
-                  <div className="w-10 h-10 bg-white border border-slate-200 dark:border-slate-800 p-0.5 rounded-xl shadow-md overflow-hidden shrink-0">
-                    <img src={ranaLogo} alt="Rana Bike Care Logo" className="w-full h-full object-contain rounded-lg" />
+                {/* Mobile Drawer Top logo profile card with Close Button */}
+                <div className="flex items-center justify-between pb-5 border-b border-orange-500/10">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-10 h-10 bg-white border border-slate-200 dark:border-slate-800 p-0.5 rounded-xl shadow-md overflow-hidden shrink-0">
+                      <img src={ranaLogo} alt="Rana Bike Care Logo" className="w-full h-full object-contain rounded-lg" />
+                    </div>
+                    <div>
+                      <h2 className="font-display font-black text-base sm:text-lg leading-none tracking-tight">RANA BIKE CARE</h2>
+                      <p className="text-[10px] text-orange-500 font-mono tracking-widest uppercase mt-0.5 font-bold">Precision Garage</p>
+                    </div>
                   </div>
-                  <div>
-                    <h2 className="font-display font-black text-lg leading-none tracking-tight">RANA BIKE CARE</h2>
-                    <p className="text-[10px] text-orange-500 font-mono tracking-widest uppercase mt-0.5 font-bold">Precision Garage</p>
-                  </div>
+                  <button
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className={`p-2 rounded-xl transition-all cursor-pointer border ${
+                      isDarkMode
+                        ? "bg-slate-900 border-slate-800 text-slate-300 hover:text-white hover:bg-slate-800"
+                        : "bg-slate-100 border-slate-200 text-slate-600 hover:text-slate-900 hover:bg-slate-200"
+                    }`}
+                    aria-label="Close menu"
+                  >
+                    <X className="h-5 w-5" />
+                  </button>
                 </div>
 
                 {/* Navigation lists (fading in one after another) */}
