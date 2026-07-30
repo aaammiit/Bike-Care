@@ -226,6 +226,7 @@
 
 /* Shudder damper/shock test animation */
 .shudder-effect {
+  will-change: transform;
   animation: shockShudder 0.3s ease-in-out infinite alternate;
 }
 
@@ -244,6 +245,7 @@
   background: rgba(255, 255, 255, 0.95);
   border-radius: 50%;
   box-shadow: 0 0 6px rgba(255, 255, 255, 0.7);
+  will-change: transform, opacity;
   animation: dripFall 1.2s cubic-bezier(0.4, 0, 1, 1) infinite;
   pointer-events: none;
 }
@@ -273,6 +275,7 @@
   background: #f97316;
   box-shadow: 0 0 8px #f97316, 0 0 12px #ef4444;
   border-radius: 50%;
+  will-change: transform, opacity;
   animation: sparkBlast 0.7s cubic-bezier(0.25, 1, 0.5, 1) forwards;
   opacity: 0;
 }
@@ -293,6 +296,7 @@
   border: 2px solid #ec4899;
   border-radius: 50%;
   box-shadow: 0 0 12px #ec4899;
+  will-change: transform, opacity;
   animation: rippleExpand 0.9s cubic-bezier(0.1, 0.8, 0.3, 1) infinite;
   opacity: 0;
 }

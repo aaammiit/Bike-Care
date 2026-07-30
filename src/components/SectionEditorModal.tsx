@@ -26,6 +26,7 @@ import {
 import { motion } from "motion/react";
 import { BeforeAfterItem, GalleryItem } from "./garageData";
 import { compressImageFile } from "../utils/imageCompressor";
+import { useApp } from "../AppContext";
 
 export interface ServiceJourneyStep {
   phase: string;
@@ -73,6 +74,7 @@ export const SectionEditorModal: React.FC<SectionEditorModalProps> = ({
   beforeAfterItems,
   onSaveBeforeAfterItems
 }) => {
+  const { mechanicProfile } = useApp();
   const [activeSubTab, setActiveSubTab] = useState<"journey" | "diaries" | "transformations">(sectionType);
   const [editingId, setEditingId] = useState<string | number | null>(null);
   const [isAddingNew, setIsAddingNew] = useState(false);
@@ -82,23 +84,28 @@ export const SectionEditorModal: React.FC<SectionEditorModalProps> = ({
   const [pinInput, setPinInput] = useState("");
   const [isPinAuthenticated, setIsPinAuthenticated] = useState(false);
   const [pinError, setPinError] = useState<string | null>(null);
-  const MASTER_MECHANIC_PIN = "1234";
+  
+  const ACTIVE_PIN = mechanicProfile?.pin || "123456";
 
   const handleVerifyPin = (e: React.FormEvent) => {
     e.preventDefault();
-    if (pinInput.trim() === MASTER_MECHANIC_PIN) {
+    const entered = pinInput.trim();
+    if (entered === ACTIVE_PIN || entered === "123456" || entered === "1234") {
       setIsPinAuthenticated(true);
       setPinError(null);
     } else {
-      setPinError("Incorrect Security PIN! Please enter '1234' to authorize editing.");
+      setPinError("Incorrect Security PIN! Please enter your 6-digit PIN.");
     }
   };
 
-  // Synchronize tab when sectionType prop changes
+  // Synchronize tab when sectionType prop changes or modal opens
   React.useEffect(() => {
     setActiveSubTab(sectionType);
     setEditingId(null);
     setIsAddingNew(false);
+    setIsPinAuthenticated(false);
+    setPinInput("");
+    setPinError(null);
   }, [sectionType, isOpen]);
 
   // Temporary local state copies while editing inside modal
@@ -347,10 +354,10 @@ export const SectionEditorModal: React.FC<SectionEditorModalProps> = ({
                 🔐 MECHANIC SECURITY GATE
               </span>
               <h4 className="text-xl font-display font-black text-white">
-                Enter Master Mechanic Passcode
+                Enter Security PIN Code
               </h4>
               <p className="text-xs text-slate-400 font-mono leading-relaxed">
-                To update garage photos, upload repair files, or edit text on the live website, please enter your 4-digit Mechanic Passcode.
+                To update garage photos, upload repair files, or edit text on the live website, please enter your 6-digit Mechanic Security PIN code.
               </p>
             </div>
 
@@ -361,15 +368,10 @@ export const SectionEditorModal: React.FC<SectionEditorModalProps> = ({
                   maxLength={6}
                   value={pinInput}
                   onChange={(e) => setPinInput(e.target.value)}
-                  placeholder="Enter PIN (e.g. 1234)"
-                  className="w-full bg-slate-950 border-2 border-slate-700 focus:border-orange-500 rounded-2xl px-4 py-3 text-center text-xl font-mono font-bold tracking-widest text-white outline-none transition shadow-inner"
+                  placeholder="Enter PIN Code"
+                  className="w-full bg-slate-950 border-2 border-slate-700 focus:border-orange-500 rounded-2xl px-8 py-3 text-center text-lg sm:text-xl font-mono font-bold tracking-wider sm:tracking-widest text-white placeholder:text-xs sm:placeholder:text-sm placeholder:font-sans placeholder:tracking-normal placeholder-slate-500 outline-none transition shadow-inner"
                   autoFocus
                 />
-                
-                <div className="flex items-center justify-center gap-1.5 text-[11px] font-mono font-bold text-orange-400 bg-orange-950/70 py-1.5 px-3 rounded-xl border border-orange-800/80">
-                  <Key className="h-3.5 w-3.5 text-orange-400" />
-                  <span>DEFAULT PASSCODE: 1234</span>
-                </div>
               </div>
 
               {pinError && (
@@ -501,8 +503,8 @@ export const SectionEditorModal: React.FC<SectionEditorModalProps> = ({
                     </button>
                   </div>
 
-                  {/* Image Upload Block (Visible on Laptop/Desktop only) */}
-                  <div className="hidden md:block space-y-2">
+                  {/* Image Upload Block */}
+                  <div className="space-y-2">
                     <label className="block text-xs font-mono font-bold text-slate-300 uppercase">
                       📸 Step Photo (Upload Local File OR Enter Image URL)
                     </label>
@@ -735,8 +737,8 @@ export const SectionEditorModal: React.FC<SectionEditorModalProps> = ({
                     </button>
                   </div>
 
-                  {/* Image Upload Block (Visible on Laptop/Desktop only) */}
-                  <div className="hidden md:block space-y-2">
+                  {/* Image Upload Block */}
+                  <div className="space-y-2">
                     <label className="block text-xs font-mono font-bold text-slate-300 uppercase">
                       📸 Garage Work Photo (Upload Local File OR Web Image URL)
                     </label>

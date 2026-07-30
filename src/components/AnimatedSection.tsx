@@ -34,6 +34,7 @@ export const AnimatedSection: React.FC<AnimatedSectionProps> = ({
         delay,
         ease: [0.215, 0.61, 0.355, 1.0] // cubic-bezier smooth ease-out
       }}
+      style={{ willChange: "transform, opacity", ...props.style }}
       className={`transform-gpu ${className}`}
       {...props}
     >

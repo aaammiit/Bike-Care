@@ -1,5 +1,6 @@
-// Deep Bass Motorcycle Engine Sound Synthesizer & Audio Manager for Website Intro
-// Features starting 3-second trim support, sub-bass booster, dynamic engine revs, and progress-based volume fading
+// Deep Bass Motorcycle Engine Sound Manager for Website Intro
+// Supports playing custom audio files (MP3/WAV/etc.), local storage audio persistence,
+// 3.0-second start trimming, dynamic engine revs, and fallback synth.
 
 export class IntroAudioManager {
   private ctx: AudioContext | null = null;
@@ -14,17 +15,47 @@ export class IntroAudioManager {
   private noiseNode: AudioBufferSourceNode | null = null;
   private noiseGain: GainNode | null = null;
 
-  // External Audio Buffer Source
-  private audioBufferSource: AudioBufferSourceNode | null = null;
+  // External Audio File Player
   private audioElement: HTMLAudioElement | null = null;
+  private customAudioUrl: string | null = null;
+  private isUsingFileAudio = false;
 
   private isRunning = false;
   private isMuted = false;
   private currentProgress = 0;
-  private trimStartSeconds = 3.0; // Automatically trim starting 3 seconds as requested!
+  private trimStartSeconds = 3.0; // Trim starting 3 seconds as requested
 
   constructor(trimStartSeconds = 3.0) {
     this.trimStartSeconds = trimStartSeconds;
+    // Check localStorage for user-uploaded custom bike sound
+    try {
+      const storedAudio = localStorage.getItem("custom_bike_sound_url");
+      if (storedAudio) {
+        this.customAudioUrl = storedAudio;
+      }
+    } catch {}
+  }
+
+  public setCustomAudioSource(urlOrDataUri: string): void {
+    this.customAudioUrl = urlOrDataUri;
+    try {
+      localStorage.setItem("custom_bike_sound_url", urlOrDataUri);
+    } catch {}
+    if (this.isRunning) {
+      this.stopAll();
+      this.startEngine();
+    }
+  }
+
+  public removeCustomAudioSource(): void {
+    this.customAudioUrl = null;
+    try {
+      localStorage.removeItem("custom_bike_sound_url");
+    } catch {}
+    if (this.isRunning) {
+      this.stopAll();
+      this.startEngine();
+    }
   }
 
   private initCtx(): boolean {
@@ -39,22 +70,18 @@ export class IntroAudioManager {
     }
 
     if (!this.masterGain && this.ctx) {
-      // Master Gain for smooth volume control & fading - set to high clear volume
       this.masterGain = this.ctx.createGain();
-      this.masterGain.gain.setValueAtTime(this.isMuted ? 0 : 0.55, this.ctx.currentTime);
+      this.masterGain.gain.setValueAtTime(this.isMuted ? 0 : 0.6, this.ctx.currentTime);
 
-      // Deep Sub-Bass Booster (Low Shelf Filter at 65Hz with +18dB massive bass boost)
       this.bassFilter = this.ctx.createBiquadFilter();
       this.bassFilter.type = "lowshelf";
       this.bassFilter.frequency.setValueAtTime(65, this.ctx.currentTime);
-      this.bassFilter.gain.setValueAtTime(18, this.ctx.currentTime); // +18dB Heavy Sub-Bass!
+      this.bassFilter.gain.setValueAtTime(18, this.ctx.currentTime);
 
-      // Lowpass Filter for realistic mechanical exhaust resonance
       this.lowpassFilter = this.ctx.createBiquadFilter();
       this.lowpassFilter.type = "lowpass";
       this.lowpassFilter.frequency.setValueAtTime(850, this.ctx.currentTime);
 
-      // Connect Chain
       this.masterGain.connect(this.bassFilter);
       this.bassFilter.connect(this.lowpassFilter);
       this.lowpassFilter.connect(this.ctx.destination);
@@ -63,55 +90,97 @@ export class IntroAudioManager {
     return true;
   }
 
-  // Load and play an external audio file/URL starting strictly AFTER trimming 3 seconds
-  public async playAudioUrl(url: string, trimSeconds = 3.0): Promise<void> {
-    this.trimStartSeconds = trimSeconds;
-    if (!this.initCtx() || !this.ctx || !this.masterGain) return;
-
+  private stopOscillators(): void {
     try {
-      const response = await fetch(url);
-      const arrayBuffer = await response.arrayBuffer();
-      const decodedBuffer = await this.ctx.decodeAudioData(arrayBuffer);
-
-      if (this.audioBufferSource) {
-        try { this.audioBufferSource.stop(); } catch {}
+      if (this.subOsc) {
+        this.subOsc.stop();
+        this.subOsc.disconnect();
+        this.subOsc = null;
       }
-
-      this.audioBufferSource = this.ctx.createBufferSource();
-      this.audioBufferSource.buffer = decodedBuffer;
-      this.audioBufferSource.connect(this.masterGain);
-
-      const now = this.ctx.currentTime;
-      // TRIM STARTING 3 SECONDS: play starting from trimSeconds (3.0s offset)
-      const offset = Math.min(trimSeconds, decodedBuffer.duration - 0.5);
-      this.audioBufferSource.start(now, offset);
-      this.isRunning = true;
+      if (this.mainOsc) {
+        this.mainOsc.stop();
+        this.mainOsc.disconnect();
+        this.mainOsc = null;
+      }
+      if (this.harmonicOsc) {
+        this.harmonicOsc.stop();
+        this.harmonicOsc.disconnect();
+        this.harmonicOsc = null;
+      }
+      if (this.noiseNode) {
+        this.noiseNode.stop();
+        this.noiseNode.disconnect();
+        this.noiseNode = null;
+      }
+      if (this.audioElement) {
+        this.audioElement.pause();
+        this.audioElement = null;
+      }
     } catch {
-      // Fallback to high-bass synthesized engine if fetch fails or CORS blocks
-      this.startEngine();
+      // ignore cleanup errors
     }
   }
 
-  // Play audio element with starting 3 seconds removed
-  public attachAudioElement(elem: HTMLAudioElement, trimSeconds = 3.0): void {
-    this.trimStartSeconds = trimSeconds;
-    this.audioElement = elem;
-    if (this.audioElement) {
-      this.audioElement.currentTime = trimSeconds; // Skip first 3 seconds
-      if (!this.isMuted) {
-        this.audioElement.play().catch(() => {});
-      }
-      this.isRunning = true;
-    }
+  public stopAll(): void {
+    this.stopOscillators();
+    this.isRunning = false;
+    this.isUsingFileAudio = false;
+  }
+
+  public getCustomAudioUrl(): string | null {
+    return this.customAudioUrl;
+  }
+
+  public isUsingCustomAudio(): boolean {
+    return this.isUsingFileAudio;
   }
 
   public startEngine(): void {
-    if (this.isRunning) return;
     if (!this.initCtx() || !this.ctx || !this.masterGain) return;
+
+    // Clean up any stale audio nodes prior to starting
+    this.stopOscillators();
+    this.isRunning = true;
+
+    // Priority 1: Try playing custom audio file if provided or if bike-sound.mp3 exists
+    const audioSrc = this.customAudioUrl || "/bike-sound.mp3";
+
+    if (audioSrc) {
+      try {
+        const audio = new Audio(audioSrc);
+        audio.loop = true;
+        audio.currentTime = this.trimStartSeconds; // Trim starting 3 seconds
+        audio.muted = this.isMuted;
+        audio.volume = this.isMuted ? 0 : Math.min(1.0, 0.5 + (this.currentProgress / 100) * 0.5);
+
+        const playPromise = audio.play();
+        if (playPromise !== undefined) {
+          playPromise
+            .then(() => {
+              this.audioElement = audio;
+              this.isUsingFileAudio = true;
+            })
+            .catch(() => {
+              // If custom/local audio file fails or doesn't exist, launch synth engine fallback
+              this.startSynthEngine();
+            });
+          return;
+        }
+      } catch {
+        // Fallback
+      }
+    }
+
+    // Priority 2: Fallback to high-bass synthesizer engine
+    this.startSynthEngine();
+  }
+
+  private startSynthEngine(): void {
+    if (!this.ctx || !this.masterGain) return;
+    this.isUsingFileAudio = false;
 
     try {
       const now = this.ctx.currentTime;
-      this.isRunning = true;
 
       // 1. Sub-Bass Sine Oscillator (32Hz - deep, heavy exhaust vibration)
       this.subOsc = this.ctx.createOscillator();
@@ -167,14 +236,14 @@ export class IntroAudioManager {
       this.harmonicOsc.start(now);
       this.noiseNode.start(now);
 
-      // Trigger immediate engine acceleration roar (bypassing initial 3s delay)
+      // Trigger immediate engine acceleration roar
       this.triggerAccelerateRoar();
     } catch {
       // Audio playback restrictions
     }
   }
 
-  // Engine throttle rev & acceleration roar (VROOOOM with heavy bass)
+  // Engine throttle rev & acceleration roar (VROOOOM with heavy bass & accelerator surge)
   public triggerAccelerateRoar(): void {
     if (!this.ctx || !this.masterGain) return;
     try {
@@ -183,18 +252,22 @@ export class IntroAudioManager {
       const revGain = this.ctx.createGain();
 
       revOsc.type = "sawtooth";
-      revOsc.frequency.setValueAtTime(65, now);
-      revOsc.frequency.exponentialRampToValueAtTime(320, now + 0.45);
-      revOsc.frequency.exponentialRampToValueAtTime(140, now + 0.9);
+      // Frequency ramps up aggressively like pulling a bike throttle
+      revOsc.frequency.setValueAtTime(75, now);
+      revOsc.frequency.exponentialRampToValueAtTime(390, now + 0.55);
+      revOsc.frequency.exponentialRampToValueAtTime(160, now + 1.1);
 
-      revGain.gain.setValueAtTime(0.7, now);
-      revGain.gain.exponentialRampToValueAtTime(0.001, now + 0.95);
+      // Gain surge reflecting throttle acceleration force
+      const currentProgRatio = this.currentProgress / 100;
+      const surgeGain = 0.65 + currentProgRatio * 0.35; // gets louder as sequence progresses
+      revGain.gain.setValueAtTime(surgeGain, now);
+      revGain.gain.exponentialRampToValueAtTime(0.001, now + 1.15);
 
       revOsc.connect(revGain);
       revGain.connect(this.masterGain);
 
       revOsc.start(now);
-      revOsc.stop(now + 0.95);
+      revOsc.stop(now + 1.15);
     } catch {
       // Fallback
     }
@@ -213,14 +286,9 @@ export class IntroAudioManager {
     }
 
     if (this.audioElement) {
-      // If using HTMLAudioElement, sync volume fade
+      // If using HTMLAudioElement, sync volume so it builds up to maximum loud in last phase
       if (!this.isMuted) {
-        if (this.currentProgress >= 75) {
-          const fadeRatio = (100 - this.currentProgress) / 25; // 1 -> 0
-          this.audioElement.volume = Math.max(0, fadeRatio * 0.95);
-        } else {
-          this.audioElement.volume = 0.95;
-        }
+        this.audioElement.volume = Math.min(1.0, 0.4 + (this.currentProgress / 100) * 0.6);
       }
       return;
     }
@@ -230,9 +298,9 @@ export class IntroAudioManager {
     try {
       const now = this.ctx.currentTime;
 
-      // Calculate Engine Pitch based on progress (70Hz -> 340Hz loud acceleration)
+      // Calculate Engine Pitch based on progress (70Hz -> 380Hz loud engine acceleration)
       const p = this.currentProgress / 100;
-      const baseFreq = 70 + Math.pow(p, 1.2) * 270;
+      const baseFreq = 70 + Math.pow(p, 1.1) * 310;
       const subFreq = baseFreq * 0.5;
       const harmFreq = baseFreq * 0.5;
 
@@ -241,27 +309,19 @@ export class IntroAudioManager {
       if (this.subOsc) this.subOsc.frequency.setTargetAtTime(subFreq, now, 0.08);
       if (this.harmonicOsc) this.harmonicOsc.frequency.setTargetAtTime(harmFreq, now, 0.08);
 
-      // Open lowpass filter as motorcycle accelerates (600Hz -> 3200Hz)
-      const cutoffFreq = 600 + p * 2600;
+      // Open lowpass filter as motorcycle accelerates (600Hz -> 3600Hz)
+      const cutoffFreq = 600 + p * 3000;
       this.lowpassFilter.frequency.setTargetAtTime(cutoffFreq, now, 0.08);
 
       if (this.noiseGain) {
-        this.noiseGain.gain.setTargetAtTime(0.12 + p * 0.18, now, 0.08);
+        this.noiseGain.gain.setTargetAtTime(0.12 + p * 0.25, now, 0.08);
       }
 
-      // AUTOMATIC VOLUME FADING BASED ON ANIMATION PROGRESS:
-      // 0% - 75%: High power volume (0.60 with +18dB bass boost)
-      // 75% - 100%: Smooth fade down to 0 so intro finishes cleanly
+      // VOLUME INCREASES CONTINUOUSLY — LOUDEST IN THE LAST PHASE (75% - 100%):
       if (!this.isMuted) {
-        if (this.currentProgress < 75) {
-          const targetVol = Math.min(0.65, 0.3 + p * 0.35);
-          this.masterGain.gain.setTargetAtTime(targetVol, now, 0.08);
-        } else {
-          // Fade out during last 25% of progress
-          const fadeRatio = (100 - this.currentProgress) / 25; // 1 -> 0
-          const fadeVol = 0.65 * Math.max(0, fadeRatio);
-          this.masterGain.gain.setTargetAtTime(fadeVol, now, 0.12);
-        }
+        // Volume builds up from 0.38 at start to 0.88 peak loudness at 100%
+        const targetVol = 0.38 + p * 0.50;
+        this.masterGain.gain.setTargetAtTime(targetVol, now, 0.08);
       }
     } catch {
       // Audio update catch
@@ -326,7 +386,7 @@ export class IntroAudioManager {
         this.masterGain.gain.setTargetAtTime(0, now, 0.05);
       } else {
         const p = this.currentProgress / 100;
-        const targetVol = p >= 0.75 ? 0.38 * ((100 - this.currentProgress) / 25) : 0.38;
+        const targetVol = 0.38 + p * 0.50;
         this.masterGain.gain.setTargetAtTime(Math.max(0.01, targetVol), now, 0.08);
       }
     }
@@ -337,6 +397,49 @@ export class IntroAudioManager {
     return this.isMuted;
   }
 
+  public isAudioContextRunning(): boolean {
+    return !!(this.ctx && this.ctx.state === "running" && this.isRunning);
+  }
+
+  public async ensureAudioStarted(): Promise<boolean> {
+    if (!this.initCtx() || !this.ctx) return false;
+
+    // Play silent buffer to unlock Web Audio API on iOS and Chrome autoplay policies
+    try {
+      const buffer = this.ctx.createBuffer(1, 1, 22050);
+      const source = this.ctx.createBufferSource();
+      source.buffer = buffer;
+      source.connect(this.ctx.destination);
+      source.start(0);
+    } catch {}
+
+    if (this.ctx.state === "suspended") {
+      try {
+        await this.ctx.resume();
+      } catch {
+        // resume attempt
+      }
+    }
+
+    if (this.ctx.state === "running") {
+      const now = this.ctx.currentTime;
+      const p = this.currentProgress / 100;
+      const targetVol = this.isMuted ? 0 : (0.38 + p * 0.50);
+      if (this.masterGain) {
+        this.masterGain.gain.cancelScheduledValues(now);
+        this.masterGain.gain.setValueAtTime(targetVol, now);
+      }
+
+      if (!this.isRunning || !this.mainOsc) {
+        this.startEngine();
+      } else {
+        this.triggerAccelerateRoar();
+      }
+      return true;
+    }
+    return false;
+  }
+
   public getMuted(): boolean {
     return this.isMuted;
   }
@@ -345,10 +448,6 @@ export class IntroAudioManager {
     this.isRunning = false;
 
     try {
-      if (this.audioBufferSource) {
-        this.audioBufferSource.stop();
-        this.audioBufferSource.disconnect();
-      }
       if (this.audioElement) {
         this.audioElement.pause();
         this.audioElement = null;
@@ -385,7 +484,6 @@ export class IntroAudioManager {
     this.harmonicOsc = null;
     this.noiseNode = null;
     this.noiseGain = null;
-    this.audioBufferSource = null;
   }
 }
 

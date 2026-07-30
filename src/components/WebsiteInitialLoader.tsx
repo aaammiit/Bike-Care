@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import ranaLogo from "../assets/images/rana_bike_cares_logo_1784714930624.jpg";
 import { motion } from "motion/react";
-import { Wrench, Shield, CheckCircle2, Gauge } from "lucide-react";
+import { Shield, CheckCircle2, Gauge, Volume2, VolumeX, FastForward, Upload, Music, RotateCcw } from "lucide-react";
 import { IntroAudioManager } from "../utils/IntroAudioManager";
 
 interface WebsiteInitialLoaderProps {
@@ -10,25 +10,80 @@ interface WebsiteInitialLoaderProps {
 
 export const WebsiteInitialLoader: React.FC<WebsiteInitialLoaderProps> = ({ onLoadingComplete }) => {
   const [progress, setProgress] = useState(0);
-  const [statusText, setStatusText] = useState("Kickstarting Engine Systems...");
+  const [statusText, setStatusText] = useState("Kickstarting Engine Systems & Ignition...");
   const [isMuted, setIsMuted] = useState(false);
+  const [audioActive, setAudioActive] = useState(false);
+  const [customAudioName, setCustomAudioName] = useState<string | null>(null);
+  
   const audioManagerRef = useRef<IntroAudioManager | null>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-  // Initialize Audio Manager on mount
+  // Initialize Audio Manager on mount & setup global user gesture listeners for instant sound on reload
   useEffect(() => {
     const manager = new IntroAudioManager();
     audioManagerRef.current = manager;
 
+    const storedName = localStorage.getItem("custom_bike_sound_filename");
+    if (storedName) {
+      setCustomAudioName(storedName);
+    }
+
+    // Attempt sound playback immediately on mount
+    manager.startEngine();
+    manager.ensureAudioStarted().then((running) => {
+      setAudioActive(running);
+    });
+
+    const tryActivateAudio = () => {
+      if (audioManagerRef.current) {
+        audioManagerRef.current.ensureAudioStarted().then((running) => {
+          if (running) {
+            setAudioActive(true);
+          }
+        });
+      }
+    };
+
+    // Programmatic auto-trigger on mount
+    try {
+      const simEvent = new MouseEvent("click", { bubbles: true, cancelable: true, view: window });
+      document.dispatchEvent(simEvent);
+      window.dispatchEvent(simEvent);
+    } catch {}
+
+    // Attach listeners
+    const events = ["pointerdown", "touchstart", "touchmove", "touchend", "click", "keydown", "scroll", "mousemove", "pointermove", "wheel", "focus", "mouseenter"];
+    events.forEach((evt) => {
+      window.addEventListener(evt, tryActivateAudio, { passive: true });
+      document.addEventListener(evt, tryActivateAudio, { passive: true });
+    });
+
+    const autoRetryInterval = setInterval(() => {
+      if (audioManagerRef.current && !audioManagerRef.current.isAudioContextRunning()) {
+        tryActivateAudio();
+      } else if (audioManagerRef.current?.isAudioContextRunning()) {
+        setAudioActive(true);
+        clearInterval(autoRetryInterval);
+      }
+    }, 300);
+
     return () => {
+      clearInterval(autoRetryInterval);
+      events.forEach((evt) => {
+        window.removeEventListener(evt, tryActivateAudio);
+        document.removeEventListener(evt, tryActivateAudio);
+      });
       manager.fadeAndStop(300);
       audioManagerRef.current = null;
     };
   }, []);
 
-  const handleStartAudio = () => {
+  const handleStartAudio = (e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
     if (audioManagerRef.current) {
-      audioManagerRef.current.startEngine();
-      audioManagerRef.current.triggerAccelerateRoar();
+      audioManagerRef.current.ensureAudioStarted().then((running) => {
+        setAudioActive(running);
+      });
       audioManagerRef.current.updateProgress(progress);
     }
   };
@@ -36,9 +91,40 @@ export const WebsiteInitialLoader: React.FC<WebsiteInitialLoaderProps> = ({ onLo
   const handleToggleMute = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (audioManagerRef.current) {
-      audioManagerRef.current.startEngine();
+      audioManagerRef.current.ensureAudioStarted();
       const muted = audioManagerRef.current.toggleMute();
       setIsMuted(muted);
+      setAudioActive(!muted);
+    }
+  };
+
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const dataUri = event.target?.result as string;
+      if (dataUri && audioManagerRef.current) {
+        audioManagerRef.current.setCustomAudioSource(dataUri);
+        setCustomAudioName(file.name);
+        try {
+          localStorage.setItem("custom_bike_sound_filename", file.name);
+        } catch {}
+        setAudioActive(true);
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleResetAudio = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (audioManagerRef.current) {
+      audioManagerRef.current.removeCustomAudioSource();
+      setCustomAudioName(null);
+      try {
+        localStorage.removeItem("custom_bike_sound_filename");
+      } catch {}
     }
   };
 
@@ -50,6 +136,7 @@ export const WebsiteInitialLoader: React.FC<WebsiteInitialLoaderProps> = ({ onLo
     onLoadingComplete();
   };
 
+  // 7.5 Seconds Intro Loader Interval (75ms per tick x 100 steps = 7500ms)
   useEffect(() => {
     const interval = setInterval(() => {
       setProgress((prev) => {
@@ -65,30 +152,32 @@ export const WebsiteInitialLoader: React.FC<WebsiteInitialLoaderProps> = ({ onLo
           return 100;
         }
 
-        const next = prev + 2;
+        const next = prev + 1;
 
         // Synchronize engine sound state with loading progress
         if (audioManagerRef.current) {
           audioManagerRef.current.updateProgress(next);
-          // Trigger accelerator throttle revs at key progress points
-          if (next === 28 || next === 56 || next === 84) {
+          // Trigger accelerator throttle revs at key engine progress points (including maximum roar at 92%)
+          if (next === 18 || next === 42 || next === 68 || next === 92) {
             audioManagerRef.current.triggerAccelerateRoar();
           }
         }
 
-        if (next < 25) {
-          setStatusText("Kickstarting Engine & Ignition...");
-        } else if (next < 60) {
-          setStatusText("Warming up Engine & Throttle Rev...");
-        } else if (next < 85) {
-          setStatusText("Calibrating Clutch & Brake Hydraulics...");
+        if (next < 20) {
+          setStatusText("Kickstarting Engine Systems & Ignition...");
+        } else if (next < 45) {
+          setStatusText("Warming up Heavy Engine & Throttle Rev...");
+        } else if (next < 70) {
+          setStatusText("Calibrating Clutch, Gears & Brake Hydraulics...");
+        } else if (next < 90) {
+          setStatusText("Tuning Exhaust Performance & Diagnostics...");
         } else {
           setStatusText("Workshop Ready! Engine Roaring...");
         }
 
         return next > 100 ? 100 : next;
       });
-    }, 40);
+    }, 75);
 
     return () => clearInterval(interval);
   }, [onLoadingComplete]);
@@ -99,7 +188,7 @@ export const WebsiteInitialLoader: React.FC<WebsiteInitialLoaderProps> = ({ onLo
       exit={{ opacity: 0, scale: 1.03 }}
       transition={{ duration: 0.5, ease: "easeInOut" }}
       onClick={handleStartAudio}
-      className="fixed inset-0 z-[9999] bg-slate-950 text-white flex flex-col justify-between overflow-hidden select-none"
+      className="fixed inset-0 z-[9999] bg-slate-950 text-white flex flex-col justify-between overflow-hidden select-none cursor-pointer"
     >
       {/* Background ambient lighting */}
       <div className="absolute inset-0 z-0 opacity-20 pointer-events-none">
@@ -111,7 +200,16 @@ export const WebsiteInitialLoader: React.FC<WebsiteInitialLoaderProps> = ({ onLo
         />
       </div>
 
-      {/* Top Header */}
+      {/* Hidden Audio File Input */}
+      <input
+        type="file"
+        ref={fileInputRef}
+        accept="audio/*"
+        onChange={handleFileUpload}
+        className="hidden"
+      />
+
+      {/* Top Header Controls */}
       <div className="p-4 sm:p-6 flex items-center justify-between max-w-7xl w-full mx-auto relative z-10">
         <div className="flex items-center space-x-3">
           <div className="w-11 h-11 rounded-xl bg-white p-0.5 shadow-lg shadow-orange-950/50 border border-orange-500 overflow-hidden shrink-0">
@@ -127,21 +225,63 @@ export const WebsiteInitialLoader: React.FC<WebsiteInitialLoaderProps> = ({ onLo
           </div>
         </div>
 
+        {/* Audio File Upload, Mute & Skip Actions */}
+        <div className="flex items-center space-x-2">
+          {/* Upload Custom Sound Button */}
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              fileInputRef.current?.click();
+            }}
+            className="p-2.5 sm:px-3 sm:py-2.5 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 border border-amber-400/50 text-amber-300 font-extrabold text-xs transition flex items-center space-x-1.5 cursor-pointer shadow-md"
+            title="Upload your own bike sound file (.mp3 / .wav)"
+          >
+            <Upload className="h-4 w-4 text-amber-400" />
+            <span className="hidden sm:inline">
+              {customAudioName ? "Change Audio" : "Upload Sound"}
+            </span>
+          </button>
 
+          {customAudioName && (
+            <button
+              onClick={handleResetAudio}
+              className="p-2.5 rounded-xl bg-slate-900 border border-slate-700 text-slate-400 hover:text-white transition cursor-pointer"
+              title="Reset to default bike sound"
+            >
+              <RotateCcw className="h-4 w-4" />
+            </button>
+          )}
+
+          <button
+            onClick={handleToggleMute}
+            className={`p-2.5 rounded-xl border backdrop-blur-md transition flex items-center space-x-1.5 text-xs font-bold cursor-pointer ${
+              isMuted
+                ? "bg-red-950/80 border-red-800 text-red-400"
+                : "bg-slate-900/90 border-slate-700 text-amber-400 hover:bg-slate-800"
+            }`}
+            title={isMuted ? "Unmute Engine Sound" : "Mute Sound"}
+          >
+            {isMuted ? <VolumeX className="h-4 w-4 text-red-400" /> : <Volume2 className="h-4 w-4 text-amber-400 animate-pulse" />}
+            <span className="hidden xs:inline">{isMuted ? "Muted" : "Sound ON"}</span>
+          </button>
+
+          <button
+            onClick={handleSkip}
+            className="px-3.5 py-2.5 rounded-xl bg-orange-600 hover:bg-orange-500 border border-orange-400 text-white font-extrabold text-xs uppercase tracking-wider shadow-lg flex items-center space-x-1.5 cursor-pointer"
+            title="Skip directly to website"
+          >
+            <span>Skip</span>
+            <FastForward className="h-3.5 w-3.5 text-white" />
+          </button>
+        </div>
       </div>
 
       {/* Center Stage: Prominent Animated Motorcycle GIF Container */}
-      <div className="flex-1 flex flex-col items-center justify-center relative z-10 px-4 my-auto space-y-5 sm:space-y-6">
+      <div className="flex-1 flex flex-col items-center justify-center relative z-10 px-4 sm:px-6 my-auto space-y-5 sm:space-y-6 md:space-y-8 w-full max-w-5xl mx-auto">
         
-        {/* Live Badge */}
-        <div className="bg-red-600/90 backdrop-blur-md px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-wider text-white border border-red-400/50 shadow-xl flex items-center space-x-2">
-          <span className="w-2.5 h-2.5 rounded-full bg-amber-300 animate-ping" />
-          <span>Rana Bike Care Loading Engine...</span>
-        </div>
-
         {/* PROMINENT 80s BIKE ANIMATION GIF FRAME */}
-        <div className="relative max-w-lg w-full rounded-3xl overflow-hidden border-2 border-amber-400/60 bg-slate-900 shadow-[0_0_50px_rgba(245,158,11,0.3)] p-2 sm:p-3 text-center">
-          <div className="relative rounded-2xl overflow-hidden bg-black aspect-video flex items-center justify-center border border-slate-800">
+        <div className="relative max-w-md sm:max-w-xl md:max-w-2xl lg:max-w-3xl xl:max-w-4xl w-full rounded-3xl overflow-hidden border-2 border-amber-400/60 bg-slate-900 shadow-[0_0_60px_rgba(245,158,11,0.35)] p-2.5 sm:p-4 text-center transition-all duration-300">
+          <div className="relative rounded-2xl overflow-hidden bg-black aspect-video sm:aspect-[16/9] md:aspect-[16/9] flex items-center justify-center border border-slate-800">
             <img 
               src="https://media.tenor.com/PS35tEHgx3kAAAAM/bike-80s.gif" 
               alt="80s Motorcycle Riding Animation"
@@ -153,25 +293,46 @@ export const WebsiteInitialLoader: React.FC<WebsiteInitialLoaderProps> = ({ onLo
             <div className="absolute inset-0 bg-gradient-to-t from-slate-950/60 via-transparent to-transparent pointer-events-none" />
 
             {/* Live Audio Indicator Badge on GIF */}
-            <div className="absolute top-3 right-3 bg-slate-950/80 backdrop-blur-md border border-slate-700 px-2.5 py-1 rounded-lg text-[10px] font-mono font-bold text-amber-400 flex items-center space-x-1.5 shadow-md">
-              <Gauge className="h-3.5 w-3.5 text-orange-400 animate-spin" />
-              <span>{isMuted ? "Audio Muted" : "Engine Sound Active"}</span>
+            <div className="absolute top-3 right-3 sm:top-4 sm:right-4 bg-slate-950/85 backdrop-blur-md border border-slate-700/80 px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl text-[10px] sm:text-xs font-mono font-bold text-amber-400 flex items-center space-x-2 shadow-lg">
+              <Gauge className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-orange-400 animate-spin" />
+              <span>
+                {isMuted
+                  ? "Audio Muted"
+                  : audioActive
+                  ? customAudioName
+                    ? `🎵 ${customAudioName}`
+                    : "Engine Sound Active"
+                  : "Tap Screen for Sound"}
+              </span>
             </div>
           </div>
         </div>
 
+        {/* Tap Screen Sound Notification Banner if Audio Suspended by Browser Autoplay Policy */}
+        {!audioActive && !isMuted && (
+          <motion.button
+            onClick={handleStartAudio}
+            animate={{ scale: [1, 1.04, 1] }}
+            transition={{ repeat: Infinity, duration: 1.5 }}
+            className="bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 text-slate-950 font-black text-xs sm:text-sm uppercase px-6 py-3 rounded-full shadow-[0_0_30px_rgba(245,158,11,0.5)] border border-amber-300 flex items-center space-x-2.5 cursor-pointer hover:brightness-110 transition z-20"
+          >
+            <Volume2 className="h-4 w-4 sm:h-5 sm:w-5 text-slate-950 animate-bounce" />
+            <span>🔊 TAP / CLICK ANYWHERE TO START ENGINE SOUND</span>
+          </motion.button>
+        )}
+
         {/* Progress Display Box */}
-        <div className="max-w-md w-full mx-auto space-y-3 text-center px-6 py-4 rounded-2xl bg-slate-900/90 border border-slate-800 backdrop-blur-xl shadow-2xl">
-          <div className="flex items-center justify-between text-xs sm:text-sm font-mono font-bold">
-            <span className="text-amber-300 tracking-wider flex items-center space-x-2">
-              <span className="w-2 h-2 rounded-full bg-amber-400 animate-ping" />
+        <div className="max-w-md sm:max-w-xl md:max-w-2xl lg:max-w-3xl w-full mx-auto space-y-3.5 text-center px-6 sm:px-8 py-4 sm:py-5 rounded-2xl sm:rounded-3xl bg-slate-900/90 border border-slate-800 backdrop-blur-xl shadow-2xl transition-all duration-300">
+          <div className="flex items-center justify-between text-xs sm:text-sm md:text-base font-mono font-bold">
+            <span className="text-amber-300 tracking-wider flex items-center space-x-2 sm:space-x-2.5">
+              <span className="w-2.5 h-2.5 rounded-full bg-amber-400 animate-ping" />
               <span>{statusText}</span>
             </span>
-            <span className="text-white text-lg font-black">{progress}%</span>
+            <span className="text-white text-lg sm:text-xl font-black">{progress}%</span>
           </div>
 
           {/* Progress Bar Container */}
-          <div className="w-full h-3 bg-slate-950 rounded-full p-0.5 border border-slate-800 relative overflow-hidden shadow-inner">
+          <div className="w-full h-3.5 sm:h-4 bg-slate-950 rounded-full p-0.5 border border-slate-800 relative overflow-hidden shadow-inner">
             <motion.div
               className="h-full bg-gradient-to-r from-red-600 via-amber-500 to-emerald-400 rounded-full relative"
               style={{ width: `${progress}%` }}
@@ -181,14 +342,14 @@ export const WebsiteInitialLoader: React.FC<WebsiteInitialLoaderProps> = ({ onLo
             </motion.div>
           </div>
 
-          <div className="flex items-center justify-center space-x-4 text-[11px] text-slate-400 font-medium pt-1">
-            <span className="flex items-center space-x-1">
-              <Shield className="h-3.5 w-3.5 text-amber-400" />
+          <div className="flex items-center justify-center space-x-4 sm:space-x-6 text-xs sm:text-sm text-slate-400 font-medium pt-1">
+            <span className="flex items-center space-x-1.5">
+              <Shield className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-amber-400" />
               <span>Multi-brand Specialist</span>
             </span>
             <span>•</span>
-            <span className="flex items-center space-x-1">
-              <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400" />
+            <span className="flex items-center space-x-1.5">
+              <CheckCircle2 className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-emerald-400" />
               <span>Mob: 9766881194</span>
             </span>
           </div>
@@ -203,5 +364,6 @@ export const WebsiteInitialLoader: React.FC<WebsiteInitialLoaderProps> = ({ onLo
     </motion.div>
   );
 };
+
 
 

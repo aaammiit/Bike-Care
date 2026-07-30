@@ -1,6 +1,6 @@
 {
-  "name": "Remix Untitled",
-  "description": "",
+  "name": "Rana Garage",
+  "description": "Local neighborhood motorcycle garage in Pune run by mechanic Rana Singh.",
   "requestFramePermissions": [
     "geolocation"
   ],

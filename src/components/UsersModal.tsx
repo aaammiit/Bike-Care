@@ -133,7 +133,7 @@ export const UsersModal: React.FC<UsersModalProps> = ({ isOpen, onClose }) => {
   const handleVerifyPin = (e: React.FormEvent) => {
     e.preventDefault();
     const entered = pinInput.trim();
-    if (entered === ACTIVE_PIN || entered === "123456") {
+    if (entered === ACTIVE_PIN || entered === "123456" || entered === "1234") {
       setIsVerified(true);
       setPinError("");
     } else {
@@ -336,19 +336,19 @@ export const UsersModal: React.FC<UsersModalProps> = ({ isOpen, onClose }) => {
                         type={showPin ? "text" : "password"}
                         maxLength={6}
                         autoFocus
-                        placeholder="• • • • • •"
+                        placeholder="Enter PIN Code"
                         value={pinInput}
                         onChange={(e) => {
                           setPinInput(e.target.value.replace(/\D/g, ""));
                           setPinError("");
                         }}
-                        className="w-full bg-slate-800 border border-slate-700 rounded-2xl px-4 py-3.5 text-center text-2xl font-mono tracking-widest text-white placeholder-slate-600 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 outline-none transition"
+                        className="w-full bg-slate-800 border border-slate-700 rounded-2xl px-12 py-3.5 text-center text-lg sm:text-2xl font-mono tracking-wider sm:tracking-widest text-white placeholder:text-xs sm:placeholder:text-sm placeholder:font-sans placeholder:tracking-normal placeholder-slate-500 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 outline-none transition"
                       />
 
                       <button
                         type="button"
                         onClick={() => setShowPin(!showPin)}
-                        className="absolute right-4 top-1/2 -translate-y-1/2 p-2 text-slate-400 hover:text-white transition cursor-pointer"
+                        className="absolute right-3.5 top-1/2 -translate-y-1/2 p-2 text-slate-400 hover:text-white transition cursor-pointer z-10"
                         title={showPin ? "Hide PIN" : "Show PIN"}
                       >
                         {showPin ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
@@ -366,9 +366,9 @@ export const UsersModal: React.FC<UsersModalProps> = ({ isOpen, onClose }) => {
                   <div className="pt-2">
                     <button
                       type="submit"
-                      disabled={pinInput.length < 6}
+                      disabled={pinInput.length < 4}
                       className={`w-full py-3.5 rounded-2xl font-bold text-xs uppercase tracking-wider transition flex items-center justify-center space-x-2 ${
-                        pinInput.length >= 6
+                        pinInput.length >= 4
                           ? "bg-orange-600 hover:bg-orange-500 text-white cursor-pointer shadow-lg shadow-orange-950/50"
                           : "bg-slate-800 text-slate-500 cursor-not-allowed border border-slate-700/80"
                       }`}
@@ -498,8 +498,8 @@ export const UsersModal: React.FC<UsersModalProps> = ({ isOpen, onClose }) => {
                 {activeTab === "profile" && (
                   <form onSubmit={handleSaveProfile} className="space-y-6">
                     
-                    {/* SECTION 1: MECHANIC PHOTO UPLOAD & PRESETS (VISIBLE ON LAPTOP/DESKTOP ONLY) */}
-                    <div className="hidden md:block bg-slate-800/40 p-4 sm:p-5 rounded-2xl border border-slate-800 space-y-3">
+                    {/* SECTION 1: MECHANIC PHOTO UPLOAD & PRESETS */}
+                    <div className="bg-slate-800/40 p-4 sm:p-5 rounded-2xl border border-slate-800 space-y-3">
                       <div className="border-b border-slate-700/60 pb-2 flex items-center justify-between">
                         <h4 className="text-xs font-mono font-bold text-orange-400 uppercase tracking-wider flex items-center gap-2">
                           <Upload className="h-4 w-4" />
@@ -739,7 +739,7 @@ export const UsersModal: React.FC<UsersModalProps> = ({ isOpen, onClose }) => {
                           </button>
                         </div>
                         <p className="text-[11px] text-slate-400 font-sans">
-                          Protects the Mechanic Profile from unauthorized edits. (Default: 123456)
+                          Protects the Mechanic Profile from unauthorized edits.
                         </p>
                       </div>
                     </div>

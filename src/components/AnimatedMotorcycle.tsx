@@ -566,6 +566,7 @@ export const AnimatedMotorcycle: React.FC = () => {
         .scrolling-ground {
           background-size: 40px 3px;
           animation: scroll-dashed 1.2s linear infinite;
+          will-change: background-position-x;
         }
 
         /* Bike riding endlessly across screen from far left to far right - Smoother slower speed */
@@ -589,6 +590,7 @@ export const AnimatedMotorcycle: React.FC = () => {
           height: 100%;
           align-items: flex-end;
           animation: city-parallax 36s linear infinite;
+          will-change: transform;
         }
         .city-scrolling-layer.paused {
           animation-play-state: paused;
