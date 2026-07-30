@@ -498,8 +498,8 @@ export const UsersModal: React.FC<UsersModalProps> = ({ isOpen, onClose }) => {
                 {activeTab === "profile" && (
                   <form onSubmit={handleSaveProfile} className="space-y-6">
                     
-                    {/* SECTION 1: MECHANIC PHOTO UPLOAD & PRESETS */}
-                    <div className="bg-slate-800/40 p-4 sm:p-5 rounded-2xl border border-slate-800 space-y-3">
+                    {/* SECTION 1: MECHANIC PHOTO UPLOAD & PRESETS (VISIBLE ON LAPTOP/DESKTOP ONLY) */}
+                    <div className="hidden md:block bg-slate-800/40 p-4 sm:p-5 rounded-2xl border border-slate-800 space-y-3">
                       <div className="border-b border-slate-700/60 pb-2 flex items-center justify-between">
                         <h4 className="text-xs font-mono font-bold text-orange-400 uppercase tracking-wider flex items-center gap-2">
                           <Upload className="h-4 w-4" />

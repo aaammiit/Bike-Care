@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
+import ranaLogo from "../assets/images/rana_bike_cares_logo_1784714930624.jpg";
 import { useApp } from "../AppContext";
 import { Wrench, Shield, User, MessageSquare, Bell, Wifi, WifiOff } from "lucide-react";
 import { motion } from "motion/react";
-const logoImg = "https://images.unsplash.com/photo-1558981403-c5f9899a28bc?auto=format&fit=crop&q=80&w=400";
+const logoImg = ranaLogo;
 
 interface HeaderProps {
   onOpenBooking: () => void;

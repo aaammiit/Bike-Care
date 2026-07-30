@@ -1,6 +1,10 @@
 {
-  "name": "Rana Bike Care",
-  "description": "Rana Bike Care — A premium, offline-payment Bike Garage Management and Service Booking Platform featuring a Google Form booking gateway with dedicated customer, mechanic, and admin terminals.",
-  "requestFramePermissions": ["geolocation"],
-  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+  "name": "Remix Untitled",
+  "description": "",
+  "requestFramePermissions": [
+    "geolocation"
+  ],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
 }

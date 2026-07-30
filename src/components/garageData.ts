@@ -1,13 +1,25 @@
-// Direct image URLs for high performance and reliable builds - strictly motorcycle and bike repair assets (no cars or people)
-const workshopLiftImg = "https://images.unsplash.com/photo-1558981403-c5f9899a28bc?auto=format&fit=crop&q=80&w=1200";
-const clutchEngineImg = "https://images.unsplash.com/photo-1568772585407-9361f9bf3a87?auto=format&fit=crop&q=80&w=1200";
-const suspensionImg = "https://images.unsplash.com/photo-1558980664-769d59546b3d?auto=format&fit=crop&q=80&w=1200";
-const foamWashImg = "https://images.unsplash.com/photo-1558981359-219d6364c9c8?auto=format&fit=crop&q=80&w=1200";
-const engineOilImg = "https://images.unsplash.com/photo-1558981806-ec527fa84c39?auto=format&fit=crop&q=80&w=1200";
+import regularServiceImg from "../assets/images/regular_bike_service_1785392002803.jpg";
+import engineRepairImg from "../assets/images/engine_repair_service_1785392016029.jpg";
+import brakeServiceImg from "../assets/images/brake_pad_service_1785392030526.jpg";
+import batteryElectricalImg from "../assets/images/battery_electrical_service_1785392046998.jpg";
+import chainClutchImg from "../assets/images/chain_clutch_service_1785392059464.jpg";
+import tyrePunctureImg from "../assets/images/tyre_puncture_service_1785392071114.jpg";
+import bikeWashImg from "../assets/images/bike_wash_polish_1785392083459.jpg";
+import generalInspectionImg from "../assets/images/general_bike_inspection_1785392095824.jpg";
+import ranaMechanicImg from "../assets/images/rana_singh_mechanic_1785394023899.jpg";
+
+// Direct image URLs for high performance and reliable builds
+const workshopLiftImg = regularServiceImg;
+const clutchEngineImg = engineRepairImg;
+const suspensionImg = brakeServiceImg;
+const foamWashImg = bikeWashImg;
+const engineOilImg = regularServiceImg;
 
 export interface MechanicInfo {
   photo: string;
   name: string;
+  roleTitle?: string;
+  bio?: string;
   age: number;
   experience: string;
   phone: string;
@@ -68,34 +80,36 @@ export interface FAQItem {
 }
 
 export const mechanicData: MechanicInfo = {
-  photo: "https://images.unsplash.com/photo-1568602471122-7832951cc4c5?auto=format&fit=crop&w=400&h=400&q=80",
+  photo: ranaMechanicImg,
   name: "Rana Singh",
-  age: 38,
-  experience: "12+ Years",
+  roleTitle: "Owner & Motorcycle Mechanic",
+  age: 40,
+  experience: "15+ Years",
   phone: "+91 97678 24216",
+  bio: "With over 15 years of hands-on experience, Rana Singh has been repairing motorcycles for riders across the local community.\n\nFrom regular servicing and oil changes to engine repairs and electrical work, every motorcycle is inspected and repaired personally.\n\nRana believes in honest advice, transparent pricing, quality workmanship, and treating every customer's bike like his own.",
   skills: [
-    "Complete Engine Overhauling",
-    "ECU Remapping & Spark Calibration",
-    "Precision Carby Tuning",
-    "Suspension Valve Re-damping",
-    "Custom Chassis Restorations",
-    "Wiring Loom Diagnostics"
+    "Regular Servicing",
+    "Engine Repair",
+    "Oil Change",
+    "Brake Repair",
+    "Clutch Repair",
+    "Electrical Repair",
+    "Chain & Sprocket",
+    "Tyre & Puncture",
+    "Battery Replacement"
   ],
-  languages: ["Hindi", "Punjabi", "Marathi", "English"],
-  availableTime: "9:00 AM - 8:00 PM (Mon - Sat)",
+  languages: ["Hindi", "Marathi", "English"],
+  availableTime: "Monday – Saturday: 9:00 AM – 8:00 PM",
   rating: 4.9,
-  totalRepairs: 5420,
+  totalRepairs: 3500,
   happyCustomers: 3200,
   certificates: [
-    "Certified Master Technician (Yamaha India)",
-    "Bosch Automotive Electrical Diagnostics Specialist",
-    "Royal Enfield Vintage Restoration Laureate (2022)"
+    "15+ Years Hands-on Local Experience",
+    "Genuine OEM Spare Parts Guarantee"
   ],
   timeline: [
-    { year: "2014", title: "Apprentice", desc: "Started as junior tech in Yamaha Service Terminal, Mumbai." },
-    { year: "2017", title: "Restoration Head", desc: "Led classic rebuilds at vintage custom hub in Pune." },
-    { year: "2020", title: "Rana Garage Founded", desc: "Launched first physical workshop in Koregaon Park." },
-    { year: "2024", title: "Smart Workshop Launch", desc: "Expanded to 3 bays with digital diagnostics boards." }
+    { year: "2010", title: "Mechanic Apprentice", desc: "Learned hands-on two-wheeler engine repair in local neighborhood workshop." },
+    { year: "2015", title: "Rana Garage Founded", desc: "Opened neighborhood workshop serving Pune commuters with honest advice and fair prices." }
   ]
 };
 
@@ -106,67 +120,67 @@ export { workshopLiftImg, clutchEngineImg, suspensionImg, foamWashImg, engineOil
 export const galleryData: GalleryItem[] = [
   {
     id: "g1",
-    title: "Clutch & Flywheel Assembly Overhaul",
-    category: "engine",
-    categoryLabel: "Engine & Clutch",
-    img: clutchEngineImg,
-    desc: "Disassembling clutch basket plates, replacing worn friction discs, and torquing flywheel bolts to OEM specification."
+    title: "Engine Oil & Filter Service (Splendor Pro)",
+    category: "servicing",
+    categoryLabel: "Commuter Servicing",
+    img: regularServiceImg,
+    desc: "Drained dark used oil, cleaned wire mesh filter screen, refilled fresh 900ml 10W-30 engine oil, and lubed drive chain."
   },
   {
     id: "g2",
-    title: "Rear Shock Absorber & Coilover Service",
-    category: "suspension",
-    categoryLabel: "Suspension & Damping",
-    img: suspensionImg,
-    desc: "Precision tuning of rear coilover shock absorber preload, replacing nitrogen seals, and adjusting damping rebound."
+    title: "Clutch Plate & Engine Overhaul (Pulsar 150)",
+    category: "engine",
+    categoryLabel: "Engine Work",
+    img: engineRepairImg,
+    desc: "Replaced worn clutch friction plates, fitted fresh clutch housing gasket, adjusted clutch lever play for smooth gear shift."
   },
   {
     id: "g3",
-    title: "Hydraulic Lift Bay Scooter Servicing",
-    category: "servicing",
-    categoryLabel: "Hydraulic Lift Bay",
-    img: workshopLiftImg,
-    desc: "Elevated hydraulic lift servicing for automatic scooters, including variator belt checks, brake drums, and engine fluid flush."
+    title: "Front Disc Brake Pad Fitting (Honda Shine)",
+    category: "brake",
+    categoryLabel: "Brake Service",
+    img: brakeServiceImg,
+    desc: "Replaced squeaking front disc brake pads, cleaned disc caliper assembly, topped up brake fluid and tested lever bite."
   },
   {
     id: "g4",
-    title: "Microfiber Buffing & Vintage Detailing",
-    category: "polishing",
-    categoryLabel: "Detailing & Polish",
-    img: foamWashImg,
-    desc: "Hand-wiping, microfiber detailing, and applying Teflon wax sealant on custom black vintage bike tanks."
+    title: "Battery & Self-Start Diagnostics (TVS Raider)",
+    category: "servicing",
+    categoryLabel: "Electrical Check",
+    img: batteryElectricalImg,
+    desc: "Tested battery terminal voltage with multimeter, cleaned corroded starter relay contacts, and fixed self-start issue."
   },
   {
     id: "g5",
-    title: "Engine Oil Level & Dipstick Inspection",
-    category: "servicing",
-    categoryLabel: "Routine Diagnostics",
-    img: engineOilImg,
-    desc: "Inspecting oil viscosity and contamination with protective white gloves before draining and filling fresh Motul 4T 10W40."
+    title: "Drive Chain Cleaning & Adjustment (Hero Passion)",
+    category: "chain",
+    categoryLabel: "Chain & Clutch",
+    img: chainClutchImg,
+    desc: "Cleaned heavy road grime from drive chain and sprockets, adjusted wheel chain slack to 25mm, applied heavy chain spray."
   },
   {
     id: "g6",
-    title: "Inverted USD Fork Resealing",
-    category: "suspension",
-    categoryLabel: "Brakes & Suspension",
-    img: "https://images.unsplash.com/photo-1542128962-9d50ad7bf744?auto=format&fit=crop&w=600&q=80",
-    desc: "Replacing leaking oil seals with double-lip NOK seals, polishing the stanchion tubes, and refilling premium 10W fork fluid."
+    title: "Tubeless Tyre Puncture Fix (Honda Unicorn)",
+    category: "servicing",
+    categoryLabel: "Tyre Repair",
+    img: tyrePunctureImg,
+    desc: "Extracted sharp nail from rear tubeless tyre, inserted sticky puncture plug strip, inflated to 33 PSI, checked air seal."
   },
   {
     id: "g7",
-    title: "Mikuni Twin-Carb Calibration",
-    category: "engine",
-    categoryLabel: "Vintage Tuning",
-    img: "https://images.unsplash.com/photo-1609630875171-b1321377ee65?auto=format&fit=crop&w=600&q=80",
-    desc: "Ultrasonic chemical tank bath for clogged brass jets, setting correct float pin height, and synchronizing vacuum draws."
+    title: "Foam Wash & Body Polish (Honda SP125)",
+    category: "washing",
+    categoryLabel: "Washing & Cleaning",
+    img: bikeWashImg,
+    desc: "High-pressure foam wash, degreased engine block, hand-wiped tank with microfiber cloth, applied protective shine polish."
   },
   {
     id: "g8",
-    title: "Laser Drivetrain & Gold Chain Alignment",
-    category: "chain",
-    categoryLabel: "Drive Transmission",
-    img: "https://images.unsplash.com/photo-1558981804-05561a35563a?auto=format&fit=crop&w=600&q=80",
-    desc: "Installing a gold-plated DID O-Ring drive chain with precise alignment using a professional laser line alignment guide."
+    title: "Pre-Monsoon General Inspection (Bajaj Pulsar)",
+    category: "servicing",
+    categoryLabel: "General Checkup",
+    img: generalInspectionImg,
+    desc: "30-point checkup covering lights, horn, tyre tread, brake shoe wear, spark plug gap, battery voltage, and 3km road test."
   }
 ];
 

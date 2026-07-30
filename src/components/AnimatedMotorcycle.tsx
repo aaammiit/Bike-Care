@@ -1,4 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
+import { Volume2, VolumeX, Zap } from "lucide-react";
+import { IntroAudioManager } from "../utils/IntroAudioManager";
 
 interface Procedure {
   id: "engine" | "suspension" | "brakes" | "chain" | "ecu" | "wash";
@@ -291,6 +293,32 @@ export const AnimatedMotorcycle: React.FC = () => {
   const [showHotspots, setShowHotspots] = useState<boolean>(true);
   const [volumeLevel, setVolumeLevel] = useState<number>(30); // 0 to 100
   const [soundMuted, setSoundMuted] = useState<boolean>(false);
+  const bikeAudioRef = useRef<IntroAudioManager | null>(null);
+
+  const toggleBikeEngineSound = () => {
+    if (!bikeAudioRef.current) {
+      bikeAudioRef.current = new IntroAudioManager(0);
+      bikeAudioRef.current.startEngine();
+      bikeAudioRef.current.triggerAccelerateRoar();
+      setSoundMuted(false);
+    } else {
+      const nextMuted = !soundMuted;
+      setSoundMuted(nextMuted);
+      bikeAudioRef.current.setMuted(nextMuted);
+      if (!nextMuted) {
+        bikeAudioRef.current.triggerAccelerateRoar();
+      }
+    }
+  };
+
+  useEffect(() => {
+    return () => {
+      if (bikeAudioRef.current) {
+        bikeAudioRef.current.destroy();
+        bikeAudioRef.current = null;
+      }
+    };
+  }, []);
   
   // Compliance tracking and hands-on calibration progress
   const [handsOnShine, setHandsOnShine] = useState<number>(65); 
@@ -404,6 +432,9 @@ export const AnimatedMotorcycle: React.FC = () => {
     // Cycle bike design automatically every 5 seconds
     const bikeInterval = setInterval(() => {
       setSelectedBike((prev) => (prev + 1) % bikeModels.length);
+      if (bikeAudioRef.current && !soundMuted) {
+        bikeAudioRef.current.triggerAccelerateRoar();
+      }
     }, 5000);
 
     // Toggle day/night backdrop automatically every 12 seconds
@@ -415,10 +446,13 @@ export const AnimatedMotorcycle: React.FC = () => {
       clearInterval(bikeInterval);
       clearInterval(environmentInterval);
     };
-  }, []);
+  }, [soundMuted]);
 
   const handleNextBike = () => {
     setSelectedBike((prev) => (prev + 1) % bikeModels.length);
+    if (bikeAudioRef.current && !soundMuted) {
+      bikeAudioRef.current.triggerAccelerateRoar();
+    }
   };
 
   useEffect(() => {
@@ -871,6 +905,49 @@ export const AnimatedMotorcycle: React.FC = () => {
 
       {/* Visual Simulation Stage Container */}
       <div className="relative overflow-hidden transition-all duration-500 w-full h-full flex-1">
+        {/* Floating Bike Running Sound Controls */}
+        <div className="absolute top-3 right-3 z-40 flex items-center gap-2">
+          <button
+            type="button"
+            onClick={toggleBikeEngineSound}
+            className={`flex items-center space-x-1.5 text-[10px] sm:text-xs font-mono font-black px-3 py-1.5 rounded-full border transition-all cursor-pointer shadow-2xl active:scale-95 select-none ${
+              soundMuted
+                ? "bg-slate-950/90 text-slate-400 border-slate-700/90 hover:text-white hover:border-slate-500 backdrop-blur-md"
+                : "bg-gradient-to-r from-orange-500 via-amber-500 to-orange-600 text-white border-amber-300 hover:from-orange-600 hover:to-amber-600 shadow-[0_0_18px_rgba(249,115,22,0.6)] backdrop-blur-md animate-pulse"
+            }`}
+            title={soundMuted ? "Unmute Bike Engine Running Sound" : "Mute Bike Engine Running Sound"}
+          >
+            {soundMuted ? (
+              <>
+                <VolumeX className="w-4 h-4 text-red-400 shrink-0" />
+                <span className="tracking-wider uppercase">Bike Sound Muted</span>
+              </>
+            ) : (
+              <>
+                <Volume2 className="w-4 h-4 text-yellow-200 animate-bounce shrink-0" />
+                <span className="tracking-wider uppercase">Bike Sound ON</span>
+              </>
+            )}
+          </button>
+
+          <button
+            type="button"
+            onClick={() => {
+              if (!bikeAudioRef.current) {
+                bikeAudioRef.current = new IntroAudioManager(0);
+                bikeAudioRef.current.startEngine();
+              }
+              setSoundMuted(false);
+              bikeAudioRef.current.setMuted(false);
+              bikeAudioRef.current.triggerAccelerateRoar();
+            }}
+            className="flex items-center space-x-1 text-[10px] sm:text-xs font-mono font-black px-2.5 py-1.5 rounded-full border border-amber-500/80 bg-slate-950/90 text-amber-400 hover:text-amber-300 hover:border-amber-400 hover:bg-slate-900 transition-all cursor-pointer shadow-lg active:scale-95 select-none backdrop-blur-md"
+            title="Rev Throttle Engine Sound"
+          >
+            <Zap className="w-3.5 h-3.5 text-amber-400 animate-pulse shrink-0" />
+            <span className="tracking-wider uppercase">Rev Engine 💨</span>
+          </button>
+        </div>
           {/* 2. Scenic background elements - Blending Sky Gradient */}
           <div className={`absolute inset-0 transition-all duration-1000 ease-in-out ${
             isNight 

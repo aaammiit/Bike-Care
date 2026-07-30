@@ -331,9 +331,9 @@ export const MechanicPanel: React.FC = () => {
                         )}
                       </div>
 
-                      {/* Photo upload trigger */}
+                      {/* Photo upload trigger (visible on desktop/laptop screens only) */}
                       {["Inspection", "Repair Started"].includes(job.status) && (
-                        <div className="flex items-center space-x-3 pt-1">
+                        <div className="hidden md:flex items-center space-x-3 pt-1">
                           <button
                             onClick={() => simulatePhotoUpload(job.id)}
                             className="flex items-center space-x-1.5 text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-lg transition"
@@ -443,9 +443,9 @@ export const MechanicPanel: React.FC = () => {
                       )}
                     </div>
 
-                    {/* Pre-uploaded images visualization list */}
+                    {/* Pre-uploaded images visualization list (visible on desktop/laptop screens only) */}
                     {job.images.length > 0 && (
-                      <div className="pt-3 border-t border-slate-100 flex items-center space-x-3 overflow-x-auto">
+                      <div className="hidden md:flex pt-3 border-t border-slate-100 items-center space-x-3 overflow-x-auto">
                         <span className="text-[10px] font-mono text-slate-400 uppercase tracking-wider shrink-0">DIAGNOSTIC SNAP:</span>
                         {job.images.map((img, iidx) => (
                           <div key={iidx} className="relative w-12 h-12 rounded-lg overflow-hidden border border-slate-200 shrink-0">

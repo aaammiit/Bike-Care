@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import ranaLogo from "../assets/images/rana_bike_cares_logo_1784714930624.jpg";
 import { Wrench, Phone, Menu, X, Sun, Moon, Cpu, MessageSquare, AlertTriangle, Bike } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 
@@ -423,18 +424,15 @@ export const CinematicNavbar: React.FC<CinematicNavbarProps> = ({
               onMouseLeave={() => setIsLogoHovered(false)}
               className="flex items-center space-x-2 sm:space-x-3 cursor-pointer group animate-fadeIn"
             >
-              {/* Rotating gear wheel + vibrating block */}
-              <div className={`relative overflow-hidden bg-eager-green text-white p-2 sm:p-2.5 rounded-xl flex items-center justify-center border-b-4 border-emerald-600 transition-all duration-300 group-hover:scale-105 ${
+              {/* Official Rana Bike Care Logo Icon */}
+              <div className={`relative overflow-hidden w-9 h-9 sm:w-11 sm:h-11 bg-white rounded-xl p-0.5 flex items-center justify-center border-2 border-emerald-500 shadow-md transition-all duration-300 group-hover:scale-105 shrink-0 ${
                 isLogoHovered ? "logo-engine-vibrate" : ""
               }`}>
-                {/* Rotating Bike */}
-                <div className={`transition-transform duration-500 ${isLogoHovered ? "scale-110" : ""}`}>
-                  <Bike className="h-3.5 w-3.5 sm:h-4.5 sm:w-4.5 stroke-[2.5]" />
-                </div>
+                <img src={ranaLogo} alt="Rana Bike Care Official Logo" className="w-full h-full object-contain rounded-lg" />
               </div>
 
               <div className="text-left">
-                <h1 className="font-display font-black text-xl sm:text-2xl leading-none tracking-tight flex items-center text-charcoal">
+                <h1 className="font-display font-black text-xl sm:text-2xl leading-none tracking-tight flex items-center text-charcoal dark:text-white">
                   Rana <span className="text-eager-green font-extrabold ml-1 text-base sm:text-lg font-sans">Bike Care</span>
                 </h1>
               </div>
@@ -590,12 +588,12 @@ export const CinematicNavbar: React.FC<CinematicNavbarProps> = ({
               <div className="space-y-7">
                 {/* Mobile Drawer Top logo profile card */}
                 <div className="flex items-center space-x-3.5 pb-5 border-b border-orange-500/10">
-                  <div className="bg-orange-500 text-white p-2 rounded-xl">
-                    <Wrench className="h-4.5 w-4.5" />
+                  <div className="w-10 h-10 bg-white border border-slate-200 dark:border-slate-800 p-0.5 rounded-xl shadow-md overflow-hidden shrink-0">
+                    <img src={ranaLogo} alt="Rana Bike Care Logo" className="w-full h-full object-contain rounded-lg" />
                   </div>
                   <div>
-                    <h2 className="font-display font-black text-lg leading-none tracking-tight">RANA GARAGE</h2>
-                    <p className="text-[10px] text-orange-500 font-mono tracking-widest uppercase mt-0.5 font-bold">Bike Care Experts</p>
+                    <h2 className="font-display font-black text-lg leading-none tracking-tight">RANA BIKE CARE</h2>
+                    <p className="text-[10px] text-orange-500 font-mono tracking-widest uppercase mt-0.5 font-bold">Precision Garage</p>
                   </div>
                 </div>
 

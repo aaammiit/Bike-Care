@@ -130,17 +130,17 @@ export const SectionEditorModal: React.FC<SectionEditorModalProps> = ({
   // Single Workshop Log Form State
   const [logForm, setLogForm] = useState<WorkshopLogItem>({
     id: `g_${Date.now()}`,
-    title: "Hydraulic Brake Master Cylinder Rebuild",
+    title: "Front Brake Shoe & Cable Fitting",
     category: "brake",
-    categoryLabel: "Brakes & Suspension",
+    categoryLabel: "Brake Service",
     img: "https://images.unsplash.com/photo-1558980664-769d59546b3d?auto=format&fit=crop&q=80&w=1200",
-    desc: "Bleeding fluid, cleaning caliper pistons, and fitting new dual ceramic pads.",
-    tool: "Pneumatic Brake Bleeder",
-    diagnostic: "Spongy brake lever travel, low hydraulic pressure.",
-    spec: "Brake line pressure restored to 120 Bar.",
+    desc: "Replaced worn drum brake shoes, cleaned brake drum liner, and adjusted cable free play.",
+    tool: "Ring Spanner & Cable Pliers",
+    diagnostic: "Soft brake pedal feel, worn drum brake lining.",
+    spec: "Brake lever free play adjusted to 15mm.",
     technician: "Rana Singh",
-    greaseLevel: "45% Fluid",
-    severity: "HIGH"
+    greaseLevel: "30% Dust",
+    severity: "MEDIUM"
   });
 
   // Single Before/After Form State
@@ -501,8 +501,8 @@ export const SectionEditorModal: React.FC<SectionEditorModalProps> = ({
                     </button>
                   </div>
 
-                  {/* Image Upload Block */}
-                  <div className="space-y-2">
+                  {/* Image Upload Block (Visible on Laptop/Desktop only) */}
+                  <div className="hidden md:block space-y-2">
                     <label className="block text-xs font-mono font-bold text-slate-300 uppercase">
                       📸 Step Photo (Upload Local File OR Enter Image URL)
                     </label>
@@ -735,8 +735,8 @@ export const SectionEditorModal: React.FC<SectionEditorModalProps> = ({
                     </button>
                   </div>
 
-                  {/* Image Upload Block */}
-                  <div className="space-y-2">
+                  {/* Image Upload Block (Visible on Laptop/Desktop only) */}
+                  <div className="hidden md:block space-y-2">
                     <label className="block text-xs font-mono font-bold text-slate-300 uppercase">
                       📸 Garage Work Photo (Upload Local File OR Web Image URL)
                     </label>
@@ -979,8 +979,8 @@ export const SectionEditorModal: React.FC<SectionEditorModalProps> = ({
                     </button>
                   </div>
 
-                  {/* Dual Image Upload Grid */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5 p-4 bg-slate-900/80 rounded-2xl border border-slate-800">
+                  {/* Dual Image Upload Grid (Visible on Laptop/Desktop only) */}
+                  <div className="hidden md:grid grid-cols-1 md:grid-cols-2 gap-5 p-4 bg-slate-900/80 rounded-2xl border border-slate-800">
                     {/* BEFORE IMAGE */}
                     <div className="space-y-3">
                       <label className="block text-xs font-mono font-black text-rose-400 uppercase tracking-wider">
