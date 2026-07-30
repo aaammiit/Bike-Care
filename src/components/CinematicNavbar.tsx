@@ -44,8 +44,16 @@ export const CinematicNavbar: React.FC<CinematicNavbarProps> = ({
 
   // Track Scrolling for Glassmorphism & Shadow
   useEffect(() => {
+    let ticking = false;
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          const scrolled = window.scrollY > 20;
+          setIsScrolled((prev) => (prev === scrolled ? prev : scrolled));
+          ticking = false;
+        });
+        ticking = true;
+      }
     };
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);

@@ -172,8 +172,8 @@ export const ServicesCarousel: React.FC<ServicesCarouselProps> = ({ onSelectServ
   const handleScroll = () => {
     if (!scrollRef.current) return;
     const el = scrollRef.current;
-    const index = Math.round(el.scrollLeft / 330);
-    setActiveCardIndex(Math.min(Math.max(index, 0), RANA_GARAGE_SERVICES.length - 1));
+    const index = Math.min(Math.max(Math.round(el.scrollLeft / 330), 0), RANA_GARAGE_SERVICES.length - 1);
+    setActiveCardIndex((prev) => (prev === index ? prev : index));
   };
 
   const scrollLeft = () => {

@@ -398,35 +398,30 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenBooking, onNavig
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
 
-  // Monitor Scroll position to highlight menu items
+  // Monitor Scroll position using IntersectionObserver to avoid layout thrashing and scroll lag
   useEffect(() => {
-    let ticking = false;
-
-    const handleScroll = () => {
-      if (!ticking) {
-        window.requestAnimationFrame(() => {
-          const sections = ["home", "services", "about", "gallery", "reviews", "faq", "contact"];
-          const scrollPos = window.scrollY + 200;
-
-          for (const section of sections) {
-            const el = document.getElementById(section);
-            if (el) {
-              const top = el.offsetTop;
-              const height = el.offsetHeight;
-              if (scrollPos >= top && scrollPos < top + height) {
-                setActiveSection(section);
-                break;
-              }
-            }
+    const sections = ["home", "services", "about", "gallery", "reviews", "faq", "contact"];
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const id = entry.target.id;
+            setActiveSection((prev) => (prev === id ? prev : id));
           }
-          ticking = false;
         });
-        ticking = true;
+      },
+      {
+        rootMargin: "-20% 0px -45% 0px",
+        threshold: 0.1
       }
-    };
+    );
 
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
+    sections.forEach((id) => {
+      const el = document.getElementById(id);
+      if (el) observer.observe(el);
+    });
+
+    return () => observer.disconnect();
   }, []);
 
   // Process Booking Form Submission
