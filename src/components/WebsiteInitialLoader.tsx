@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import ranaLogo from "../assets/images/rana_bike_cares_logo_1784714930624.jpg";
 import { motion } from "motion/react";
-import { Wrench, Shield, CheckCircle2, Volume2, VolumeX, Gauge } from "lucide-react";
+import { Wrench, Shield, CheckCircle2, Gauge } from "lucide-react";
 import { IntroAudioManager } from "../utils/IntroAudioManager";
 
 interface WebsiteInitialLoaderProps {
@@ -127,39 +127,7 @@ export const WebsiteInitialLoader: React.FC<WebsiteInitialLoaderProps> = ({ onLo
           </div>
         </div>
 
-        {/* Sound Toggle & Skip Controls */}
-        <div className="flex items-center space-x-2.5">
-          <button
-            type="button"
-            onClick={handleToggleMute}
-            className={`flex items-center space-x-1.5 text-xs font-mono font-bold px-3 py-2 rounded-full border transition-all cursor-pointer shadow-lg active:scale-95 ${
-              isMuted 
-                ? "bg-slate-900/90 text-slate-400 border-slate-700 hover:text-white" 
-                : "bg-orange-500/20 text-orange-400 border-orange-500/60 hover:bg-orange-500 hover:text-white"
-            }`}
-            title={isMuted ? "Enable Engine Sound" : "Mute Sound"}
-          >
-            {isMuted ? (
-              <>
-                <VolumeX className="h-4 w-4" />
-                <span className="hidden sm:inline">Sound Off</span>
-              </>
-            ) : (
-              <>
-                <Volume2 className="h-4 w-4 animate-pulse" />
-                <span className="hidden sm:inline font-bold">Full-Bass Sound ON</span>
-              </>
-            )}
-          </button>
 
-          <button
-            type="button"
-            onClick={handleSkip}
-            className="text-xs font-bold text-slate-300 hover:text-white bg-slate-900/90 border border-slate-700 hover:border-amber-400 px-4 py-2 rounded-full transition-all cursor-pointer shadow-lg active:scale-95"
-          >
-            Skip Intro →
-          </button>
-        </div>
       </div>
 
       {/* Center Stage: Prominent Animated Motorcycle GIF Container */}
