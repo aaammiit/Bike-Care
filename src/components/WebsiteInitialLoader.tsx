@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import ranaLogo from "../assets/images/rana_bike_cares_logo_1784714930624.jpg";
 import { motion } from "motion/react";
-import { Shield, CheckCircle2, Gauge, Volume2, VolumeX, FastForward, Upload, Music, RotateCcw } from "lucide-react";
+import { Shield, CheckCircle2, Gauge, Volume2, VolumeX, FastForward } from "lucide-react";
 import { IntroAudioManager } from "../utils/IntroAudioManager";
 
 interface WebsiteInitialLoaderProps {
@@ -13,20 +13,13 @@ export const WebsiteInitialLoader: React.FC<WebsiteInitialLoaderProps> = ({ onLo
   const [statusText, setStatusText] = useState("Kickstarting Engine Systems & Ignition...");
   const [isMuted, setIsMuted] = useState(false);
   const [audioActive, setAudioActive] = useState(false);
-  const [customAudioName, setCustomAudioName] = useState<string | null>(null);
   
   const audioManagerRef = useRef<IntroAudioManager | null>(null);
-  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   // Initialize Audio Manager on mount & setup global user gesture listeners for instant sound on reload
   useEffect(() => {
     const manager = new IntroAudioManager();
     audioManagerRef.current = manager;
-
-    const storedName = localStorage.getItem("custom_bike_sound_filename");
-    if (storedName) {
-      setCustomAudioName(storedName);
-    }
 
     // Attempt sound playback immediately on mount
     manager.startEngine();
@@ -95,36 +88,6 @@ export const WebsiteInitialLoader: React.FC<WebsiteInitialLoaderProps> = ({ onLo
       const muted = audioManagerRef.current.toggleMute();
       setIsMuted(muted);
       setAudioActive(!muted);
-    }
-  };
-
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      const dataUri = event.target?.result as string;
-      if (dataUri && audioManagerRef.current) {
-        audioManagerRef.current.setCustomAudioSource(dataUri);
-        setCustomAudioName(file.name);
-        try {
-          localStorage.setItem("custom_bike_sound_filename", file.name);
-        } catch {}
-        setAudioActive(true);
-      }
-    };
-    reader.readAsDataURL(file);
-  };
-
-  const handleResetAudio = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (audioManagerRef.current) {
-      audioManagerRef.current.removeCustomAudioSource();
-      setCustomAudioName(null);
-      try {
-        localStorage.removeItem("custom_bike_sound_filename");
-      } catch {}
     }
   };
 
@@ -200,15 +163,6 @@ export const WebsiteInitialLoader: React.FC<WebsiteInitialLoaderProps> = ({ onLo
         />
       </div>
 
-      {/* Hidden Audio File Input */}
-      <input
-        type="file"
-        ref={fileInputRef}
-        accept="audio/*"
-        onChange={handleFileUpload}
-        className="hidden"
-      />
-
       {/* Top Header Controls */}
       <div className="p-4 sm:p-6 flex items-center justify-between max-w-7xl w-full mx-auto relative z-10">
         <div className="flex items-center space-x-3">
@@ -225,33 +179,8 @@ export const WebsiteInitialLoader: React.FC<WebsiteInitialLoaderProps> = ({ onLo
           </div>
         </div>
 
-        {/* Audio File Upload, Mute & Skip Actions */}
+        {/* Mute & Skip Actions */}
         <div className="flex items-center space-x-2">
-          {/* Upload Custom Sound Button */}
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              fileInputRef.current?.click();
-            }}
-            className="p-2.5 sm:px-3 sm:py-2.5 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 border border-amber-400/50 text-amber-300 font-extrabold text-xs transition flex items-center space-x-1.5 cursor-pointer shadow-md"
-            title="Upload your own bike sound file (.mp3 / .wav)"
-          >
-            <Upload className="h-4 w-4 text-amber-400" />
-            <span className="hidden sm:inline">
-              {customAudioName ? "Change Audio" : "Upload Sound"}
-            </span>
-          </button>
-
-          {customAudioName && (
-            <button
-              onClick={handleResetAudio}
-              className="p-2.5 rounded-xl bg-slate-900 border border-slate-700 text-slate-400 hover:text-white transition cursor-pointer"
-              title="Reset to default bike sound"
-            >
-              <RotateCcw className="h-4 w-4" />
-            </button>
-          )}
-
           <button
             onClick={handleToggleMute}
             className={`p-2.5 rounded-xl border backdrop-blur-md transition flex items-center space-x-1.5 text-xs font-bold cursor-pointer ${
@@ -299,9 +228,7 @@ export const WebsiteInitialLoader: React.FC<WebsiteInitialLoaderProps> = ({ onLo
                 {isMuted
                   ? "Audio Muted"
                   : audioActive
-                  ? customAudioName
-                    ? `🎵 ${customAudioName}`
-                    : "Engine Sound Active"
+                  ? "Engine Sound Active"
                   : "Tap Screen for Sound"}
               </span>
             </div>
