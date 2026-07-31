@@ -4,6 +4,7 @@ import { LandingPage } from "./components/LandingPage";
 import { BookingWizard } from "./components/BookingWizard";
 import { UsersModal } from "./components/UsersModal";
 import { WebsiteInitialLoader } from "./components/WebsiteInitialLoader";
+import { OfflineStatusNotifier } from "./components/OfflineStatusNotifier";
 import { ServiceType } from "./types";
 import { motion, AnimatePresence } from "motion/react";
 import { Phone, MessageSquare } from "lucide-react";
@@ -21,6 +22,9 @@ const MainAppContent: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-slate-900 text-slate-100 flex flex-col relative selection:bg-rose-500 selection:text-white">
+      {/* Offline Status & Network Notifier Banner */}
+      <OfflineStatusNotifier />
+
       {/* Full Screen Initial Website Loader */}
       <AnimatePresence>
         {isAppLoading && (

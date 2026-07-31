@@ -310,7 +310,7 @@ export const CinematicNavbar: React.FC<CinematicNavbarProps> = ({
 
       {/* Main Navbar Header wrapper */}
       <header
-        className={`fixed top-0 left-0 z-50 w-full text-charcoal transition-all duration-300 ease-in-out ${
+        className={`fixed top-0 left-0 z-50 w-full text-charcoal transition-all duration-300 ease-in-out gpu-accelerate ${
           isScrolled
             ? "bg-white/95 backdrop-blur-md py-2.5 border-b-4 border-slate-300/90 shadow-[0_5px_0_0_#e2e8f0,0_12px_24px_-4px_rgba(0,0,0,0.15)]"
             : "bg-white py-4 border-b-2 border-slate-200 shadow-[0_2px_0_0_#f1f5f9]"

@@ -27,8 +27,16 @@
 }
 
 @layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+  }
   body {
     @apply font-sans bg-white text-charcoal antialiased selection:bg-storybook-green selection:text-night-ink;
+    overflow-x: hidden;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 }
 
@@ -215,6 +223,25 @@
 
 .dark-glass-panel {
   @apply bg-night-ink border border-b-2 border-slate-900;
+}
+
+/* GPU Hardware Acceleration for Smooth 60fps/120fps Scrolling */
+.gpu-accelerate {
+  transform: translateZ(0);
+  will-change: transform;
+  backface-visibility: hidden;
+}
+
+/* Content Visibility Auto - Skips off-screen layout & paint computations until scrolled into view */
+.cv-auto {
+  content-visibility: auto;
+  contain-intrinsic-size: 1px 700px;
+}
+
+/* Paused off-screen animations */
+.offscreen-paused,
+.offscreen-paused * {
+  animation-play-state: paused !important;
 }
 
 /* --- CUSTOM IMMERSIVE WORKSHOP ANIMATIONS --- */

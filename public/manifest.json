@@ -1,0 +1,17 @@
+{
+  "short_name": "Rana Bike Care",
+  "name": "Rana Bike Care — Precision Garage",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' fill='%23f97316'><rect width='512' height='512' rx='128' fill='%230f172a'/><path d='M315 135a21 21 0 0 0 0 30l34 34a21 21 0 0 0 30 0l80-80a128 128 0 0 1-169 169l-147 147a45 45 0 0 1-64-64l147-147a128 128 0 0 1 169-169l-80 80z' fill='%23f97316'/></svg>",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml"
+    }
+  ],
+  "start_url": "/",
+  "background_color": "#0f172a",
+  "theme_color": "#0f172a",
+  "display": "standalone",
+  "orientation": "portrait",
+  "description": "Rana Bike Care is a premier motorcycle repair garage and tuning workshop."
+}

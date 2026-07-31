@@ -379,13 +379,29 @@ export const AnimatedMotorcycle: React.FC = () => {
     }, 120);
   };
 
-  // Fluctuating real-time diagnostics sensors
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [isInViewport, setIsInViewport] = useState(true);
+
   useEffect(() => {
+    if (!containerRef.current) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsInViewport(entry.isIntersecting);
+      },
+      { threshold: 0.01 }
+    );
+    observer.observe(containerRef.current);
+    return () => observer.disconnect();
+  }, []);
+
+  // Fluctuating real-time diagnostics sensors (only active when visible in viewport)
+  useEffect(() => {
+    if (!isInViewport) return;
     const timer = setInterval(() => {
       setMetricFluctuation(Math.random() - 0.5);
-    }, 250);
+    }, 400);
     return () => clearInterval(timer);
-  }, []);
+  }, [isInViewport]);
 
   // Step-by-step procedure simulation progress
   useEffect(() => {
@@ -429,6 +445,8 @@ export const AnimatedMotorcycle: React.FC = () => {
 
   // Set up intervals to handle automatic day/night toggling and bike cycling continuously in ALWAYS AUTO MODE
   useEffect(() => {
+    if (!isInViewport) return;
+
     // Cycle bike design automatically every 5 seconds
     const bikeInterval = setInterval(() => {
       setSelectedBike((prev) => (prev + 1) % bikeModels.length);
@@ -446,7 +464,7 @@ export const AnimatedMotorcycle: React.FC = () => {
       clearInterval(bikeInterval);
       clearInterval(environmentInterval);
     };
-  }, [soundMuted]);
+  }, [soundMuted, isInViewport]);
 
   const handleNextBike = () => {
     setSelectedBike((prev) => (prev + 1) % bikeModels.length);
@@ -555,7 +573,10 @@ export const AnimatedMotorcycle: React.FC = () => {
   const terminalLogs = getTerminalLogs();
 
   return (
-    <div className="relative w-full overflow-hidden select-none transition-all duration-300 h-[380px] xs:h-[440px] sm:h-[520px] md:h-[600px] lg:h-[650px] bg-slate-950/20 rounded-none border-y border-slate-900/60 shadow-2xl flex flex-col">
+    <div 
+      ref={containerRef}
+      className={`relative w-full overflow-hidden select-none transition-all duration-300 h-[380px] xs:h-[440px] sm:h-[520px] md:h-[600px] lg:h-[650px] bg-slate-950/20 rounded-none border-y border-slate-900/60 shadow-2xl flex flex-col gpu-accelerate ${!isInViewport ? "offscreen-paused" : ""}`}
+    >
       {/* 1. CSS Keyframes and styling rules */}
       <style>{`
         /* Ground scrolling */
