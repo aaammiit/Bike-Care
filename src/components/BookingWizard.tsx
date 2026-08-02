@@ -166,11 +166,11 @@ export const BookingWizard: React.FC<BookingWizardProps> = ({
 📍 *Location:* ${locText || "Pune Workshop Visit"}
 📅 *Preferred Date:* ${bookingDate}
 ----------------------------------------
-📍 *Rana Garage:* Lane 7, Koregaon Park, Pune
-📞 *Helpline:* +91 97678 24216`;
+📍 *Rana Garage:* Dapodi, Pimpri Chinchwad, Pune - 411012
+📞 *Helpline:* +91 92724 96996`;
 
     const encoded = encodeURIComponent(message);
-    const url = `https://wa.me/919767824216?text=${encoded}`;
+    const url = `https://wa.me/919272496996?text=${encoded}`;
 
     setFormattedWaUrl(url);
     setIsSubmitted(true);
@@ -366,7 +366,7 @@ export const BookingWizard: React.FC<BookingWizardProps> = ({
                   <input
                     type="text"
                     required
-                    placeholder="e.g. Lane 7, Koregaon Park, Pune"
+                    placeholder="e.g. Dapodi, Pimpri Chinchwad, Pune"
                     value={locationAddress}
                     onChange={(e) => setLocationAddress(e.target.value)}
                     className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-400 focus:border-emerald-500 outline-none transition font-medium"
@@ -492,11 +492,11 @@ export const BookingWizard: React.FC<BookingWizardProps> = ({
                   </a>
                 ) : (
                   <a
-                    href="tel:+919767824216"
+                    href="tel:+919272496996"
                     className="w-full bg-amber-600 hover:bg-amber-500 text-white font-bold py-3.5 rounded-xl text-xs transition flex items-center justify-center space-x-2 shadow-lg"
                   >
                     <Phone className="h-4 w-4 animate-bounce" />
-                    <span>📞 Call Mechanic Master Rana (+91 97678 24216)</span>
+                    <span>📞 Call Mechanic Master Rana (+91 92724 96996)</span>
                   </a>
                 )}
 

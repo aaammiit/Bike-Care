@@ -819,7 +819,7 @@ export const CustomerDashboard: React.FC<CustomerDashboardProps> = ({ onOpenBook
                                 Scheduled Date: <span className="font-bold">{book.acceptedDate || book.date}</span> ({book.acceptedTimeSlot || book.timeSlot})
                               </p>
                               <p className="text-[11px] text-emerald-700">
-                                Garage Contact: <span className="font-mono font-bold">+91 97678 24216</span> (Rana Singh)
+                                Garage Contact: <span className="font-mono font-bold">+91 92724 96996</span> (Rana Singh)
                               </p>
                             </div>
                           )}
@@ -834,7 +834,7 @@ export const CustomerDashboard: React.FC<CustomerDashboardProps> = ({ onOpenBook
                                 "{book.rejectionReason || "Workshop schedule full for requested slot."}"
                               </p>
                               <p className="text-[11px] text-rose-700">
-                                Please call us at <span className="font-mono font-bold">+91 97678 24216</span> to select an alternate slot.
+                                Please call us at <span className="font-mono font-bold">+91 92724 96996</span> to select an alternate slot.
                               </p>
                             </div>
                           )}
@@ -933,17 +933,17 @@ export const CustomerDashboard: React.FC<CustomerDashboardProps> = ({ onOpenBook
                 Emergency Mechanical Assistance
               </h3>
               <p className="text-xs text-slate-600 leading-relaxed">
-                Stuck on the road? Puncture, dry chain, electrical blackout or accidental recovery? Pune's Koregaon Park crew has an active recovery truck!
+                Stuck on the road? Puncture, dry chain, electrical blackout or accidental recovery? Dapodi & Pimpri Chinchwad crew has an active recovery truck!
               </p>
 
               <div className="space-y-3 font-sans text-xs">
                 <div className="p-3 bg-red-50 border border-red-100 rounded-xl flex items-center justify-between">
                   <div>
                     <span className="font-bold text-red-950 block">Assistance Hotline</span>
-                    <span className="text-[10px] text-red-600">Available Monday - Saturday (9 AM - 8 PM)</span>
+                    <span className="text-[10px] text-red-600">Available Monday - Saturday (10 AM - 9 PM)</span>
                   </div>
                   <a
-                    href="tel:+919767824216"
+                    href="tel:+919272496996"
                     className="bg-red-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold"
                   >
                     Call Now
@@ -957,15 +957,15 @@ export const CustomerDashboard: React.FC<CustomerDashboardProps> = ({ onOpenBook
                   </div>
                   <button
                     onClick={() => {
-                      const userLoc = "Lane 5, Koregaon Park, Pune";
-                      const mapsUrl = generateGoogleMapsUrl(userLoc, { lat: 18.5362, lon: 73.8940 });
+                      const userLoc = "Dapodi, Pimpri Chinchwad, Pune";
+                      const mapsUrl = generateGoogleMapsUrl(userLoc, { lat: 18.5772, lon: 73.8298 });
                       const bikeName = bikes[0] ? `${bikes[0].brand} ${bikes[0].model}` : "Motorcycle";
                       const msg = `🚨 *TOWING & RECOVERY HELP REQUEST*
 Hello Rana Garage, I need emergency towing assistance for my ${bikeName}.
 • Customer: ${currentCustomer.name} (${currentCustomer.mobile})
 • Location: ${userLoc}
 📍 *Google Maps Location:* ${mapsUrl}`;
-                      window.open(`https://wa.me/919767824216?text=${encodeURIComponent(msg)}`, "_blank");
+                      window.open(`https://wa.me/919272496996?text=${encodeURIComponent(msg)}`, "_blank");
                       setToastMessage("Opening WhatsApp with live Google Maps towing location!");
                     }}
                     className="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold flex items-center cursor-pointer transition"
@@ -986,17 +986,17 @@ Hello Rana Garage, I need emergency towing assistance for my ${bikeName}.
                 Garage Location Navigation
               </h3>
               <p className="text-xs text-slate-600 leading-relaxed">
-                Follow North Main road or Koregaon Park lane 5 directly. Easily accessible for cruiser tow trucks and scooters.
+                Located conveniently in Dapodi, Pimpri Chinchwad. Easily accessible for two-wheeler service, repair and towing.
               </p>
 
               <div className="p-4 bg-slate-100 border border-slate-200 rounded-2xl flex items-center justify-between">
                 <div>
-                  <span className="font-bold text-slate-900 block text-xs">Plot 12A, Lane 5, Koregaon Park</span>
-                  <span className="text-[10px] text-slate-500 font-mono block mt-0.5">PUNE, MAHARASHTRA 411001</span>
+                  <span className="font-bold text-slate-900 block text-xs">Rana Auto Garage, Dapodi</span>
+                  <span className="text-[10px] text-slate-500 font-mono block mt-0.5">PIMPRI CHINCHWAD, PUNE 411012</span>
                 </div>
                 
                 <a
-                  href="https://maps.google.com/?q=Koregaon+Park+Pune"
+                  href="https://maps.google.com/?q=Rana+Auto+Garage+Dapodi+Pimpri+Chinchwad+Pune"
                   target="_blank"
                   rel="noreferrer"
                   className="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-3.5 py-2 rounded-xl transition flex items-center shrink-0"

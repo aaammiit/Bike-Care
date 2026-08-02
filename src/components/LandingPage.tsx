@@ -325,7 +325,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenBooking, onNavig
     return tomorrow.toISOString().split("T")[0];
   });
   const [formTime, setFormTime] = useState("10:00 AM - 12:00 PM");
-  const [formPinCode, setFormPinCode] = useState("271201");
+  const [formPinCode, setFormPinCode] = useState("411012");
   const [formLoc, setFormLoc] = useState("");
 
   // Booking Feedback States
@@ -365,10 +365,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenBooking, onNavig
       (error) => {
         console.warn("Geolocation permission denied or failed, using high-accuracy fallback:", error);
         // Fallback to beautiful default Pune coordinates for seamless sandbox execution
-        const fallbackLat = 18.5362;
-        const fallbackLon = 73.8940;
+        const fallbackLat = 18.5772;
+        const fallbackLon = 73.8298;
         setGpsCoords({ lat: fallbackLat, lon: fallbackLon });
-        setFormLoc(`Lat: ${fallbackLat.toFixed(6)}, Lon: ${fallbackLon.toFixed(6)} (Koregaon Park, Pune GPS Link)`);
+        setFormLoc(`Lat: ${fallbackLat.toFixed(6)}, Lon: ${fallbackLon.toFixed(6)} (Dapodi, Pimpri Chinchwad GPS Link)`);
         setGpsLoading(false);
         playDiagnosticBeep(600, 250);
       },
@@ -450,7 +450,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenBooking, onNavig
     setIsSubmitting(true);
 
     // Save to user requests store for owner CSV access
-    const finalLocation = `${formLoc || "Koregaon Park, Pune"} [PIN: ${formPinCode || "271201"}]`;
+    const finalLocation = `${formLoc || "Dapodi, Pimpri Chinchwad, Pune"} [PIN: ${formPinCode || "411012"}]`;
     if (addUserRequest) {
       addUserRequest({
         name: formName,
@@ -494,13 +494,13 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenBooking, onNavig
 *Preferred Schedule:*
 • Preferred Date: ${formDate}
 • Preferred Slot: ${formTime}
-• Area PIN Code: ${formPinCode || "271201"}
+• Area PIN Code: ${formPinCode || "411012"}
 
 ---
 _Please confirm my slot on your dashboard, Master Rana. Thank you!_`;
 
         const encodedMessage = encodeURIComponent(whatsappMessage);
-        const waUrl = `https://wa.me/919767824216?text=${encodedMessage}`;
+        const waUrl = `https://wa.me/919272496996?text=${encodedMessage}`;
 
         // Open WhatsApp after a brief delay so the user sees the success modal first!
         setTimeout(() => {
@@ -1535,7 +1535,7 @@ _Please confirm my slot on your dashboard, Master Rana. Thank you!_`;
                       WORKING HOURS
                     </span>
                     <span className="font-bold text-slate-900 dark:text-white text-xs sm:text-sm">
-                      Monday – Saturday: 9:00 AM – 8:00 PM
+                      Monday – Saturday: 10:00 AM – 9:00 PM
                     </span>
                   </div>
                 </div>
@@ -1561,7 +1561,7 @@ _Please confirm my slot on your dashboard, Master Rana. Thank you!_`;
                 </button>
 
                 <a
-                  href={`https://wa.me/919767824216?text=${encodeURIComponent("Hello Rana Singh, I would like to inquire about motorcycle service at Rana Garage.")}`}
+                  href={`https://wa.me/919272496996?text=${encodeURIComponent("Hello Rana Singh, I would like to inquire about motorcycle service at Rana Garage.")}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="px-6 py-3.5 rounded-2xl bg-emerald-600 hover:bg-emerald-500 active:scale-[0.98] text-white font-black text-xs sm:text-sm tracking-wider uppercase transition-all duration-200 shadow-md hover:shadow-lg hover:shadow-emerald-600/25 flex items-center justify-center space-x-2.5 cursor-pointer"
@@ -1692,7 +1692,7 @@ _Please confirm my slot on your dashboard, Master Rana. Thank you!_`;
               <AnimatedSectionHeader
                 badge="ACTIVE WORKSHOP JOBS"
                 title="Workshop Diaries. Real Garage Logs."
-                description="Inspect authentic mechanical repair logs straight from our Koregaon Park service bays. Click any job card to view Rana's grease-stained physical workshop workbench file, diagnostics, and tools used."
+                description="Inspect authentic mechanical repair logs straight from our Dapodi, Pimpri Chinchwad service bays. Click any job card to view Rana's grease-stained physical workshop workbench file, diagnostics, and tools used."
               />
             </div>
             <button
@@ -2139,7 +2139,7 @@ _Please confirm my slot on your dashboard, Master Rana. Thank you!_`;
                   <div>
                     <h4 className="text-xs font-bold text-slate-900 dark:text-white font-mono uppercase tracking-wide">Physical Address</h4>
                     <p className="text-xs text-slate-600 dark:text-slate-400 mt-1 leading-relaxed">
-                      {activeMechanic.address || "Lane 7, Koregaon Park, Pune, MH - 411001"}
+                      {activeMechanic.address || "Rana Auto Garage, Dapodi, Pimpri Chinchwad, Pune, Maharashtra 411012"}
                     </p>
                   </div>
                 </div>
@@ -2151,7 +2151,7 @@ _Please confirm my slot on your dashboard, Master Rana. Thank you!_`;
                   <div>
                     <h4 className="text-xs font-bold text-slate-900 dark:text-white font-mono uppercase tracking-wide">Workshop Hours</h4>
                     <p className="text-xs text-slate-600 dark:text-slate-400 mt-1 leading-relaxed">
-                      {activeMechanic.availableTime || "9:00 AM - 8:00 PM (Mon - Sat)"}
+                      {activeMechanic.availableTime || "10:00 AM - 9:00 PM (Mon - Sat)"}
                     </p>
                   </div>
                 </div>
@@ -2203,7 +2203,7 @@ _Please confirm my slot on your dashboard, Master Rana. Thank you!_`;
                   style={{ border: 0, filter: "grayscale(15%) contrast(1.05)" }}
                   loading="lazy"
                   allowFullScreen
-                  src={`https://maps.google.com/maps?q=${encodeURIComponent(activeMechanic.address || "Koregaon Park Pune")}&t=&z=14&ie=UTF8&iwloc=&output=embed`}
+                  src={`https://maps.google.com/maps?q=${encodeURIComponent(activeMechanic.address || "Rana Auto Garage Dapodi Pimpri Chinchwad Pune")}&t=&z=14&ie=UTF8&iwloc=&output=embed`}
                   className="w-full h-full"
                 />
 
@@ -2290,9 +2290,10 @@ _Please confirm my slot on your dashboard, Master Rana. Thank you!_`;
             <div className="space-y-3.5">
               <h4 className="text-xs font-bold text-slate-800 dark:text-white font-mono uppercase tracking-wider">Contact Station</h4>
               <p className="text-xs leading-relaxed text-slate-500">
-                Shop No. 12, Koregaon Park Plaza, <br />
-                Near Lane 5, Koregaon Park, Pune <br />
-                Phone: +91 98765 43210
+                Rana Auto Garage <br />
+                Dapodi, Pimpri Chinchwad, Pune <br />
+                Maharashtra 411012 <br />
+                Phone & WhatsApp: +91 92724 96996
               </p>
             </div>
 
@@ -2378,15 +2379,15 @@ _Please confirm my slot on your dashboard, Master Rana. Thank you!_`;
               <div className="space-y-2.5 pt-2">
                 {!isWhatsApp ? (
                   <a
-                    href="tel:+919767824216"
+                    href="tel:+919272496996"
                     className="w-full bg-[#F97316] hover:bg-[#ea580c] text-white py-3.5 rounded-xl text-xs font-black uppercase tracking-widest transition shadow-lg shadow-orange-500/20 flex items-center justify-center space-x-2"
                   >
                     <Phone className="h-4 w-4 animate-bounce" />
-                    <span>📞 Call Mechanic (+91 97678 24216)</span>
+                    <span>📞 Call Mechanic (+91 92724 96996)</span>
                   </a>
                 ) : (
                   <a
-                    href={`https://wa.me/919767824216?text=${encodeURIComponent(`*🏍️ RANA BIKE CARE APPOINTMENT REQUEST*\nName: ${formName}\nPhone: ${formPhone}\nBike: ${formBrand} ${formModel}\nDate: ${formDate}`)}`}
+                    href={`https://wa.me/919272496996?text=${encodeURIComponent(`*🏍️ RANA BIKE CARE APPOINTMENT REQUEST*\nName: ${formName}\nPhone: ${formPhone}\nBike: ${formBrand} ${formModel}\nDate: ${formDate}`)}`}
                     target="_blank"
                     rel="noreferrer"
                     className="w-full bg-emerald-600 hover:bg-emerald-500 text-white py-3.5 rounded-xl text-xs font-black uppercase tracking-widest transition shadow-lg shadow-emerald-500/20 flex items-center justify-center space-x-2"

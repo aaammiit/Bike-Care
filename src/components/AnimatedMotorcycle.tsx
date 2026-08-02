@@ -1162,7 +1162,7 @@ export const AnimatedMotorcycle: React.FC = () => {
               </div>
               <span className="text-[8.5px] sm:text-[10px] font-mono font-black text-amber-300 bg-slate-950 px-1.5 sm:px-2 py-0.5 rounded-full border border-amber-400/60 shadow-md flex items-center space-x-1">
                 <span>📞</span>
-                <span className="tracking-wider">9766881194</span>
+                <span className="tracking-wider">9272496996</span>
               </span>
             </div>
 

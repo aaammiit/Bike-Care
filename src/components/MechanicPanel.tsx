@@ -166,7 +166,7 @@ export const MechanicPanel: React.FC = () => {
           </div>
           <div>
             <h2 className="font-display font-bold text-lg text-white">Workshop Terminal: {loggedInMechanicName}</h2>
-            <p className="text-xs text-slate-400 font-mono">Expert Mechanic • Koregaon Park Pune Workshop Floor</p>
+            <p className="text-xs text-slate-400 font-mono">Expert Mechanic • Dapodi, Pimpri Chinchwad Workshop Floor</p>
           </div>
         </div>
 

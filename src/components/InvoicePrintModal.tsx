@@ -89,8 +89,8 @@ export const InvoicePrintModal: React.FC<InvoicePrintModalProps> = ({ isOpen, on
                       </div>
                       <span className="font-display font-bold text-lg text-slate-900 tracking-tight">Rana Garage</span>
                     </div>
-                    <p className="text-[10px] text-slate-500 font-mono">Pune-Koregaon Park Workshop Branch</p>
-                    <p className="text-[10px] text-slate-400">Tel: +91 98765 43210 • GSTIN: 27AAAAA1111A1Z1</p>
+                    <p className="text-[10px] text-slate-500 font-mono">Dapodi, Pimpri Chinchwad Branch, Pune 411012</p>
+                    <p className="text-[10px] text-slate-400">Tel: +91 92724 96996 • GSTIN: 27AAAAA1111A1Z1</p>
                   </div>
 
                   <div className="text-left sm:text-right space-y-1">
@@ -117,7 +117,7 @@ export const InvoicePrintModal: React.FC<InvoicePrintModalProps> = ({ isOpen, on
                     <h4 className="font-bold text-slate-400 font-mono uppercase tracking-wider text-[10px]">CLIENT DETAILS</h4>
                     <p className="font-bold text-slate-950 text-sm">{invoice.customerName}</p>
                     <p className="text-slate-600 font-mono">{invoice.customerMobile}</p>
-                    <p className="text-slate-500 leading-tight">ROW 4, Koregaon Park, Pune</p>
+                    <p className="text-slate-500 leading-tight">Dapodi, Pimpri Chinchwad, Pune - 411012</p>
                   </div>
 
                   {/* Bike Spec */}
@@ -185,7 +185,7 @@ export const InvoicePrintModal: React.FC<InvoicePrintModalProps> = ({ isOpen, on
                     <div className="space-y-1 font-sans">
                       <h5 className="font-bold text-xs text-slate-900">Scan at Counter</h5>
                       <p className="text-[10px] text-slate-500 leading-snug">
-                        Scan this QR code via GPay, PhonePe, or BHIM UPI directly at our Koregaon Park payment counter to settle the bill.
+                        Scan this QR code via GPay, PhonePe, or BHIM UPI directly at our Dapodi, Pimpri Chinchwad payment counter to settle the bill.
                       </p>
                       <div className="pt-2 text-[10px] text-slate-600 font-mono space-y-0.5">
                         <p>MODE: Cash / UPI at Workshop Only</p>

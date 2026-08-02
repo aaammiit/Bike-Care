@@ -123,7 +123,7 @@ const DEFAULT_CUSTOMER = {
   name: "Rahul Sharma",
   email: "worksample822@gmail.com",
   mobile: "+91 98765 43210",
-  address: "Row House No. 4, Koregaon Park, Pune, MH - 411001"
+  address: "Dapodi, Pimpri Chinchwad, Pune, MH - 411012"
 };
 
 const INITIAL_BIKES: Bike[] = [
@@ -407,7 +407,7 @@ const INITIAL_MECHANIC_PROFILE: MechanicProfile = {
   photo: mechanicData.photo,
   roleTitle: "Owner & Motorcycle Mechanic",
   availableTime: mechanicData.availableTime,
-  address: "Lane 7, Koregaon Park, Pune, MH - 411001",
+  address: "Rana Auto garage, Dapodi, Pimpri Chinchwad, Pune, Maharashtra 411012",
   bio: "With over 15 years of hands-on experience, Rana Singh has been repairing motorcycles for riders across the local community.\n\nFrom regular servicing and oil changes to engine repairs and electrical work, every motorcycle is inspected and repaired personally.\n\nRana believes in honest advice, transparent pricing, quality workmanship, and treating every customer's bike like his own.",
   skills: mechanicData.skills,
   languages: mechanicData.languages,
@@ -427,7 +427,21 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const [mechanicProfile, setMechanicProfile] = useState<MechanicProfile>(() => {
     const saved = localStorage.getItem("garage_mechanic_profile");
-    return saved ? JSON.parse(saved) : INITIAL_MECHANIC_PROFILE;
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        // Automatically sync to required address, phone, and working hours
+        return {
+          ...parsed,
+          phone: "+91 92724 96996",
+          address: "Rana Auto garage, Dapodi, Pimpri Chinchwad, Pune, Maharashtra 411012",
+          availableTime: "Monday – Saturday: 10:00 AM – 9:00 PM"
+        };
+      } catch (e) {
+        console.warn("Failed to parse saved mechanic profile:", e);
+      }
+    }
+    return INITIAL_MECHANIC_PROFILE;
   });
 
   const [userRequests, setUserRequests] = useState<UserRequest[]>(() => {
@@ -951,7 +965,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     // Notify Customer on WhatsApp and SMS with ACCEPTED Date and Time!
     triggerSmsWhatsApp(
       booking.customerMobile,
-      `*✅ RANA GARAGE - BOOKING ACCEPTED*\nHello ${booking.customerName}, your service booking for ${booking.bikeDetails} has been ACCEPTED!\n\n📅 Accepted Date: ${finalDate}\n⏰ Accepted Time Slot: ${finalTimeSlot}\n👨‍🔧 Assigned Mechanic: ${mech ? mech.name : "Karan Singh"}\n📞 Contact Garage: +91 97678 24216\n📍 Live Tracking ID: ${newRepair.id}`,
+      `*✅ RANA GARAGE - BOOKING ACCEPTED*\nHello ${booking.customerName}, your service booking for ${booking.bikeDetails} has been ACCEPTED!\n\n📅 Accepted Date: ${finalDate}\n⏰ Accepted Time Slot: ${finalTimeSlot}\n👨‍🔧 Assigned Mechanic: ${mech ? mech.name : "Karan Singh"}\n📞 Contact Garage: +91 92724 96996\n📍 Live Tracking ID: ${newRepair.id}`,
       "WhatsApp"
     );
 
@@ -987,7 +1001,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     // Notify customer via SMS / WhatsApp with rejection reason
     triggerSmsWhatsApp(
       booking.customerMobile,
-      `*❌ RANA GARAGE - BOOKING UPDATE*\nHello ${booking.customerName}, your service request for ${booking.bikeDetails} could not be accepted at this time.\n\n⚠️ Reason: "${reasonMsg}"\n\n📞 Please call Rana Singh at +91 97678 24216 to discuss an alternate date.`,
+      `*❌ RANA GARAGE - BOOKING UPDATE*\nHello ${booking.customerName}, your service request for ${booking.bikeDetails} could not be accepted at this time.\n\n⚠️ Reason: "${reasonMsg}"\n\n📞 Please call Rana Singh at +91 92724 96996 to discuss an alternate date.`,
       "WhatsApp"
     );
 

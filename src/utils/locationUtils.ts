@@ -60,9 +60,9 @@ export function generateGoogleMapsUrl(
   // Fallback to address query mapping
   const cleanAddress = locationStr
     ? locationStr.replace(/\(.*?\)/g, "").replace(/Lat:.*?, Lon:.*?/gi, "").trim()
-    : "Koregaon Park, Pune";
+    : "Dapodi, Pimpri Chinchwad, Pune";
 
-  const addressQuery = cleanAddress.length > 2 ? cleanAddress : "Koregaon Park, Pune";
+  const addressQuery = cleanAddress.length > 2 ? cleanAddress : "Dapodi, Pimpri Chinchwad, Pune";
   return `https://maps.google.com/?q=${encodeURIComponent(addressQuery)}`;
 }
 
@@ -74,6 +74,6 @@ export function formatWhatsAppLocationBlock(
   coords?: LatLngCoords | null
 ): string {
   const mapsUrl = generateGoogleMapsUrl(locationStr, coords);
-  const locDisplay = locationStr || "Koregaon Park, Pune";
+  const locDisplay = locationStr || "Dapodi, Pimpri Chinchwad, Pune";
   return `• Location: ${locDisplay}\n📍 *Google Maps Location:* ${mapsUrl}`;
 }

@@ -8,6 +8,7 @@ import bikeWashImg from "../assets/images/bike_wash_polish_1785392083459.jpg";
 import generalInspectionImg from "../assets/images/general_bike_inspection_1785392095824.jpg";
 import ranaMechanicImg from "../assets/images/rana_singh_mechanic_1785394023899.jpg";
 
+
 // Direct image URLs for high performance and reliable builds
 const workshopLiftImg = regularServiceImg;
 const clutchEngineImg = engineRepairImg;
@@ -23,6 +24,7 @@ export interface MechanicInfo {
   age: number;
   experience: string;
   phone: string;
+  address?: string;
   skills: string[];
   languages: string[];
   availableTime: string;
@@ -85,7 +87,8 @@ export const mechanicData: MechanicInfo = {
   roleTitle: "Owner & Motorcycle Mechanic",
   age: 40,
   experience: "15+ Years",
-  phone: "+91 97678 24216",
+  phone: "+91 92724 96996",
+  address: "Rana Auto garage, Dapodi, Pimpri Chinchwad, Pune, Maharashtra 411012",
   bio: "With over 15 years of hands-on experience, Rana Singh has been repairing motorcycles for riders across the local community.\n\nFrom regular servicing and oil changes to engine repairs and electrical work, every motorcycle is inspected and repaired personally.\n\nRana believes in honest advice, transparent pricing, quality workmanship, and treating every customer's bike like his own.",
   skills: [
     "Regular Servicing",
@@ -99,7 +102,7 @@ export const mechanicData: MechanicInfo = {
     "Battery Replacement"
   ],
   languages: ["Hindi", "Marathi", "English"],
-  availableTime: "Monday – Saturday: 9:00 AM – 8:00 PM",
+  availableTime: "Monday – Saturday: 10:00 AM – 9:00 PM",
   rating: 4.9,
   totalRepairs: 3500,
   happyCustomers: 3200,
@@ -302,7 +305,7 @@ export const faqItems: FAQItem[] = [
   },
   {
     question: "Do you offer emergency roadside breakdown support?",
-    answer: "Yes, we support local puncture, starting, and towing emergency requests within a 5km radius of Koregaon Park, Pune. Toggle the 'Emergency Repair Request' button in the form to flag your ticket instantly!"
+    answer: "Yes, we support local puncture, starting, and towing emergency requests within Dapodi, Pimpri Chinchwad, and Pune. Toggle the 'Emergency Repair Request' button in the form to flag your ticket instantly!"
   }
 ];
 

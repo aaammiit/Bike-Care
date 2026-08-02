@@ -277,7 +277,7 @@ export const WebsiteInitialLoader: React.FC<WebsiteInitialLoaderProps> = ({ onLo
             <span>•</span>
             <span className="flex items-center space-x-1.5">
               <CheckCircle2 className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-emerald-400" />
-              <span>Mob: 9766881194</span>
+              <span>Mob: 92724 96996</span>
             </span>
           </div>
         </div>
@@ -286,7 +286,7 @@ export const WebsiteInitialLoader: React.FC<WebsiteInitialLoaderProps> = ({ onLo
 
       {/* Bottom Footer info */}
       <div className="p-4 text-center text-[10px] sm:text-xs text-slate-400 font-mono tracking-widest relative z-10 border-t border-slate-900 bg-slate-950/80 backdrop-blur-md">
-        RANA AUTO GARAGE • PUNE • TWO-WHEELER REPAIR & SPARES
+        RANA AUTO GARAGE • DAPODI, PIMPRI CHINCHWAD, PUNE 411012 • TWO-WHEELER REPAIR & SPARES
       </div>
     </motion.div>
   );

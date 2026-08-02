@@ -86,7 +86,7 @@ export const UsersModal: React.FC<UsersModalProps> = ({ isOpen, onClose }) => {
     photo: mechanicProfile?.photo || mechanicData.photo,
     roleTitle: mechanicProfile?.roleTitle || "Master Mechanic & Workshop Owner",
     availableTime: mechanicProfile?.availableTime || mechanicData.availableTime,
-    address: mechanicProfile?.address || "Lane 7, Koregaon Park, Pune, MH - 411001",
+    address: mechanicProfile?.address || "Rana Auto garage, Dapodi, Pimpri Chinchwad, Pune, Maharashtra 411012",
     bio: mechanicProfile?.bio || "Expert motorcycle engineer specializing in Royal Enfield, KTM, Yamaha, and vintage restoration.",
     skills: mechanicProfile?.skills || mechanicData.skills,
     languages: mechanicProfile?.languages || mechanicData.languages,
@@ -117,7 +117,7 @@ export const UsersModal: React.FC<UsersModalProps> = ({ isOpen, onClose }) => {
         photo: mechanicProfile.photo || mechanicData.photo,
         roleTitle: mechanicProfile.roleTitle || "Founder & Master Mechanic",
         availableTime: mechanicProfile.availableTime || mechanicData.availableTime,
-        address: mechanicProfile.address || "Lane 7, Koregaon Park, Pune, MH - 411001",
+        address: mechanicProfile.address || "Rana Auto garage, Dapodi, Pimpri Chinchwad, Pune, Maharashtra 411012",
         bio: mechanicProfile.bio || "Rana personally diagnoses, tunes, and rebuilds every machine that enters the garage.",
         skills: mechanicProfile.skills || mechanicData.skills,
         languages: mechanicProfile.languages || mechanicData.languages,
@@ -182,7 +182,7 @@ export const UsersModal: React.FC<UsersModalProps> = ({ isOpen, onClose }) => {
       photo: mechanicData.photo,
       roleTitle: "Founder & Master Mechanic",
       availableTime: mechanicData.availableTime,
-      address: "Lane 7, Koregaon Park, Pune, MH - 411001",
+      address: "Rana Auto garage, Dapodi, Pimpri Chinchwad, Pune, Maharashtra 411012",
       bio: "Rana personally diagnoses, tunes, and rebuilds every machine that enters the garage. From single-cylinder commuter bikes to high-performance multi-cylinder superbikes, he handles every machine with mathematical precision.",
       skills: mechanicData.skills,
       languages: mechanicData.languages,
@@ -615,7 +615,7 @@ export const UsersModal: React.FC<UsersModalProps> = ({ isOpen, onClose }) => {
                             value={formData.phone}
                             onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                             className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-white focus:border-orange-500 outline-none font-mono font-bold"
-                            placeholder="+91 97678 24216"
+                            placeholder="+91 92724 96996"
                           />
                         </div>
 
@@ -676,7 +676,7 @@ export const UsersModal: React.FC<UsersModalProps> = ({ isOpen, onClose }) => {
                             value={formData.availableTime}
                             onChange={(e) => setFormData({ ...formData, availableTime: e.target.value })}
                             className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-white focus:border-orange-500 outline-none font-medium"
-                            placeholder="9:00 AM - 8:00 PM (Mon - Sat)"
+                            placeholder="10:00 AM - 9:00 PM (Mon - Sat)"
                           />
                         </div>
 
@@ -690,7 +690,7 @@ export const UsersModal: React.FC<UsersModalProps> = ({ isOpen, onClose }) => {
                             value={formData.address}
                             onChange={(e) => setFormData({ ...formData, address: e.target.value })}
                             className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-white focus:border-orange-500 outline-none font-medium"
-                            placeholder="Lane 7, Koregaon Park, Pune, MH - 411001"
+                            placeholder="Rana Auto garage, Dapodi, Pimpri Chinchwad, Pune, Maharashtra 411012"
                           />
                         </div>
                       </div>
@@ -703,7 +703,7 @@ export const UsersModal: React.FC<UsersModalProps> = ({ isOpen, onClose }) => {
                           style={{ border: 0, filter: "grayscale(20%) contrast(1.1)" }}
                           loading="lazy"
                           allowFullScreen
-                          src={`https://maps.google.com/maps?q=${encodeURIComponent(formData.address || "Koregaon Park Pune")}&t=&z=14&ie=UTF8&iwloc=&output=embed`}
+                          src={`https://maps.google.com/maps?q=${encodeURIComponent(formData.address || "Rana Auto Garage Dapodi Pimpri Chinchwad Pune")}&t=&z=14&ie=UTF8&iwloc=&output=embed`}
                         />
                       </div>
                     </div>

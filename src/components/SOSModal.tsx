@@ -23,8 +23,8 @@ interface SOSModalProps {
   onClose: () => void;
 }
 
-const MECHANIC_PHONE = "+91 97678 24216";
-const MECHANIC_RAW_PHONE = "+919767824216";
+const MECHANIC_PHONE = "+91 92724 96996";
+const MECHANIC_RAW_PHONE = "+919272496996";
 
 export const SOSModal: React.FC<SOSModalProps> = ({ isOpen, onClose }) => {
   const { addUserRequest } = useApp();
@@ -90,8 +90,8 @@ export const SOSModal: React.FC<SOSModalProps> = ({ isOpen, onClose }) => {
       mapsUrl = `https://maps.google.com/?q=${gpsCoords.lat.toFixed(6)},${gpsCoords.lon.toFixed(6)}`;
       locationText = `Lat ${gpsCoords.lat.toFixed(5)}, Lon ${gpsCoords.lon.toFixed(5)}`;
     } else {
-      mapsUrl = generateGoogleMapsUrl(manualLocation || "Koregaon Park, Pune");
-      locationText = manualLocation || "Pune Breakdown Area";
+      mapsUrl = generateGoogleMapsUrl(manualLocation || "Dapodi, Pimpri Chinchwad, Pune");
+      locationText = manualLocation || "Dapodi, Pimpri Chinchwad Breakdown Area";
     }
 
     if (manualLocation.trim()) {
@@ -107,12 +107,12 @@ export const SOSModal: React.FC<SOSModalProps> = ({ isOpen, onClose }) => {
 🗺️ Map: ${mapsUrl}
 📝 Issue: ${issueText}
 ----------------------------------------
-⚠️ URGENT RESCUE - RANA GARAGE PUNE (+91 97678 24216)`;
+⚠️ URGENT RESCUE - RANA GARAGE PUNE (+91 92724 96996)`;
 
     return {
       fullMessage,
-      waUrl: `https://wa.me/919767824216?text=${encodeURIComponent(fullMessage)}`,
-      smsUrl: `sms:+919767824216?body=${encodeURIComponent(fullMessage)}`
+      waUrl: `https://wa.me/919272496996?text=${encodeURIComponent(fullMessage)}`,
+      smsUrl: `sms:+919272496996?body=${encodeURIComponent(fullMessage)}`
     };
   };
 
@@ -122,7 +122,7 @@ export const SOSModal: React.FC<SOSModalProps> = ({ isOpen, onClose }) => {
     if (addUserRequest) {
       addUserRequest({
         name: customerName.trim() || "Roadside Rider",
-        phone: customerPhone.trim() || "9767824216",
+        phone: customerPhone.trim() || "9272496996",
         bikeModel: "Breakdown Motorcycle",
         serviceCategory: "Emergency SOS Breakdown",
         description: issueNote.trim() || "Immediate roadside breakdown rescue required",
@@ -242,7 +242,7 @@ export const SOSModal: React.FC<SOSModalProps> = ({ isOpen, onClose }) => {
                 <input
                   type="tel"
                   required
-                  placeholder="e.g. 9767824216"
+                  placeholder="e.g. 9272496996"
                   value={customerPhone}
                   onChange={(e) => setCustomerPhone(e.target.value)}
                   className={`w-full bg-slate-800 border rounded-xl px-4 py-3 text-xs text-white placeholder-slate-400 outline-none transition font-mono font-medium ${
@@ -273,7 +273,7 @@ export const SOSModal: React.FC<SOSModalProps> = ({ isOpen, onClose }) => {
                 <input
                   type="text"
                   required={!gpsCoords}
-                  placeholder="e.g. Koregaon Park Lane 7 / Petrol Pump"
+                  placeholder="e.g. Dapodi, Pimpri Chinchwad, Pune"
                   value={manualLocation}
                   onChange={(e) => setManualLocation(e.target.value)}
                   className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-xs text-white placeholder-slate-400 focus:border-rose-500 focus:bg-slate-800/90 focus:ring-1 focus:ring-rose-500 outline-none transition font-medium"

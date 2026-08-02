@@ -592,7 +592,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onViewInvoice })
                         rows={3}
                         value={rejectionReason}
                         onChange={e => setRejectionReason(e.target.value)}
-                        placeholder="e.g. Workshop schedule full for requested time slot. Please contact us at +91 97678 24216."
+                        placeholder="e.g. Workshop schedule full for requested time slot. Please contact us at +91 92724 96996."
                         className="w-full bg-slate-50 dark:bg-slate-950/50 border border-slate-200 dark:border-slate-800 rounded-xl p-3 text-xs focus:ring-1 focus:ring-red-500 outline-none"
                       />
                     </div>

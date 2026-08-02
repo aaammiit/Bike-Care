@@ -55,17 +55,17 @@ const MainAppContent: React.FC = () => {
         </motion.button>
 
         <motion.a
-          href="tel:+919767824216"
+          href="tel:+919272496996"
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           className="flex items-center space-x-2 bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold px-3.5 py-2.5 rounded-full shadow-xl border border-slate-700/80 tracking-wide"
         >
           <Phone className="h-4 w-4 text-emerald-400 animate-pulse" />
-          <span className="hidden xs:inline">+91 97678 24216</span>
+          <span className="hidden xs:inline">+91 92724 96996</span>
         </motion.a>
 
         <motion.a
-          href="https://wa.me/919767824216?text=Hello%20Rana%20Singh%20(Rana%20Garage),%20I%20have%20an%20inquiry%20regarding%20motorcycle%20repair%20and%20service."
+          href="https://wa.me/919272496996?text=Hello%20Rana%20Singh%20(Rana%20Garage),%20I%20have%20an%20inquiry%20regarding%20motorcycle%20repair%20and%20service."
           target="_blank"
           rel="noreferrer"
           whileHover={{ scale: 1.05 }}
