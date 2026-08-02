@@ -1,9 +1,8 @@
-const CACHE_NAME = 'rana-bike-care-cache-v1';
+const CACHE_NAME = 'rana-bike-care-cache-v2';
 const PRECACHE_ASSETS = [
   '/',
   '/index.html',
-  '/manifest.json',
-  '/src/main.tsx'
+  '/manifest.json'
 ];
 
 // Install Event - Pre-cache core app shell
@@ -18,7 +17,7 @@ self.addEventListener('install', (event) => {
   );
 });
 
-// Activate Event - Clean up old cache storage
+// Activate Event - Clean up old cache storage immediately
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((cacheNames) => {
@@ -34,40 +33,52 @@ self.addEventListener('activate', (event) => {
   );
 });
 
-// Fetch Event - Smart offline caching strategy
+// Fetch Event - Smart Network-First strategy to ensure codebase updates reflect immediately
 self.addEventListener('fetch', (event) => {
   const req = event.request;
 
-  // Ignore non-GET requests or chrome extension schemes
+  // Ignore non-GET requests, non-http, or chrome extension requests
   if (req.method !== 'GET' || !req.url.startsWith('http')) {
     return;
   }
 
-  // Strategy 1: HTML / Navigation Requests -> Network First, fallback to Cache
-  if (req.mode === 'navigate' || (req.headers.get('accept') && req.headers.get('accept').includes('text/html'))) {
+  // Network-First Strategy for Code, HTML, JS, CSS, and API/JSON requests
+  // This guarantees that any changes to your code base are fetched immediately from network
+  const url = new URL(req.url);
+  const isCodeOrDoc = 
+    req.mode === 'navigate' ||
+    req.headers.get('accept')?.includes('text/html') ||
+    url.pathname.endsWith('.js') ||
+    url.pathname.endsWith('.ts') ||
+    url.pathname.endsWith('.tsx') ||
+    url.pathname.endsWith('.css') ||
+    url.pathname.endsWith('.json') ||
+    url.pathname.includes('/src/') ||
+    url.pathname.includes('@vite') ||
+    url.pathname.includes('@id');
+
+  if (isCodeOrDoc) {
     event.respondWith(
       fetch(req)
-        .then((response) => {
-          if (response && response.status === 200) {
-            const responseClone = response.clone();
+        .then((networkResponse) => {
+          if (networkResponse && networkResponse.status === 200) {
+            const responseClone = networkResponse.clone();
             caches.open(CACHE_NAME).then((cache) => cache.put(req, responseClone));
           }
-          return response;
+          return networkResponse;
         })
         .catch(async () => {
-          console.log('[SW] Network unreachable, serving cached HTML:', req.url);
+          console.log('[SW] Network offline, falling back to cached code:', req.url);
           const cachedResponse = await caches.match(req);
           if (cachedResponse) return cachedResponse;
           const rootCached = await caches.match('/index.html');
-          if (rootCached) return rootCached;
-          const fallbackCached = await caches.match('/');
-          return fallbackCached || Response.error();
+          return rootCached || caches.match('/') || Response.error();
         })
     );
     return;
   }
 
-  // Strategy 2: Assets (JS, CSS, Images, Fonts) -> Stale-While-Revalidate / Cache First
+  // Stale-While-Revalidate / Cache-First for static media assets (images, fonts, sounds)
   event.respondWith(
     caches.match(req).then((cachedResponse) => {
       const fetchPromise = fetch(req)
@@ -79,10 +90,9 @@ self.addEventListener('fetch', (event) => {
           return networkResponse;
         })
         .catch(() => {
-          console.log('[SW] Asset fetch failed, using cache if available for:', req.url);
+          console.log('[SW] Asset fetch failed, using cache for:', req.url);
         });
 
-      // Return cached version immediately if available, otherwise wait for network fetch
       return cachedResponse || fetchPromise;
     })
   );
