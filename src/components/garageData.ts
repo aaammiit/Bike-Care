@@ -6,8 +6,7 @@ import chainClutchImg from "../assets/images/chain_clutch_service_1785392059464.
 import tyrePunctureImg from "../assets/images/tyre_puncture_service_1785392071114.jpg";
 import bikeWashImg from "../assets/images/bike_wash_polish_1785392083459.jpg";
 import generalInspectionImg from "../assets/images/general_bike_inspection_1785392095824.jpg";
-import ranaMechanicImg from "../assets/images/rana_singh_mechanic_1785394023899.png";
-
+import ranaMechanicImg from "../assets/images/rana_singh_mechanic_1785394023899.jpg";
 
 // Direct image URLs for high performance and reliable builds
 const workshopLiftImg = regularServiceImg;
