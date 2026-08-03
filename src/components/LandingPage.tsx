@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import ranaLogo from "../assets/images/rana_bike_cares_logo_1784714930624.jpg";
-import ranaMechanicImg from "../assets/images/rana_singh_mechanic_1785394023899.png";
+import ranaMechanicImg from "../assets/images/rana_singh_profile_1785657869563.jpg";
 import journeyStep1Img from "../assets/images/journey_step_entry_handover_1785392370485.jpg";
 import journeyStep2Img from "../assets/images/journey_step_diagnosis_check_1785392385570.jpg";
 import journeyStep3Img from "../assets/images/journey_step_repair_work_1785392399728.jpg";
@@ -1386,17 +1386,18 @@ _Please confirm my slot on your dashboard, Master Rana. Thank you!_`;
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/20 to-transparent" />
                   
-                  {/* Floating Trust Badge on Image */}
-                  <div className="absolute top-4 left-4 bg-slate-900/90 backdrop-blur-md text-amber-400 border border-amber-500/40 px-3.5 py-1.5 rounded-full text-[11px] font-mono font-bold flex items-center space-x-1.5 shadow-lg">
-                    <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
-                    <span>4.9 Rated by Local Riders</span>
-                  </div>
-
-                  {/* Photo Caption Overlay */}
-                  <div className="absolute bottom-5 left-5 right-5 text-left text-white">
-                    <span className="text-[11px] font-mono font-bold text-orange-400 tracking-widest uppercase block mb-1">
-                      LOCAL NEIGHBORHOOD GARAGE
-                    </span>
+                  {/* Photo Caption Overlay with Rating Badge aligned at bottom to keep top signboard contact phone number clear */}
+                  <div className="absolute bottom-5 left-5 right-5 text-left text-white space-y-1">
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="text-[11px] font-mono font-bold text-orange-400 tracking-widest uppercase block">
+                        LOCAL NEIGHBORHOOD GARAGE
+                      </span>
+                      {/* Trust Badge placed at bottom overlay so top contact details on image are unobscured */}
+                      <div className="bg-slate-900/90 backdrop-blur-md text-amber-400 border border-amber-500/40 px-2.5 py-1 rounded-full text-[11px] font-mono font-bold flex items-center space-x-1.5 shadow-lg shrink-0">
+                        <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
+                        <span>4.9 Rated</span>
+                      </div>
+                    </div>
                     <h3 className="text-2xl font-black tracking-tight drop-shadow-md">Rana Singh</h3>
                     <p className="text-xs text-slate-200 font-medium mt-0.5">Owner & Motorcycle Mechanic • Pune</p>
                   </div>
@@ -1409,7 +1410,7 @@ _Please confirm my slot on your dashboard, Master Rana. Thank you!_`;
                     <span>100% Personal Attention to Every Bike</span>
                   </div>
                   <span className="text-[10px] font-mono font-bold text-[#F97316] uppercase bg-white dark:bg-slate-800 px-2.5 py-1 rounded-full border border-orange-200 dark:border-orange-800 shrink-0">
-                    Family Owned
+                    4.9 ★ Rated by Local Riders
                   </span>
                 </div>
               </motion.div>
