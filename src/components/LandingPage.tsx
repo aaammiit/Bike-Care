@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import ranaLogo from "../assets/images/rana_bike_cares_logo_1784714930624.jpg";
-import ranaMechanicImg from "../assets/images/rana_singh_mechanic_1785394023899.jpg";
+import ranaMechanicImg from "../assets/images/rana_singh_mechanic_1785394023899.png";
 import journeyStep1Img from "../assets/images/journey_step_entry_handover_1785392370485.jpg";
 import journeyStep2Img from "../assets/images/journey_step_diagnosis_check_1785392385570.jpg";
 import journeyStep3Img from "../assets/images/journey_step_repair_work_1785392399728.jpg";
