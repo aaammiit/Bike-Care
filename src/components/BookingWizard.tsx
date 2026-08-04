@@ -166,7 +166,7 @@ export const BookingWizard: React.FC<BookingWizardProps> = ({
 📍 *Location:* ${locText || "Pune Workshop Visit"}
 📅 *Preferred Date:* ${bookingDate}
 ----------------------------------------
-📍 *Rana Garage:* Dapodi, Pimpri Chinchwad, Pune - 411012
+📍 *Rana Garage:* Ganesh Nagar, Dapodi, Opp. Shitladevi Chowk, Pimpri Chinchwad, Pune - 411012
 📞 *Helpline:* +91 92724 96996`;
 
     const encoded = encodeURIComponent(message);

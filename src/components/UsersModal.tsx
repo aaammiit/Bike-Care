@@ -5,6 +5,7 @@ import {
   ShieldCheck, 
   Lock, 
   UserCheck, 
+  User,
   Phone, 
   Wrench, 
   Award, 
@@ -86,7 +87,7 @@ export const UsersModal: React.FC<UsersModalProps> = ({ isOpen, onClose }) => {
     photo: mechanicProfile?.photo || mechanicData.photo,
     roleTitle: mechanicProfile?.roleTitle || "Master Mechanic & Workshop Owner",
     availableTime: mechanicProfile?.availableTime || mechanicData.availableTime,
-    address: mechanicProfile?.address || "Rana Auto garage, Dapodi, Pimpri Chinchwad, Pune, Maharashtra 411012",
+    address: mechanicProfile?.address || "Rana Auto Garage, Ganesh Nagar, Dapodi, Opposite Shitladevi Chowk Pimpri Chinchwad, Pune, Maharashtra 411012",
     bio: mechanicProfile?.bio || "Expert motorcycle engineer specializing in Royal Enfield, KTM, Yamaha, and vintage restoration.",
     skills: mechanicProfile?.skills || mechanicData.skills,
     languages: mechanicProfile?.languages || mechanicData.languages,
@@ -117,7 +118,7 @@ export const UsersModal: React.FC<UsersModalProps> = ({ isOpen, onClose }) => {
         photo: mechanicProfile.photo || mechanicData.photo,
         roleTitle: mechanicProfile.roleTitle || "Founder & Master Mechanic",
         availableTime: mechanicProfile.availableTime || mechanicData.availableTime,
-        address: mechanicProfile.address || "Rana Auto garage, Dapodi, Pimpri Chinchwad, Pune, Maharashtra 411012",
+        address: mechanicProfile.address || "Rana Auto Garage, Ganesh Nagar, Dapodi, Opposite Shitladevi Chowk Pimpri Chinchwad, Pune, Maharashtra 411012",
         bio: mechanicProfile.bio || "Rana personally diagnoses, tunes, and rebuilds every machine that enters the garage.",
         skills: mechanicProfile.skills || mechanicData.skills,
         languages: mechanicProfile.languages || mechanicData.languages,
@@ -182,7 +183,7 @@ export const UsersModal: React.FC<UsersModalProps> = ({ isOpen, onClose }) => {
       photo: mechanicData.photo,
       roleTitle: "Founder & Master Mechanic",
       availableTime: mechanicData.availableTime,
-      address: "Rana Auto garage, Dapodi, Pimpri Chinchwad, Pune, Maharashtra 411012",
+      address: "Rana Auto Garage, Ganesh Nagar, Dapodi, Opposite Shitladevi Chowk Pimpri Chinchwad, Pune, Maharashtra 411012",
       bio: "Rana personally diagnoses, tunes, and rebuilds every machine that enters the garage. From single-cylinder commuter bikes to high-performance multi-cylinder superbikes, he handles every machine with mathematical precision.",
       skills: mechanicData.skills,
       languages: mechanicData.languages,
@@ -690,7 +691,7 @@ export const UsersModal: React.FC<UsersModalProps> = ({ isOpen, onClose }) => {
                             value={formData.address}
                             onChange={(e) => setFormData({ ...formData, address: e.target.value })}
                             className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-white focus:border-orange-500 outline-none font-medium"
-                            placeholder="Rana Auto garage, Dapodi, Pimpri Chinchwad, Pune, Maharashtra 411012"
+                            placeholder="Rana Auto Garage, Ganesh Nagar, Dapodi, Opposite Shitladevi Chowk Pimpri Chinchwad, Pune, Maharashtra 411012"
                           />
                         </div>
                       </div>
@@ -997,12 +998,18 @@ export const UsersModal: React.FC<UsersModalProps> = ({ isOpen, onClose }) => {
                           >
                             <div className="flex items-start justify-between gap-2 border-b border-slate-700/60 pb-2">
                               <div className="flex items-center space-x-3">
-                                <img 
-                                  src={rev.photo} 
-                                  alt={rev.name}
-                                  referrerPolicy="no-referrer"
-                                  className="w-10 h-10 rounded-full border border-slate-600 object-cover bg-slate-900"
-                                />
+                                {rev.photo && !rev.photo.includes("unsplash.com") ? (
+                                  <img 
+                                    src={rev.photo} 
+                                    alt={rev.name}
+                                    referrerPolicy="no-referrer"
+                                    className="w-10 h-10 rounded-full border border-slate-600 object-cover bg-slate-900"
+                                  />
+                                ) : (
+                                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-orange-500/20 to-slate-800 border border-orange-500/30 flex items-center justify-center text-orange-400 font-bold shrink-0">
+                                    <User className="h-5 w-5" />
+                                  </div>
+                                )}
                                 <div>
                                   <h5 className="text-sm font-bold text-white">{rev.name}</h5>
                                   <p className="text-[11px] text-amber-400 font-mono">{rev.bike}</p>

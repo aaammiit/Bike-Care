@@ -1996,14 +1996,24 @@ _Please confirm my slot on your dashboard, Master Rana. Thank you!_`;
 
                     <div className="flex items-center justify-between gap-4 pt-4 border-t border-slate-200 dark:border-slate-800/60">
                       <div className="flex items-center space-x-3.5">
-                        <SafeImage 
-                          src={displayReviews[activeReviewIdx % displayReviews.length]?.photo} 
-                          alt={displayReviews[activeReviewIdx % displayReviews.length]?.name} 
-                          fallbackSrc="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80"
-                          iconFallback={<User className="h-6 w-6 text-slate-400" />}
-                          className="w-12 h-12 rounded-full border border-slate-200 dark:border-slate-800 object-cover"
-                          containerClassName="w-12 h-12 rounded-full min-h-0 p-0"
-                        />
+                        {displayReviews[activeReviewIdx % displayReviews.length]?.photo && !displayReviews[activeReviewIdx % displayReviews.length]?.photo.includes("unsplash.com") ? (
+                          <SafeImage 
+                            src={displayReviews[activeReviewIdx % displayReviews.length]?.photo} 
+                            alt={displayReviews[activeReviewIdx % displayReviews.length]?.name} 
+                            fallbackSrc=""
+                            iconFallback={
+                              <div className="w-12 h-12 rounded-full bg-orange-500/10 border border-orange-500/30 flex items-center justify-center text-[#F97316]">
+                                <User className="h-6 w-6" />
+                              </div>
+                            }
+                            className="w-12 h-12 rounded-full border border-slate-200 dark:border-slate-800 object-cover"
+                            containerClassName="w-12 h-12 rounded-full min-h-0 p-0"
+                          />
+                        ) : (
+                          <div className="w-12 h-12 rounded-full bg-gradient-to-br from-orange-500/20 to-slate-800 border border-orange-500/30 flex items-center justify-center text-[#F97316] font-bold shadow-sm shrink-0">
+                            <User className="h-6 w-6 text-[#F97316]" />
+                          </div>
+                        )}
                         <div className="text-left">
                           <h4 className="text-sm font-bold text-slate-900 dark:text-white">{displayReviews[activeReviewIdx % displayReviews.length]?.name}</h4>
                           <p className="text-[11px] text-[#F97316] font-mono">{displayReviews[activeReviewIdx % displayReviews.length]?.bike}</p>
@@ -2140,7 +2150,7 @@ _Please confirm my slot on your dashboard, Master Rana. Thank you!_`;
                   <div>
                     <h4 className="text-xs font-bold text-slate-900 dark:text-white font-mono uppercase tracking-wide">Physical Address</h4>
                     <p className="text-xs text-slate-600 dark:text-slate-400 mt-1 leading-relaxed">
-                      {activeMechanic.address || "Rana Auto Garage, Dapodi, Pimpri Chinchwad, Pune, Maharashtra 411012"}
+                      {activeMechanic.address || "Rana Auto Garage, Ganesh Nagar, Dapodi, Opposite Shitladevi Chowk Pimpri Chinchwad, Pune, Maharashtra 411012"}
                     </p>
                   </div>
                 </div>
@@ -2292,8 +2302,8 @@ _Please confirm my slot on your dashboard, Master Rana. Thank you!_`;
               <h4 className="text-xs font-bold text-slate-800 dark:text-white font-mono uppercase tracking-wider">Contact Station</h4>
               <p className="text-xs leading-relaxed text-slate-500">
                 Rana Auto Garage <br />
-                Dapodi, Pimpri Chinchwad, Pune <br />
-                Maharashtra 411012 <br />
+                Ganesh Nagar, Dapodi, Opp. Shitladevi Chowk <br />
+                Pimpri Chinchwad, Pune, MH 411012 <br />
                 Phone & WhatsApp: +91 92724 96996
               </p>
             </div>

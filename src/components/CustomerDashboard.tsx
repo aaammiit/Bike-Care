@@ -991,8 +991,8 @@ Hello Rana Garage, I need emergency towing assistance for my ${bikeName}.
 
               <div className="p-4 bg-slate-100 border border-slate-200 rounded-2xl flex items-center justify-between">
                 <div>
-                  <span className="font-bold text-slate-900 block text-xs">Rana Auto Garage, Dapodi</span>
-                  <span className="text-[10px] text-slate-500 font-mono block mt-0.5">PIMPRI CHINCHWAD, PUNE 411012</span>
+                  <span className="font-bold text-slate-900 block text-xs">Rana Auto Garage</span>
+                  <span className="text-[10px] text-slate-500 font-mono block mt-0.5">Ganesh Nagar, Dapodi, Opp. Shitladevi Chowk, Pimpri Chinchwad, Pune 411012</span>
                 </div>
                 
                 <a

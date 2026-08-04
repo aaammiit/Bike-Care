@@ -407,7 +407,7 @@ const INITIAL_MECHANIC_PROFILE: MechanicProfile = {
   photo: mechanicData.photo,
   roleTitle: "Owner & Motorcycle Mechanic",
   availableTime: mechanicData.availableTime,
-  address: "Rana Auto garage, Dapodi, Pimpri Chinchwad, Pune, Maharashtra 411012",
+  address: "Rana Auto Garage, Ganesh Nagar, Dapodi, Opposite Shitladevi Chowk Pimpri Chinchwad, Pune, Maharashtra 411012",
   bio: "With over 15 years of hands-on experience, Rana Singh has been repairing motorcycles for riders across the local community.\n\nFrom regular servicing and oil changes to engine repairs and electrical work, every motorcycle is inspected and repaired personally.\n\nRana believes in honest advice, transparent pricing, quality workmanship, and treating every customer's bike like his own.",
   skills: mechanicData.skills,
   languages: mechanicData.languages,
@@ -434,7 +434,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         return {
           ...parsed,
           phone: "+91 92724 96996",
-          address: "Rana Auto garage, Dapodi, Pimpri Chinchwad, Pune, Maharashtra 411012",
+          address: "Rana Auto Garage, Ganesh Nagar, Dapodi, Opposite Shitladevi Chowk Pimpri Chinchwad, Pune, Maharashtra 411012",
           availableTime: "Monday – Saturday: 10:00 AM – 9:00 PM"
         };
       } catch (e) {
@@ -673,7 +673,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       ...reviewData,
       id: "rev_" + Math.random().toString(36).substring(2, 9),
       date: new Date().toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" }),
-      photo: reviewData.photo || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&h=150&q=80"
+      photo: reviewData.photo || ""
     };
     setCustomerReviews(prev => [newRev, ...prev]);
     return newRev;

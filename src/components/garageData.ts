@@ -87,7 +87,7 @@ export const mechanicData: MechanicInfo = {
   age: 40,
   experience: "15+ Years",
   phone: "+91 92724 96996",
-  address: "Rana Auto garage, Dapodi, Pimpri Chinchwad, Pune, Maharashtra 411012",
+  address: "Rana Auto Garage, Ganesh Nagar, Dapodi, Opposite Shitladevi Chowk Pimpri Chinchwad, Pune, Maharashtra 411012",
   bio: "With over 15 years of hands-on experience, Rana Singh has been repairing motorcycles for riders across the local community.\n\nFrom regular servicing and oil changes to engine repairs and electrical work, every motorcycle is inspected and repaired personally.\n\nRana believes in honest advice, transparent pricing, quality workmanship, and treating every customer's bike like his own.",
   skills: [
     "Regular Servicing",

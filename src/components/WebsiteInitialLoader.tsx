@@ -286,7 +286,7 @@ export const WebsiteInitialLoader: React.FC<WebsiteInitialLoaderProps> = ({ onLo
 
       {/* Bottom Footer info */}
       <div className="p-4 text-center text-[10px] sm:text-xs text-slate-400 font-mono tracking-widest relative z-10 border-t border-slate-900 bg-slate-950/80 backdrop-blur-md">
-        RANA AUTO GARAGE • DAPODI, PIMPRI CHINCHWAD, PUNE 411012 • TWO-WHEELER REPAIR & SPARES
+        RANA AUTO GARAGE • GANESH NAGAR, DAPODI, OPP. SHITLADEVI CHOWK, PIMPRI CHINCHWAD, PUNE 411012 • TWO-WHEELER REPAIR & SPARES
       </div>
     </motion.div>
   );

@@ -89,7 +89,7 @@ export const InvoicePrintModal: React.FC<InvoicePrintModalProps> = ({ isOpen, on
                       </div>
                       <span className="font-display font-bold text-lg text-slate-900 tracking-tight">Rana Garage</span>
                     </div>
-                    <p className="text-[10px] text-slate-500 font-mono">Dapodi, Pimpri Chinchwad Branch, Pune 411012</p>
+                    <p className="text-[10px] text-slate-500 font-mono">Ganesh Nagar, Dapodi, Opp. Shitladevi Chowk, Pimpri Chinchwad, Pune 411012</p>
                     <p className="text-[10px] text-slate-400">Tel: +91 92724 96996 • GSTIN: 27AAAAA1111A1Z1</p>
                   </div>
 
